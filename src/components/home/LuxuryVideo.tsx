@@ -17,7 +17,7 @@ export default function LuxuryVideo() {
         src="/Vector 7.png"
         alt=""
         aria-hidden="true"
-        className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none opacity-80 rotate-180"
+        className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
       />
 
       {/* Right side vector decoration */}
@@ -25,7 +25,7 @@ export default function LuxuryVideo() {
         src="/Vector 7.png"
         alt=""
         aria-hidden="true"
-        className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none opacity-80 scale-x-[-1] rotate-180"
+        className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180"
       />
 
       {/* Header */}
