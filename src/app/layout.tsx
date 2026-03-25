@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Open_Sans } from "next/font/google"; // 👈 change here
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
 
-const raleway = Raleway({
+const openSans = Open_Sans({
   subsets: ["latin"],
-  variable: "--font-raleway",
-  weight: ["300", "400", "500", "600", "700"], // optional but recommended
+  variable: "--font-open-sans",
+  weight: ["300", "400", "500", "600", "700"], // same weights
 });
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${raleway.variable} antialiased`}>
+      <body className={`${openSans.variable} antialiased`}>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

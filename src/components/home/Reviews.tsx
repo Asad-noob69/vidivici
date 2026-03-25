@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 const reviews = [
   {
     id: 1,
@@ -57,28 +60,13 @@ const reviews = [
     rating: 5,
     text: "Booked the Bentley for my wedding day and it was perfect. The team coordinated everything flawlessly. I cannot imagine that special day without the magic Vidi Vici added to it.",
   },
-  {
-    id: 9,
-    name: "Noah Williams",
-    avatar: "https://i.pravatar.cc/40?img=7",
-    rating: 4,
-    text: "Great selection of exotic cars and honest pricing. I've rented twice now and both times the experience has been top tier. The app makes it incredibly easy to manage your booking.",
-  },
 ];
 
-const col1 = reviews.slice(0, 3);
-const col2 = reviews.slice(3, 6);
-const col3 = reviews.slice(6, 9);
-
-function StarRating({ rating }) {
+function Stars({ rating }) {
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-0.5 mt-1">
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
+        <svg key={i} width="13" height="13" viewBox="0 0 24 24"
           fill={i < rating ? "#FACC15" : "none"}
           stroke={i < rating ? "#FACC15" : "#D1D5DB"}
           strokeWidth="2"
@@ -90,137 +78,120 @@ function StarRating({ rating }) {
   );
 }
 
-function ReviewCard({ review }) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4 w-full">
-      <div className="flex items-center gap-3 mb-3">
-        <img
-          src={review.avatar}
-          alt={review.name}
-          className="w-9 h-9 rounded-full object-cover"
-        />
-        <div>
-          <p className="text-[13px] font-semibold text-gray-900 leading-none mb-1">
-            {review.name}
-          </p>
-          <StarRating rating={review.rating} />
-        </div>
-      </div>
-      <p className="text-[12.5px] text-gray-500 leading-relaxed">{review.text}</p>
-    </div>
-  );
-}
-
-function ScrollColumn({ reviews, duration, tilt }) {
-  const doubled = [...reviews, ...reviews];
-  return (
-    <div
-      className="flex-1 overflow-hidden"
-      style={{ transform: `rotate(${tilt}deg)` }}
-    >
-      <div
-        className="flex flex-col"
-        style={{
-          animation: `scrollUp ${duration}s linear infinite`,
-        }}
-      >
-        {doubled.map((r, i) => (
-          <ReviewCard key={`${r.id}-${i}`} review={r} />
-        ))}
-      </div>
-    </div>
-  );
-}
+const CARD_WIDTH = 300;
+const CARD_GAP = 16;
+const STEP = CARD_WIDTH + CARD_GAP;
 
 export default function Testimonials() {
+  const trackRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
+
+  const updateState = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    setActiveIndex(Math.round(el.scrollLeft / STEP));
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", updateState, { passive: true });
+    return () => el.removeEventListener("scroll", updateState);
+  }, []);
+
+  const scroll = (dir) => {
+    trackRef.current?.scrollBy({ left: dir * STEP * 3, behavior: "smooth" });
+  };
+
+  const scrollToIndex = (i) => {
+    trackRef.current?.scrollTo({ left: i * STEP, behavior: "smooth" });
+  };
+
   return (
-    <section className="relative w-full bg-[#f7f7f8] py-16 px-6 overflow-hidden">
-      <style>{`
-        @keyframes scrollUp {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(-50%); }
-        }
-        .scroll-col:hover > div {
-          animation-play-state: paused;
-        }
-      `}</style>
+    <section className="w-full bg-white py-16 overflow-hidden">
 
       {/* Header */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-10 px-6">
         <h2 className="text-3xl font-black text-gray-900 tracking-tight">
           What Our Customers Are Saying
         </h2>
         <p className="mt-3 text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
-          From first-class service to unforgettable moments, our clients share
-          why Vidi Vici is their choice for luxury in Los Angeles.
+          From first-class service to unforgettable moments, our clients share why Vidi Vici is
+          their choice for luxury in Los Angeles.
         </p>
       </div>
 
-      {/* Columns */}
-      <div className="max-w-5xl mx-auto flex gap-5 h-[580px]">
-        {/* Col 1 — slight tilt left */}
-        <div
-          className="flex-1 overflow-hidden scroll-col"
-          style={{ transform: "rotate(-1.5deg)" }}
-        >
-          <div
-            style={{ animation: "scrollUp 22s linear infinite" }}
-            className="flex flex-col"
+      {/* Carousel wrapper */}
+      <div className="relative">
+        {canLeft && (
+          <button
+            onClick={() => scroll(-1)}
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
           >
-            {[...col1, ...col1].map((r, i) => (
-              <ReviewCard key={`c1-${r.id}-${i}`} review={r} />
-            ))}
-          </div>
-        </div>
+            <ChevronLeft size={16} strokeWidth={2.5} className="text-gray-700" />
+          </button>
+        )}
+        {canRight && (
+          <button
+            onClick={() => scroll(1)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+          >
+            <ChevronRight size={16} strokeWidth={2.5} className="text-gray-700" />
+          </button>
+        )}
 
-        {/* Col 2 — no tilt, slightly faster */}
         <div
-          className="flex-1 overflow-hidden scroll-col"
-          style={{ transform: "rotate(0deg)" }}
+          ref={trackRef}
+          className="flex gap-4 overflow-x-auto px-14 pb-2"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div
-            style={{ animation: "scrollUp 18s linear infinite" }}
-            className="flex flex-col"
-          >
-            {[...col2, ...col2].map((r, i) => (
-              <ReviewCard key={`c2-${r.id}-${i}`} review={r} />
-            ))}
-          </div>
-        </div>
-
-        {/* Col 3 — slight tilt right */}
-        <div
-          className="flex-1 overflow-hidden scroll-col"
-          style={{ transform: "rotate(1.5deg)" }}
-        >
-          <div
-            style={{ animation: "scrollUp 25s linear infinite" }}
-            className="flex flex-col"
-          >
-            {[...col3, ...col3].map((r, i) => (
-              <ReviewCard key={`c3-${r.id}-${i}`} review={r} />
-            ))}
-          </div>
+          {reviews.map((r) => (
+            <div
+              key={r.id}
+              className="flex-shrink-0 bg-white border border-gray-100 rounded-2xl shadow-sm p-5 flex flex-col justify-between"
+              style={{ width: `${CARD_WIDTH}px` }}
+            >
+              <p className="text-[13px] text-gray-500 leading-relaxed">
+                {r.text}
+              </p>
+              <div className="flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+                <img
+                  src={r.avatar}
+                  alt={r.name}
+                  className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                />
+                <div>
+                  <p className="text-[13px] font-semibold text-gray-900 leading-none">
+                    {r.name}
+                  </p>
+                  <Stars rating={r.rating} />
+                </div>
+              </div>
+            </div>
+          ))}
+          <div className="w-8 flex-shrink-0" />
         </div>
       </div>
 
-      {/* Top + Bottom fade masks */}
-      <div
-        className="absolute inset-x-0 pointer-events-none"
-        style={{
-          top: 0,
-          height: "80px",
-          background: "linear-gradient(to bottom, #f7f7f8, transparent)",
-        }}
-      />
-      <div
-        className="absolute inset-x-0 pointer-events-none"
-        style={{
-          bottom: 0,
-          height: "80px",
-          background: "linear-gradient(to top, #f7f7f8, transparent)",
-        }}
-      />
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-6">
+        {reviews.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToIndex(i)}
+            className={`rounded-full transition-all duration-300 ${
+              i === activeIndex
+                ? "w-5 h-2 bg-gray-900"
+                : "w-2 h-2 bg-gray-300 hover:bg-gray-500"
+            }`}
+          />
+        ))}
+      </div>
+
     </section>
   );
 }
