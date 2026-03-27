@@ -32,9 +32,9 @@ export default function WhyChooseUs({ bg = "#f0f0ee" }: { bg?: string }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-32 items-start">
 
         {/* Left: Heading + CTA */}
-        <div className="flex flex-col justify-between h-full gap-8">
+        <div className="flex flex-col h-full gap-8">
           <div>
-            <h2 className="text-4xl font-black text-mist-900 leading-tight tracking-tight">
+            <h2 className="text-4xl font-bold text-mist-900 leading-tight tracking-tight">
               Why Choose Vidi Vici?
             </h2>
             <p className="mt-4 text-sm text-mist-600 leading-relaxed">

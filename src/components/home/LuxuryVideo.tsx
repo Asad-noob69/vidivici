@@ -30,7 +30,7 @@ export default function LuxuryVideo() {
 
       {/* Header */}
       <div className="relative text-center mb-10 max-w-4xl mx-auto">
-        <h2 className="text-4xl font-black text-mist-900">
+        <h2 className="text-4xl font-bold text-mist-900">
           Luxury Is a Lifestyle. <br /> Make It Yours.
         </h2>
         <p className="mt-4 text-sm text-mist-500 leading-relaxed max-w-xl mx-auto">

@@ -71,7 +71,7 @@ export default function Footer() {
                 <Image src="/logo.png" alt="Vidi Vici Logo" width={56} height={56} />
               </div>
               <div>
-                <p className="text-xl font-black tracking-wide">Vidi Vici</p>
+                <p className="text-xl font-bold tracking-wide">Vidi Vici</p>
                 <p className="text-[11px] tracking-[0.25em] text-white/50 uppercase">Rental</p>
               </div>
             </div>

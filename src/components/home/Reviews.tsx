@@ -116,7 +116,7 @@ export default function Testimonials() {
 
       {/* Header */}
       <div className="text-center mb-10 sm:px-16 lg:px-20 px-10">
-        <h2 className="text-3xl font-black text-mist-900 tracking-tight">
+        <h2 className="text-3xl font-bold text-mist-900 tracking-tight">
           What Our Customers Are Saying
         </h2>
         <p className="mt-3 text-sm text-mist-400 max-w-md mx-auto leading-relaxed">

@@ -11,8 +11,16 @@ const inquiryTypes = [
   "General Inquiry",
 ];
 
-export default function Contact() {
-  const [form, setForm] = useState({
+interface ContactFormData {
+  fullName: string;
+  email: string;
+  phone: string;
+  inquiryType: string;
+  message: string;
+}
+
+export default function ContactForm() {
+  const [form, setForm] = useState<ContactFormData>({
     fullName: "",
     email: "",
     phone: "",
@@ -20,79 +28,99 @@ export default function Contact() {
     message: "",
   });
 
-  const handleChange = (e) => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("Message sent! We'll be in touch shortly.");
+    setIsSubmitted(true);
+    // Reset form after 2 seconds
+    setTimeout(() => {
+      setForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        inquiryType: "",
+        message: "",
+      });
+      setIsSubmitted(false);
+    }, 2000);
   };
 
   return (
-    <section className="w-full bg-white py-16 sm:px-16 lg:px-20 px-10">
+    <section className="w-full bg-white py-12 sm:px-16 lg:px-20 px-10">
       <div className="">
-        <div className="border border-gray-200 rounded-3xl overflow-hidden flex flex-col md:flex-row">
+        <div className="border border-gray-200 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm">
+          {/* Left Panel - Contact Info */}
+          <div className="bg-gray-100 p-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden">
+            {/* Decorative background */}
+            <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-400 to-transparent rounded-full blur-3xl"></div>
+            </div>
 
-          {/* Left panel */}
-          <div className="bg-[#f7f7f6] p-8 md:w-[300px] flex-shrink-0 flex flex-col gap-6 relative overflow-hidden">
-            {/* Vector image */}
-            <img
-              src="/Vector 7.png"
-              alt=""
-              aria-hidden="true"
-              className="absolute bottom-0 right-0 h-[89%] w-auto object-contain object-right pointer-events-none select-none"
-            />
-
-            <div>
-              <h3 className="text-[18px] font-black text-mist-900 leading-snug mb-2">
+            {/* Header Text */}
+            <div className="relative z-10">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug mb-3">
                 Have questions or want to book your luxury experience?
               </h3>
-              <p className="text-[13px] text-mist-400 leading-relaxed">
+              <p className="text-sm text-gray-600 leading-relaxed">
                 Our team is here to assist you with cars, villas, and VIP events in Los Angeles
               </p>
             </div>
 
-            <div className="border-t border-gray-200 pt-6 flex flex-col gap-5">
+            {/* Divider */}
+            <div className="border-t border-gray-300"></div>
+
+            {/* Contact Info Items */}
+            <div className="relative z-10 flex flex-col gap-6">
               <ContactInfo
-                icon={<Phone size={15} />}
+                icon={<Phone size={16} />}
                 label="Phone"
                 value="(310) 555-0991"
               />
               <ContactInfo
-                icon={<Mail size={15} />}
+                icon={<Mail size={16} />}
                 label="Email"
                 value="admin@vidivicitrental.com"
               />
               <ContactInfo
-                icon={<MapPin size={15} />}
+                icon={<MapPin size={16} />}
                 label="Address"
-                value={"8687 Melrose Ave, Los Angeles CA\n90069, United States"}
+                value="8687 Melrose Ave, Los Angeles CA 90069, United States"
               />
               <ContactInfo
-                icon={<Clock size={15} />}
+                icon={<Clock size={16} />}
                 label="Working Hours"
                 value="Mon–Sun: 8 AM – 8 PM"
               />
             </div>
           </div>
 
-          {/* Right form */}
-          <div className="flex-1 p-8">
-            <h2 className="text-2xl font-black text-mist-900 mb-6 tracking-tight">
+          {/* Right Panel - Form */}
+          <div className="flex-1 p-8 md:p-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 tracking-tight">
               Get in touch with us
             </h2>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-              {/* Row 1 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+              {/* Full Name & Email Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Field label="Full Name">
                   <input
                     name="fullName"
+                    type="text"
                     value={form.fullName}
                     onChange={handleChange}
                     placeholder="Enter your full name"
-                    className="input-base"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white"
+                    required
                   />
                 </Field>
                 <Field label="Email">
@@ -102,24 +130,27 @@ export default function Contact() {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="input-base"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white"
+                    required
                   />
                 </Field>
               </div>
 
-              {/* Row 2 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Phone & Inquiry Type Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Field label="Phone">
-                  <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:border-gray-400 transition-colors">
-                    <span className="px-3 py-2.5 text-sm border-r border-gray-200 bg-gray-50 flex items-center gap-1.5 text-mist-600">
+                  <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:border-gray-400 transition-colors duration-200 bg-white">
+                    <span className="px-4 py-3 text-lg border-r border-gray-300 bg-gray-50 flex items-center gap-2 text-gray-600 flex-shrink-0">
                       🇺🇸
                     </span>
                     <input
                       name="phone"
+                      type="tel"
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="Enter your phone number"
-                      className="flex-1 px-3 py-2.5 text-[13px] text-mist-900 placeholder-gray-300 outline-none bg-white"
+                      className="flex-1 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none bg-white"
+                      required
                     />
                   </div>
                 </Field>
@@ -128,11 +159,16 @@ export default function Contact() {
                     name="inquiryType"
                     value={form.inquiryType}
                     onChange={handleChange}
-                    className="input-base text-mist-400 appearance-none"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white appearance-none cursor-pointer"
+                    required
                   >
-                    <option value="" disabled>Select your inquiry type</option>
-                    {inquiryTypes.map((t) => (
-                      <option key={t} value={t} className="text-mist-900">{t}</option>
+                    <option value="" disabled>
+                      Select your inquiry type
+                    </option>
+                    {inquiryTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
                     ))}
                   </select>
                 </Field>
@@ -145,60 +181,58 @@ export default function Contact() {
                   value={form.message}
                   onChange={handleChange}
                   placeholder="Write your message here..."
-                  rows={4}
-                  className="input-base resize-none"
+                  rows={5}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white resize-none"
+                  required
                 />
               </Field>
 
-              {/* Submit */}
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gray-900 text-white text-[14px] font-semibold py-3.5 rounded-xl hover:bg-gray-700 transition-colors duration-200 mt-1"
+                className="w-full bg-mist-900 text-white font-semibold py-4 rounded-xl hover:bg-mist-800 transition-colors duration-200 mt-2"
               >
-                Send
+                {isSubmitted ? "Message Sent!" : "Send"}
               </button>
             </form>
           </div>
         </div>
       </div>
-
-      <style>{`
-        .input-base {
-          width: 100%;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 10px 14px;
-          font-size: 13px;
-          color: #111827;
-          background: white;
-          outline: none;
-          transition: border-color 0.15s;
-        }
-        .input-base::placeholder { color: #d1d5db; }
-        .input-base:focus { border-color: #9ca3af; }
-      `}</style>
     </section>
   );
 }
 
-function Field({ label, children }) {
+interface FieldProps {
+  label: string;
+  children: React.ReactNode;
+}
+
+function Field({ label, children }: FieldProps) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-[12px] font-semibold text-mist-700">{label}</label>
+    <div className="flex flex-col gap-2">
+      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
-function ContactInfo({ icon, label, value }) {
+interface ContactInfoProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}
+
+function ContactInfo({ icon, label, value }: ContactInfoProps) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center text-mist-500 flex-shrink-0 mt-0.5">
+    <div className="flex items-start gap-4">
+      <div className="w-8 h-8 rounded-full border border-gray-300 bg-white flex items-center justify-center text-gray-600 flex-shrink-0 mt-0.5">
         {icon}
       </div>
       <div>
-        <p className="text-[12px] font-bold text-mist-900">{label}</p>
-        <p className="text-[12px] text-mist-400 leading-relaxed whitespace-pre-line">{value}</p>
+        <p className="text-sm font-bold text-gray-900">{label}</p>
+        <p className="text-sm text-gray-600 leading-relaxed">{value}</p>
       </div>
     </div>
   );

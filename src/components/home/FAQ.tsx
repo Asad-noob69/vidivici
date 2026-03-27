@@ -40,7 +40,7 @@ export default function FAQ() {
   const [openId, setOpenId] = useState(1);
 
   return (
-    <section className="w-full bg-white py-16 px-24">
+    <section className="w-full bg-white py-16 sm:px-24 lg:px-32 px-16">
       <div className="">
 
         {/* Header */}
@@ -68,7 +68,7 @@ export default function FAQ() {
                   <span
                     className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
                       isOpen
-                        ? "bg-gray-900 text-white"
+                        ? "bg-mist-900 text-white"
                         : "bg-gray-100 text-mist-600 hover:bg-gray-200"
                     }`}
                   >
