@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react"
 import { useState, useEffect, useRef } from "react"
-import Image from "next/image"
 import { Pencil, Camera } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -144,7 +143,8 @@ export default function PersonalInfoPage() {
           <div className="relative">
             <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center">
               {form.image ? (
-                <Image src={form.image} alt="Profile" fill className="object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.image} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-4xl font-bold text-gray-500">{initials}</span>
               )}

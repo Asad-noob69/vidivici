@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LayoutDashboard, Car, FolderOpen, Tag, CalendarDays, FileText, HelpCircle, Star, Mail, Settings, ArrowLeft, Menu } from "lucide-react"
+import { LayoutDashboard, Car, FolderOpen, Tag, CalendarDays, FileText, HelpCircle, Star, Mail, Settings, ArrowLeft, Menu, Users } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const navItems = [
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Brands", href: "/admin/brands", icon: Tag },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarDays },
+  { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Blog Posts", href: "/admin/blog", icon: FileText },
   { label: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { label: "Testimonials", href: "/admin/testimonials", icon: Star },

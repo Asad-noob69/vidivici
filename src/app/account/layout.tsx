@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { User, CalendarDays, Heart, FileText, CreditCard, LogOut, ArrowLeft } from "lucide-react"
 
@@ -18,12 +18,22 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const [profileImage, setProfileImage] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login")
     }
   }, [status, router])
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch("/api/account/profile")
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => { if (data?.image) setProfileImage(data.image) })
+        .catch(() => {})
+    }
+  }, [session])
 
   if (status === "loading") {
     return (
@@ -48,8 +58,13 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               {/* Avatar + Name */}
               <div className="flex flex-col items-center text-center pb-6 border-b border-gray-100">
-                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-2xl font-bold text-gray-500 mb-3">
-                  {initials}
+                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-2xl font-bold text-gray-500 mb-3 overflow-hidden">
+                  {profileImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{initials}</span>
+                  )}
                 </div>
                 <p className="font-semibold text-gray-900 text-lg">{user.name || "User"}</p>
                 <p className="text-sm text-gray-400">{user.name || user.email}</p>
