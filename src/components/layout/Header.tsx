@@ -119,7 +119,7 @@ export default function Header() {
   return (
     <div ref={headerRef}>
       {/* HEADER */}
-      <header className="absolute top-0 z-50 w-full px-4 sm:px-16 font-['Jost',sans-serif]">
+      <header className="absolute top-0 z-50 w-full sm:px-16  lg:px-20 px-10 px-10 font-['Jost',sans-serif]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 gap-4">
 
           {/* LEFT NAV */}
@@ -165,7 +165,7 @@ export default function Header() {
           </nav>
 
           {/* LOGO */}
-          <div className="flex sm:justify-center flex-shrink-0 order-first sm:order-none">
+          <div className="flex justify-center flex-shrink-0">
             <Link href="/">
               <Image src="/Logo.png" alt="Logo" width={40} height={40} />
             </Link>
@@ -205,7 +205,7 @@ export default function Header() {
               Become a Partner
             </button>
 
-            <button className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-transparent hover:text-white">
+            <button className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-gray-50 cursor-pointer transition">
               Reserve Now
             </button>
 
@@ -220,16 +220,28 @@ export default function Header() {
           {/* MOBILE HAMBURGER */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="sm:hidden flex items-center justify-center w-9 h-9"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            className="sm:hidden flex flex-col gap-[5px] w-9 h-9"
           >
-            {mobileOpen ? (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M4 4L16 16M16 4L4 16" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <Image src="/hamburger.png" alt="Menu" width={34} height={34} />
-            )}
+            <span
+              className="block w-[22px] h-[1.5px] bg-white"
+              style={{
+                transform: mobileOpen
+                  ? "rotate(45deg) translate(0,6.5px)"
+                  : "none",
+              }}
+            />
+            <span
+              className="block w-[22px] h-[1.5px] bg-white"
+              style={{ opacity: mobileOpen ? 0 : 1 }}
+            />
+            <span
+              className="block w-[22px] h-[1.5px] bg-white"
+              style={{
+                transform: mobileOpen
+                  ? "rotate(-45deg) translate(0,-6.5px)"
+                  : "none",
+              }}
+            />
           </button>
         </div>
       </header>

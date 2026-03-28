@@ -60,7 +60,7 @@ export default function AdminCarsPage() {
     <div>
       <Toaster position="top-right" />
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Cars</h1>
+        <h1 className="text-2xl font-bold text-mist-900">Manage Cars</h1>
         <Link href="/admin/cars/new" className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">
           + Add New Car
         </Link>
@@ -70,7 +70,7 @@ export default function AdminCarsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left text-xs text-gray-500 border-b border-gray-200">
+              <tr className="text-left text-xs text-mist-500 border-b border-gray-200">
                 <th className="px-6 py-3">Car</th>
                 <th className="px-6 py-3">Brand</th>
                 <th className="px-6 py-3">Category</th>

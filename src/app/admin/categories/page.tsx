@@ -107,14 +107,14 @@ export default function AdminCategoriesPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs text-gray-500 block mb-1">Name</label>
+              <label className="text-xs text-mist-500 block mb-1">Name</label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
+                className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">Description</label>
+              <label className="text-xs text-mist-500 block mb-1">Description</label>
               <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
+                className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
             </div>
           </div>
           <button onClick={handleSubmit} className="mt-4 bg-black text-white px-6 py-2 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">{editingId ? "Update Category" : "Save Category"}</button>

@@ -116,8 +116,8 @@ export default function AdminBrandsPage() {
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">Logo (Upload)</label>
-              <input type="file" accept="image/*" className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white" />
+              <label className="text-xs text-mist-500 block mb-1">Logo (Upload)</label>
+              <input type="file" accept="image/*" className="text-sm text-mist-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white" />
             </div>
             <div className="md:col-span-2">
               <label className="text-xs text-gray-500 block mb-1">Description</label>
