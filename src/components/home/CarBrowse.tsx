@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const carMakes = [
   { name: "Rolls-Royce", logo: "/carlogo1.png" },
@@ -44,6 +45,19 @@ function CarLogo({ car, selected, onClick }) {
       <span className="text-xs text-mist-600">{car.name}</span>
     </button>
   );
+}
+
+function CategoryCard({ category, onClick }: { category: Category; onClick: (slug: string) => void }) {
+    return (
+        <button
+            onClick={() => onClick(category.slug)}
+            className="flex flex-col items-center justify-center gap-3
+        py-8 px-14 my-3 rounded-2xl border shrink-0
+        transition-all duration-200 border-gray-200 bg-white hover:border-gray-400 hover:scale-105"
+        >
+            <span className="text-lg font-semibold text-gray-700">{category.name}</span>
+        </button>
+    );
 }
 
 export default function CarBrowseSection() {

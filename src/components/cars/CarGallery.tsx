@@ -4,7 +4,7 @@ import { useState } from "react"
 import { ImageOff } from "lucide-react"
 
 interface CarGalleryProps {
-  images: { url: string; alt?: string }[]
+  images: { url: string; alt?: string | null }[]
 }
 
 export default function CarGallery({ images }: CarGalleryProps) {
@@ -12,15 +12,15 @@ export default function CarGallery({ images }: CarGalleryProps) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl h-96 flex items-center justify-center">
-        <ImageOff size={48} className="text-mist-700" />
+      <div className="bg-gray-100 rounded-2xl h-96 flex items-center justify-center">
+        <ImageOff size={48} className="text-gray-300" />
       </div>
     )
   }
 
   return (
     <div>
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden h-96 mb-3">
+      <div className="bg-gray-100 rounded-2xl overflow-hidden h-80 sm:h-96 mb-3">
         <img
           src={images[activeIndex].url}
           alt={images[activeIndex].alt || "Car image"}
@@ -33,8 +33,8 @@ export default function CarGallery({ images }: CarGalleryProps) {
             <button
               key={i}
               onClick={() => setActiveIndex(i)}
-              className={`w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${
-                i === activeIndex ? "border-[#dbb241]" : "border-[#2a2a2a]"
+              className={`w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
+                i === activeIndex ? "border-gray-900" : "border-gray-200 hover:border-gray-400"
               }`}
             >
               <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" />

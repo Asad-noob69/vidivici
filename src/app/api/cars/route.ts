@@ -12,17 +12,26 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
 
-    const where: any = { isAvailable: true }
+    const all = searchParams.get('all')
+    const search = searchParams.get('search')
+    const where: any = all === 'true' ? {} : { isAvailable: true }
     if (brand) where.brand = { slug: brand }
     if (category) where.category = { slug: category }
     if (location) where.location = location
     if (minPrice) where.pricePerDay = { ...where.pricePerDay, gte: parseFloat(minPrice) }
     if (maxPrice) where.pricePerDay = { ...where.pricePerDay, lte: parseFloat(maxPrice) }
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { brand: { name: { contains: search, mode: 'insensitive' } } },
+        { category: { name: { contains: search, mode: 'insensitive' } } },
+      ]
+    }
 
     const [cars, total] = await Promise.all([
       prisma.car.findMany({
         where,
-        include: { brand: true, category: true, images: { where: { isPrimary: true }, take: 1 } },
+        include: { brand: true, category: true, images: { orderBy: { isPrimary: 'desc' }, take: 1 } },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -39,14 +48,27 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const slug = body.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+    const { images, ...carData } = body
+    const slug = carData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
 
     const car = await prisma.car.create({
-      data: { ...body, slug },
-      include: { brand: true, category: true },
+      data: {
+        ...carData,
+        slug,
+        ...(images && images.length > 0 && {
+          images: {
+            create: (images as string[]).map((url: string, i: number) => ({
+              url,
+              isPrimary: i === 0,
+            })),
+          },
+        }),
+      },
+      include: { brand: true, category: true, images: true },
     })
     return NextResponse.json(car, { status: 201 })
   } catch (error) {
+    console.error('Failed to create car:', error)
     return NextResponse.json({ error: 'Failed to create car' }, { status: 500 })
   }
 }

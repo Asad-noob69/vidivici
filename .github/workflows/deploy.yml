@@ -1,0 +1,90 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # ── 1. Checkout code ──────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Set up SSH agent with deploy key ───────────────────────────────
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # ── 3. Add server to known hosts (prevents interactive prompt) ────────
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # ── 4. Deploy via SSH ─────────────────────────────────────────────────
+      - name: Deploy
+        run: |
+          ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'DEPLOY'
+            set -e
+            APP_DIR="/var/www/falcon-car-rental"
+            cd "$APP_DIR"
+
+            echo "======================================"
+            echo " [1/6] Pulling latest code from GitHub"
+            echo "======================================"
+            git pull origin main
+
+            echo "======================================"
+            echo " [2/6] Installing dependencies"
+            echo "======================================"
+            npm install --production=false
+
+            echo "======================================"
+            echo " [3/6] Applying database migrations"
+            echo "        (auto-handles new tables/fields)"
+            echo "======================================"
+            npx prisma migrate deploy
+
+            echo "======================================"
+            echo " [4/6] Generating Prisma client"
+            echo "======================================"
+            npx prisma generate
+
+            echo "======================================"
+            echo " [5/6] Building Next.js"
+            echo "======================================"
+            export NODE_OPTIONS="--max-old-space-size=1500"
+            npm run build
+
+            echo "======================================"
+            echo " [6/6] Restarting app (zero downtime)"
+            echo "======================================"
+            pm2 restart falcon-car-rental --update-env
+            pm2 save
+
+            echo ""
+            echo "✅ Deployment complete!"
+            pm2 status
+          DEPLOY
+
+      # ── 5. Health check ───────────────────────────────────────────────────
+      - name: Health check
+        run: |
+          echo "Waiting 15s for app to fully restart..."
+          sleep 15
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 \
+            http://${{ secrets.SERVER_HOST }} 2>/dev/null || echo "000")
+          echo "HTTP response: $HTTP_CODE"
+          if [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "301" || "$HTTP_CODE" == "302" ]]; then
+            echo "✅ Site is healthy!"
+          else
+            echo "⚠️  Unexpected response ($HTTP_CODE) — check PM2 logs on server"
+            # Don't fail the workflow for health-check issues
+          fi
