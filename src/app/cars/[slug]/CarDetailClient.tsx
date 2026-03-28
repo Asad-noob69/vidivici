@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import CarGallery from "@/components/cars/CarGallery"
 import Rentals from "@/components/home/Rentals"
@@ -363,6 +364,12 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                     ⓘ {car.shortDescription}
                   </span>
                 </div>
+              </div>
+
+              {/* Pickup Location */}
+              <div className="mt-4 flex items-center gap-2 text-sm text-gray-500 px-1">
+                <MapPin size={14} />
+                Pickup: {car.location}
               </div>
             </div>
           </div>
