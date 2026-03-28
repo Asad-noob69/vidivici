@@ -40,19 +40,34 @@ export async function PUT(
       return NextResponse.json({ error: 'Car not found' }, { status: 404 })
     }
 
+    const { images, ...carData } = body
+
     // Regenerate slug if name changed
-    if (body.name && body.name !== existing.name) {
-      body.slug = body.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+    if (carData.name && carData.name !== existing.name) {
+      carData.slug = carData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+    }
+
+    // If new images provided, replace all existing images
+    if (images && images.length > 0) {
+      await prisma.carImage.deleteMany({ where: { carId: id } })
+      await prisma.carImage.createMany({
+        data: (images as string[]).map((url: string, i: number) => ({
+          url,
+          isPrimary: i === 0,
+          carId: id,
+        })),
+      })
     }
 
     const car = await prisma.car.update({
       where: { id },
-      data: body,
+      data: carData,
       include: { brand: true, category: true, images: true },
     })
 
     return NextResponse.json(car)
   } catch (error) {
+    console.error('Failed to update car:', error)
     return NextResponse.json({ error: 'Failed to update car' }, { status: 500 })
   }
 }

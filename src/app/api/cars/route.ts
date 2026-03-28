@@ -40,14 +40,27 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const slug = body.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+    const { images, ...carData } = body
+    const slug = carData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
 
     const car = await prisma.car.create({
-      data: { ...body, slug },
-      include: { brand: true, category: true },
+      data: {
+        ...carData,
+        slug,
+        ...(images && images.length > 0 && {
+          images: {
+            create: (images as string[]).map((url: string, i: number) => ({
+              url,
+              isPrimary: i === 0,
+            })),
+          },
+        }),
+      },
+      include: { brand: true, category: true, images: true },
     })
     return NextResponse.json(car, { status: 201 })
   } catch (error) {
+    console.error('Failed to create car:', error)
     return NextResponse.json({ error: 'Failed to create car' }, { status: 500 })
   }
 }
