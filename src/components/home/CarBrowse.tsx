@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const carMakes = [
     { name: "Rolls-Royce", logo: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/rollsroyce.svg" },
@@ -17,14 +18,19 @@ const carMakes = [
     { name: "McLaren", logo: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/mclaren.svg" },
 ];
 
-function CarLogo({ car, selected, onClick }) {
+interface Category {
+  id: string
+  name: string
+  slug: string
+}
 
+function CarLogo({ car, onClick }: { car: { name: string; logo: string }; onClick: (name: string) => void }) {
     return (
         <button
             onClick={() => onClick(car.name)}
-            className={`flex flex-col items-center justify-center gap-3
-        py-8 px-14 my-3 rounded-2xl border shrink-0 
-        transition-all duration-200 border-gray-200 bg-white hover:border-gray-400 hover:scale-105 `}
+            className="flex flex-col items-center justify-center gap-3
+        py-8 px-14 my-3 rounded-2xl border shrink-0
+        transition-all duration-200 border-gray-200 bg-white hover:border-gray-400 hover:scale-105"
         >
             <img
                 src={car.logo}
@@ -36,9 +42,39 @@ function CarLogo({ car, selected, onClick }) {
     );
 }
 
+function CategoryCard({ category, onClick }: { category: Category; onClick: (slug: string) => void }) {
+    return (
+        <button
+            onClick={() => onClick(category.slug)}
+            className="flex flex-col items-center justify-center gap-3
+        py-8 px-14 my-3 rounded-2xl border shrink-0
+        transition-all duration-200 border-gray-200 bg-white hover:border-gray-400 hover:scale-105"
+        >
+            <span className="text-lg font-semibold text-gray-700">{category.name}</span>
+        </button>
+    );
+}
+
 export default function CarBrowseSection() {
-    const [selectedMake, setSelectedMake] = useState(null);
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState("make");
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        fetch("/api/categories")
+            .then(r => r.ok ? r.json() : [])
+            .then(setCategories)
+            .catch(() => {});
+    }, []);
+
+    const handleMakeClick = (name: string) => {
+        const slug = name.toLowerCase().replace(/[\s]+/g, "-");
+        router.push(`/cars?brand=${slug}`);
+    };
+
+    const handleCategoryClick = (slug: string) => {
+        router.push(`/cars?category=${slug}`);
+    };
 
     return (
         <section className="w-full bg-[#f5f5f5] py-16 overflow-hidden">
@@ -70,33 +106,41 @@ export default function CarBrowseSection() {
 
             <div className="mx-auto">
 
-                {/* Row 1 */}
-                <div className="marquee">
-                    <div className="marquee-track">
-                        {[...carMakes, ...carMakes].map((car, i) => (
-                            <CarLogo
-                                key={i}
-                                car={car}
-                                selected={selectedMake === car.name}
-                                onClick={setSelectedMake}
-                            />
-                        ))}
-                    </div>
-                </div>
+                {activeTab === "make" ? (
+                    <>
+                        {/* Row 1 */}
+                        <div className="marquee">
+                            <div className="marquee-track">
+                                {[...carMakes, ...carMakes].map((car, i) => (
+                                    <CarLogo
+                                        key={i}
+                                        car={car}
+                                        onClick={handleMakeClick}
+                                    />
+                                ))}
+                            </div>
+                        </div>
 
-                {/* Row 2 (reverse) */}
-                <div className="marquee mt-4">
-                    <div className="marquee-track reverse">
-                        {[...carMakes, ...carMakes].map((car, i) => (
-                            <CarLogo
-                                key={"r" + i}
-                                car={car}
-                                selected={selectedMake === car.name}
-                                onClick={setSelectedMake}
-                            />
+                        {/* Row 2 (reverse) */}
+                        <div className="marquee mt-4">
+                            <div className="marquee-track reverse">
+                                {[...carMakes, ...carMakes].map((car, i) => (
+                                    <CarLogo
+                                        key={"r" + i}
+                                        car={car}
+                                        onClick={handleMakeClick}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex flex-wrap justify-center gap-4 px-6">
+                        {categories.map((cat) => (
+                            <CategoryCard key={cat.id} category={cat} onClick={handleCategoryClick} />
                         ))}
                     </div>
-                </div>
+                )}
 
             </div>
 

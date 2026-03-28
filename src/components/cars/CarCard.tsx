@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ImageOff } from "lucide-react"
+import { ImageOff, Users, Gauge, Zap, ArrowUpRight, Heart } from "lucide-react"
 
 interface CarCardProps {
   name: string
@@ -12,37 +12,65 @@ interface CarCardProps {
   seats?: number
   image?: string
   shortDescription?: string
+  horsepower?: number
+  acceleration?: string
 }
 
-export default function CarCard({ name, slug, brand, pricePerDay, year, transmission, seats, image, shortDescription }: CarCardProps) {
+export default function CarCard({ name, slug, brand, pricePerDay, seats, image, horsepower, acceleration }: CarCardProps) {
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-[#dbb241]/50 transition-all group hover:-translate-y-1">
-      <div className="h-52 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] flex items-center justify-center overflow-hidden">
+    <div className="relative flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+      {/* Image */}
+      <div className="relative h-52 overflow-hidden bg-gray-100">
         {image ? (
-          <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <ImageOff size={32} className="text-gray-700" />
+          <div className="w-full h-full flex items-center justify-center">
+            <ImageOff size={32} className="text-gray-300" />
+          </div>
         )}
+        <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+          <Heart size={14} />
+        </button>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
-      <div className="p-5">
-        <p className="text-xs text-[#dbb241] font-medium mb-1">{brand}</p>
-        <h3 className="text-lg font-semibold text-white group-hover:text-[#dbb241] transition-colors mb-1">{name}</h3>
-        {shortDescription && <p className="text-xs text-gray-500 mb-3">{shortDescription}</p>}
-        <div className="flex gap-2 mb-4">
-          {year && <span className="text-[10px] bg-[#2a2a2a] text-gray-400 px-2 py-0.5 rounded">{year}</span>}
-          {transmission && <span className="text-[10px] bg-[#2a2a2a] text-gray-400 px-2 py-0.5 rounded">{transmission}</span>}
-          {seats && <span className="text-[10px] bg-[#2a2a2a] text-gray-400 px-2 py-0.5 rounded">{seats} seats</span>}
+
+      {/* Body */}
+      <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
+        <p className="text-[10px] text-gray-400 font-medium tracking-wide uppercase">{brand}</p>
+        <h3 className="text-[15px] font-semibold text-gray-900 leading-snug -mt-0.5">{name}</h3>
+
+        {/* Stats */}
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex flex-col items-center gap-0.5">
+            <Users size={12} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">Seats</span>
+            <span className="text-[11px] font-semibold text-gray-700">{seats || "—"}</span>
+          </div>
+          <div className="w-px h-8 bg-gray-100" />
+          <div className="flex flex-col items-center gap-0.5">
+            <Gauge size={12} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">0-60 mph</span>
+            <span className="text-[11px] font-semibold text-gray-700">{acceleration || "—"}</span>
+          </div>
+          <div className="w-px h-8 bg-gray-100" />
+          <div className="flex flex-col items-center gap-0.5">
+            <Zap size={12} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">Engine</span>
+            <span className="text-[11px] font-semibold text-gray-700">{horsepower ? `${horsepower} hp` : "—"}</span>
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-xl font-bold text-[#dbb241]">${pricePerDay}<span className="text-xs text-gray-500 font-normal"> /day</span></p>
-        </div>
-        <div className="flex gap-2 mt-4">
-          <Link href={`/cars/${slug}`} className="flex-1 text-center text-xs border border-[#dbb241] text-[#dbb241] px-3 py-2 rounded hover:bg-[#dbb241] hover:text-black transition-colors font-medium">
-            View Details
+
+        <div className="h-px bg-gray-100 mt-1" />
+
+        {/* Footer */}
+        <div className="flex items-center justify-between mt-1">
+          <Link href={`/cars/${slug}`} className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+            View Details <ArrowUpRight size={11} strokeWidth={2.5} />
           </Link>
-          <Link href={`/cars/${slug}`} className="flex-1 text-center text-xs bg-[#dbb241] text-black px-3 py-2 rounded hover:bg-[#c9a238] transition-colors font-semibold">
-            Reserve Now
-          </Link>
+          <div className="flex flex-col items-end">
+            <span className="text-[15px] font-bold text-gray-900">${pricePerDay}</span>
+            <span className="text-[10px] text-gray-400">/day</span>
+          </div>
         </div>
       </div>
     </div>

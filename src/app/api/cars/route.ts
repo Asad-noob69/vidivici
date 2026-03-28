@@ -13,17 +13,25 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12')
 
     const all = searchParams.get('all')
+    const search = searchParams.get('search')
     const where: any = all === 'true' ? {} : { isAvailable: true }
     if (brand) where.brand = { slug: brand }
     if (category) where.category = { slug: category }
     if (location) where.location = location
     if (minPrice) where.pricePerDay = { ...where.pricePerDay, gte: parseFloat(minPrice) }
     if (maxPrice) where.pricePerDay = { ...where.pricePerDay, lte: parseFloat(maxPrice) }
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { brand: { name: { contains: search, mode: 'insensitive' } } },
+        { category: { name: { contains: search, mode: 'insensitive' } } },
+      ]
+    }
 
     const [cars, total] = await Promise.all([
       prisma.car.findMany({
         where,
-        include: { brand: true, category: true, images: { where: { isPrimary: true }, take: 1 } },
+        include: { brand: true, category: true, images: { orderBy: { isPrimary: 'desc' }, take: 1 } },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
