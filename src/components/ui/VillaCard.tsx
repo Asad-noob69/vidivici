@@ -72,13 +72,13 @@ export default function VillaCard({
 
         <div className="flex items-center justify-between mt-0.5">
           <StatPill icon={<BedDouble size={12} />} label="Bedrooms" value={bedrooms} />
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <StatPill icon={<Users size={12} />} label="Guests" value={guests} />
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <StatPill icon={<Maximize2 size={12} />} label="Sq.ft" value={sqft} />
         </div>
 
-        <div className="h-px bg-gray-100 mt-0.5" />
+        <div className="h-px bg-mist-100 mt-0.5" />
 
         <div className="flex items-center justify-between mt-0.5">
           <button

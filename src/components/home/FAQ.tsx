@@ -55,7 +55,7 @@ export default function FAQ() {
             return (
               <div
                 key={faq.id}
-                className="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-200"
+                className="border border-mist-200 rounded-2xl overflow-hidden transition-all duration-200"
               >
                 {/* Question row */}
                 <button
@@ -69,7 +69,7 @@ export default function FAQ() {
                     className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
                       isOpen
                         ? "bg-mist-900 text-white"
-                        : "bg-gray-100 text-mist-600 hover:bg-gray-200"
+                        : "bg-mist-100 text-mist-600 hover:bg-mist-200"
                     }`}
                   >
                     {isOpen ? <Minus size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}

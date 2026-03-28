@@ -38,13 +38,13 @@ function CarLogo({ car, selected, onClick }: { car: { name: string; logo: string
       onClick={() => onClick(car.name)}
       className="flex flex-col items-center justify-center gap-3
       py-8 px-14 my-3 rounded-2xl border shrink-0
-      transition-all duration-200 border-gray-200 bg-white
-      hover:border-gray-400 hover:scale-105"
+      transition-all duration-200 border-mist-200 bg-white
+      hover:border-mist-400 hover:scale-105"
     >
       <img
         src={car.logo}
         alt={car.name}
-        className="w-16 h-16 object-contain grayscale hover:grayscale-0 transition"
+        className="w-16 h-16 object-contain mistscale hover:mistscale-0 transition"
       />
 
       <span className="text-xs text-mist-600">{car.name}</span>
@@ -58,7 +58,7 @@ function CategoryCard({ category, onClick }: { category: { slug: string; name: s
             onClick={() => onClick(category.slug)}
             className="flex flex-col items-center justify-center gap-3
         py-8 px-14 my-3 rounded-2xl border shrink-0
-        transition-all duration-200 border-gray-200 bg-white hover:border-gray-400 hover:scale-105"
+        transition-all duration-200 border-mist-200 bg-white hover:border-mist-400 hover:scale-105"
         >
             <span className="text-lg font-semibold text-mist-700">{category.name}</span>
         </button>
@@ -74,7 +74,7 @@ export default function CarBrowseSection() {
   return (
     <section className="w-full bg-[#f5f5f5] py-16 overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-20 mb-10 flex justify-center">
-        <div className="flex bg-gray-100 rounded-xl p-1 shadow-sm">
+        <div className="flex bg-mist-100 rounded-xl p-1 shadow-sm">
 
           <button
             onClick={() => setActiveTab("make")}

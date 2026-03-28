@@ -57,12 +57,12 @@ export default function ContactForm() {
   return (
     <section className="w-full bg-white py-12 sm:px-16 lg:px-20 px-10">
       <div className="">
-        <div className="border border-gray-200 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm">
+        <div className="border border-mist-200 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm">
           {/* Left Panel - Contact Info */}
-          <div className="bg-gray-100 p-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden">
+          <div className="bg-mist-100 p-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden">
             {/* Decorative background */}
             <div className="absolute inset-0 opacity-5 pointer-events-none">
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-400 to-transparent rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-mist-400 to-transparent rounded-full blur-3xl"></div>
             </div>
 
             {/* Header Text */}
@@ -76,7 +76,7 @@ export default function ContactForm() {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-300"></div>
+            <div className="border-t border-mist-300"></div>
 
             {/* Contact Info Items */}
             <div className="relative z-10 flex flex-col gap-6">
@@ -119,7 +119,7 @@ export default function ContactForm() {
                     value={form.fullName}
                     onChange={handleChange}
                     placeholder="Enter your full name"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white"
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white"
                     required
                   />
                 </Field>
@@ -130,7 +130,7 @@ export default function ContactForm() {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white"
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white"
                     required
                   />
                 </Field>
@@ -139,8 +139,8 @@ export default function ContactForm() {
               {/* Phone & Inquiry Type Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Field label="Phone">
-                  <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:border-gray-400 transition-colors duration-200 bg-white">
-                    <span className="px-4 py-3 text-lg border-r border-gray-300 bg-gray-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
+                  <div className="flex items-center border border-mist-300 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
+                    <span className="px-4 py-3 text-lg border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
                       🇺🇸
                     </span>
                     <input
@@ -149,7 +149,7 @@ export default function ContactForm() {
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="Enter your phone number"
-                      className="flex-1 px-4 py-3 text-sm text-mist-900 placeholder-gray-400 outline-none bg-white"
+                      className="flex-1 px-4 py-3 text-sm text-mist-900 placeholder-mist-400 outline-none bg-white"
                       required
                     />
                   </div>
@@ -159,7 +159,7 @@ export default function ContactForm() {
                     name="inquiryType"
                     value={form.inquiryType}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white appearance-none cursor-pointer"
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white appearance-none cursor-pointer"
                     required
                   >
                     <option value="" disabled>
@@ -182,7 +182,7 @@ export default function ContactForm() {
                   onChange={handleChange}
                   placeholder="Write your message here..."
                   rows={5}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors duration-200 bg-white resize-none"
+                  className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white resize-none"
                   required
                 />
               </Field>
@@ -227,7 +227,7 @@ interface ContactInfoProps {
 function ContactInfo({ icon, label, value }: ContactInfoProps) {
   return (
     <div className="flex items-start gap-4">
-      <div className="w-8 h-8 rounded-full border border-gray-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
+      <div className="w-8 h-8 rounded-full border border-mist-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
         {icon}
       </div>
       <div>

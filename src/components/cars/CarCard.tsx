@@ -48,9 +48,9 @@ export default function CarCard({ id, name, slug, brand, pricePerDay, seats, ima
   }
 
   return (
-    <div className="relative flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+    <div className="relative flex flex-col bg-white rounded-2xl overflow-hidden border border-mist-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
       {/* Image */}
-      <div className="relative h-52 overflow-hidden bg-gray-100">
+      <div className="relative h-52 overflow-hidden bg-mist-100">
         {image ? (
           <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
@@ -84,13 +84,13 @@ export default function CarCard({ id, name, slug, brand, pricePerDay, seats, ima
             <span className="text-[10px] text-mist-400">Seats</span>
             <span className="text-[11px] font-semibold text-mist-700">{seats || "—"}</span>
           </div>
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <div className="flex flex-col items-center gap-0.5">
             <Gauge size={12} className="text-mist-400" />
             <span className="text-[10px] text-mist-400">0-60 mph</span>
             <span className="text-[11px] font-semibold text-mist-700">{acceleration || "—"}</span>
           </div>
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <div className="flex flex-col items-center gap-0.5">
             <Zap size={12} className="text-mist-400" />
             <span className="text-[10px] text-mist-400">Engine</span>
@@ -98,7 +98,7 @@ export default function CarCard({ id, name, slug, brand, pricePerDay, seats, ima
           </div>
         </div>
 
-        <div className="h-px bg-gray-100 mt-1" />
+        <div className="h-px bg-mist-100 mt-1" />
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-1">

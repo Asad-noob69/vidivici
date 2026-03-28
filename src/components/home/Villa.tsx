@@ -132,7 +132,7 @@ export default function Villa({ showHeader = true }) {
           <h2 className="text-xl sm:text-4xl font-bold text-mist-900 tracking-tight">
             Luxury Villa Rentals
           </h2>
-          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium text-mist-700 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium text-mist-700 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200">
             View all
             <ArrowUpRight size={15} />
           </button>
@@ -144,7 +144,7 @@ export default function Villa({ showHeader = true }) {
           {canScrollLeft && (
             <button
               onClick={() => scroll(-1)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
             >
               <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
             </button>
@@ -152,7 +152,7 @@ export default function Villa({ showHeader = true }) {
           {canScrollRight && (
             <button
               onClick={() => scroll(1)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
             >
               <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
             </button>
@@ -191,8 +191,8 @@ export default function Villa({ showHeader = true }) {
               key={i}
               onClick={() => scrollToIndex(i)}
               className={`rounded-full transition-all duration-300 ${i === activeIndex
-                ? "w-5 h-2 bg-gray-900"
-                : "w-2 h-2 bg-gray-300 hover:bg-gray-500"
+                ? "w-5 h-2 bg-mist-900"
+                : "w-2 h-2 bg-mist-300 hover:bg-mist-500"
                 }`}
             />
           ))}

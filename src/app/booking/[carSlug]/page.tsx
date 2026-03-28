@@ -199,7 +199,7 @@ export default function ReservationPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center pt-20">
-        <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-mist-300 border-t-mist-900 rounded-full animate-spin" />
       </div>
     )
   }
@@ -219,11 +219,11 @@ export default function ReservationPage() {
     <div className="bg-white min-h-screen pt-20 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Tabs */}
-        <div className="flex gap-0 mb-8 border border-gray-200 rounded-xl overflow-hidden max-w-sm mx-auto">
-          <div className="flex-1 py-2.5 text-center text-sm font-medium bg-gray-900 text-white">
+        <div className="flex gap-0 mb-8 border border-mist-200 rounded-xl overflow-hidden max-w-sm mx-auto">
+          <div className="flex-1 py-2.5 text-center text-sm font-medium bg-mist-900 text-white">
             Car
           </div>
-          <div className="flex-1 py-2.5 text-center text-sm font-medium text-mist-400 bg-gray-50 cursor-not-allowed">
+          <div className="flex-1 py-2.5 text-center text-sm font-medium text-mist-400 bg-mist-50 cursor-not-allowed">
             Villa
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function ReservationPage() {
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                step >= 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-mist-400"
+                step >= 1 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
               }`}
             >
               {step > 1 ? <CheckCircle size={16} /> : "1"}
@@ -243,12 +243,12 @@ export default function ReservationPage() {
               Select
             </span>
           </div>
-          <div className={`flex-1 h-0.5 mx-2 mt-[-12px] ${step >= 2 ? "bg-blue-600" : "bg-gray-200"}`} />
+          <div className={`flex-1 h-0.5 mx-2 mt-[-12px] ${step >= 2 ? "bg-blue-600" : "bg-mist-200"}`} />
           {/* Step 2 */}
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                step >= 2 ? "bg-blue-600 text-white" : "bg-gray-200 text-mist-400"
+                step >= 2 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
               }`}
             >
               {step > 2 ? <CheckCircle size={16} /> : "2"}
@@ -257,12 +257,12 @@ export default function ReservationPage() {
               Pay
             </span>
           </div>
-          <div className={`flex-1 h-0.5 mx-2 mt-[-12px] ${step >= 3 ? "bg-blue-600" : "bg-gray-200"}`} />
+          <div className={`flex-1 h-0.5 mx-2 mt-[-12px] ${step >= 3 ? "bg-blue-600" : "bg-mist-200"}`} />
           {/* Step 3 */}
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                step >= 3 ? "bg-blue-600 text-white" : "bg-gray-200 text-mist-400"
+                step >= 3 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
               }`}
             >
               3
@@ -423,7 +423,7 @@ function SelectStep({
           <div>
             <label className="text-xs text-mist-500 block mb-1.5">Make</label>
             <div className="relative">
-              <select className="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-500 bg-white focus:border-gray-400 focus:outline-none pr-8" disabled>
+              <select className="w-full appearance-none border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-500 bg-white focus:border-mist-400 focus:outline-none pr-8" disabled>
                 <option>{car.brandName || "Select a make"}</option>
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none" />
@@ -432,7 +432,7 @@ function SelectStep({
           <div>
             <label className="text-xs text-mist-500 block mb-1.5">Model</label>
             <div className="relative">
-              <select className="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-500 bg-white focus:border-gray-400 focus:outline-none pr-8" disabled>
+              <select className="w-full appearance-none border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-500 bg-white focus:border-mist-400 focus:outline-none pr-8" disabled>
                 <option>{car.name || "Select a model"}</option>
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none" />
@@ -453,7 +453,7 @@ function SelectStep({
                 min={today}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-gray-400 focus:outline-none"
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-mist-400 focus:outline-none"
               />
             </div>
             <div>
@@ -462,7 +462,7 @@ function SelectStep({
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-gray-400 focus:outline-none"
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-mist-400 focus:outline-none"
               />
             </div>
           </div>
@@ -474,7 +474,7 @@ function SelectStep({
                 min={startDate || today}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-gray-400 focus:outline-none"
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-mist-400 focus:outline-none"
               />
             </div>
             <div>
@@ -483,7 +483,7 @@ function SelectStep({
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-gray-400 focus:outline-none"
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 focus:border-mist-400 focus:outline-none"
               />
             </div>
           </div>
@@ -496,7 +496,7 @@ function SelectStep({
         <label className="flex items-center gap-2.5 cursor-pointer mb-4">
           <div
             className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-              needDriver ? "border-blue-600" : "border-gray-300"
+              needDriver ? "border-blue-600" : "border-mist-300"
             }`}
           >
             {needDriver && <div className="w-2 h-2 rounded-full bg-blue-600" />}
@@ -521,7 +521,7 @@ function SelectStep({
                 max={16}
                 value={driverHours}
                 onChange={(e) => setDriverHours(Number(e.target.value))}
-                className="w-full accent-gray-900"
+                className="w-full accent-mist-900"
               />
               <div className="flex justify-between text-[10px] text-mist-400 mt-1">
                 <span>0 hr</span>
@@ -537,7 +537,7 @@ function SelectStep({
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <div
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      driverAvailability === "full" ? "border-blue-600" : "border-gray-300"
+                      driverAvailability === "full" ? "border-blue-600" : "border-mist-300"
                     }`}
                   >
                     {driverAvailability === "full" && (
@@ -556,7 +556,7 @@ function SelectStep({
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <div
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      driverAvailability === "select" ? "border-blue-600" : "border-gray-300"
+                      driverAvailability === "select" ? "border-blue-600" : "border-mist-300"
                     }`}
                   >
                     {driverAvailability === "select" && (
@@ -581,7 +581,7 @@ function SelectStep({
                 <button
                   type="button"
                   onClick={() => setDriverDays(Math.max(1, driverDays - 1))}
-                  className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-mist-500 hover:bg-gray-50"
+                  className="w-8 h-8 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50"
                 >
                   <Minus size={14} />
                 </button>
@@ -591,7 +591,7 @@ function SelectStep({
                 <button
                   type="button"
                   onClick={() => setDriverDays(Math.min(days || 365, driverDays + 1))}
-                  className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-mist-500 hover:bg-gray-50"
+                  className="w-8 h-8 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50"
                 >
                   <Plus size={14} />
                 </button>
@@ -605,7 +605,7 @@ function SelectStep({
       <button
         onClick={onNext}
         disabled={!startDate || !endDate || days < 1}
-        className="w-full bg-gray-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full bg-mist-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Next
       </button>
@@ -694,7 +694,7 @@ function PayStep({
           placeholder="MM/YY"
           value={cardName}
           onChange={(e) => setCardName(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none"
+          className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none"
         />
       </div>
 
@@ -708,7 +708,7 @@ function PayStep({
             value={cardNumber}
             onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
             maxLength={19}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none pr-20"
+            className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none pr-20"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
             <span className="text-[8px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">AutoFill</span>
@@ -726,7 +726,7 @@ function PayStep({
             value={expiry}
             onChange={(e) => setExpiry(formatExpiry(e.target.value))}
             maxLength={5}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none"
+            className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none"
           />
         </div>
         <div>
@@ -737,7 +737,7 @@ function PayStep({
             value={cvv}
             onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
             maxLength={4}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none"
+            className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none"
           />
         </div>
       </div>
@@ -750,7 +750,7 @@ function PayStep({
           placeholder="Enter billing address"
           value={billingAddress}
           onChange={(e) => setBillingAddress(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none"
+          className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none"
         />
       </div>
 
@@ -762,7 +762,7 @@ function PayStep({
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full appearance-none border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 bg-white focus:border-gray-400 focus:outline-none pr-8"
+              className="w-full appearance-none border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 bg-white focus:border-mist-400 focus:outline-none pr-8"
             >
               <option>United States</option>
               <option>Canada</option>
@@ -782,15 +782,15 @@ function PayStep({
             placeholder="ZIP code"
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-gray-400 focus:outline-none"
+            className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none"
           />
         </div>
       </div>
 
       {/* PayPal option */}
-      <div className="border border-gray-200 rounded-xl p-4">
+      <div className="border border-mist-200 rounded-xl p-4">
         <label className="flex items-center gap-2.5 cursor-pointer">
-          <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
+          <div className="w-4 h-4 rounded-full border-2 border-mist-300" />
           <span className="text-sm text-mist-500">PayPal</span>
         </label>
       </div>
@@ -810,14 +810,14 @@ function PayStep({
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 border border-gray-200 text-mist-700 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors"
+          className="flex-1 border border-mist-200 text-mist-700 py-3 rounded-xl font-semibold text-sm hover:bg-mist-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={onPay}
           disabled={submitting || !cardNumber || !expiry || !cvv}
-          className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 bg-mist-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {submitting ? "Processing..." : "Place Order"}
         </button>
@@ -849,13 +849,13 @@ function DoneStep({ bookingId, carName }: { bookingId: string; carName: string }
       <div className="flex gap-3 justify-center pt-4">
         <Link
           href="/account/bookings"
-          className="px-6 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 transition-colors"
+          className="px-6 py-2.5 bg-mist-900 text-white rounded-xl text-sm font-semibold hover:bg-mist-700 transition-colors"
         >
           View My Bookings
         </Link>
         <Link
           href="/cars"
-          className="px-6 py-2.5 border border-gray-200 text-mist-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"
+          className="px-6 py-2.5 border border-mist-200 text-mist-700 rounded-xl text-sm font-semibold hover:bg-mist-50 transition-colors"
         >
           Browse More Cars
         </Link>
@@ -905,10 +905,10 @@ function SummaryCard({
   }
 
   return (
-    <div className="border border-gray-200 rounded-2xl p-5 space-y-4 sticky top-24">
+    <div className="border border-mist-200 rounded-2xl p-5 space-y-4 sticky top-24">
       {/* Car Header */}
       <div className="flex gap-4">
-        <div className="w-24 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+        <div className="w-24 h-16 bg-mist-100 rounded-xl overflow-hidden flex-shrink-0">
           {car.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
@@ -922,14 +922,14 @@ function SummaryCard({
           <h3 className="font-semibold text-mist-900 text-sm">{car.name}</h3>
           <div className="mt-2 space-y-1.5">
             <div className="flex items-start gap-2">
-              <div className="w-2 h-2 rounded-full bg-gray-900 mt-1 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-mist-900 mt-1 flex-shrink-0" />
               <div className="text-xs text-mist-500">
                 <p>{formatDate(startDate, startTime)}</p>
                 <p className="text-mist-400">{car.location}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-2 h-2 rounded-full bg-gray-400 mt-1 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-mist-400 mt-1 flex-shrink-0" />
               <div className="text-xs text-mist-500">
                 <p>{formatDate(endDate, endTime)}</p>
                 <p className="text-mist-400">{car.location}</p>
@@ -946,7 +946,7 @@ function SummaryCard({
 
       {/* User info (Pay step) */}
       {step >= 2 && session?.user && (
-        <div className="text-xs text-mist-500 space-y-0.5 border-t border-gray-100 pt-3">
+        <div className="text-xs text-mist-500 space-y-0.5 border-t border-mist-100 pt-3">
           <p>
             <span className="text-mist-700 font-medium">Full name:</span> {session.user.name || "—"}
           </p>
@@ -957,14 +957,14 @@ function SummaryCard({
       )}
 
       {step >= 2 && (
-        <p className="text-xs text-mist-400 border-t border-gray-100 pt-3">
+        <p className="text-xs text-mist-400 border-t border-mist-100 pt-3">
           Free cancellation within 24 hours from the time you place the order.
         </p>
       )}
 
       {/* Price Breakdown */}
       {pricing && days > 0 && (
-        <div className="space-y-2 text-sm border-t border-gray-100 pt-3">
+        <div className="space-y-2 text-sm border-t border-mist-100 pt-3">
           <div className="flex justify-between text-mist-500">
             <span>Car Total <span className="text-xs">({`$${car.pricePerDay} × ${days}d`})</span></span>
             <span className="text-mist-900">${pricing.subtotal.toLocaleString()}</span>
@@ -1003,7 +1003,7 @@ function SummaryCard({
             </>
           )}
 
-          <hr className="border-gray-100" />
+          <hr className="border-mist-100" />
 
           {step >= 2 ? (
             <>

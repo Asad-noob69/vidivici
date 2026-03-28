@@ -1,176 +1,223 @@
 "use client"
 
 import { useState } from "react"
-import { CreditCard, Plus, X } from "lucide-react"
+import Link from "next/link"
+import { Plus, CreditCard } from "lucide-react"
+
+interface SavedCard {
+  id: string
+  last4: string
+  brand: string
+  expiry: string
+  name: string
+}
 
 export default function PaymentMethodsPage() {
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({
-    nameOnCard: "", cardNumber: "", expiry: "", cvv: "",
-    billingAddress: "", country: "United States", zipCode: "",
-  })
+  const [cards, setCards] = useState<SavedCard[]>([])
+
+  const [name, setName]           = useState("")
+  const [cardNumber, setCardNumber] = useState("")
+  const [expiry, setExpiry]       = useState("")
+  const [cvv, setCvv]             = useState("")
+  const [address, setAddress]     = useState("")
+  const [country, setCountry]     = useState("United States")
+  const [zip, setZip]             = useState("")
+
+  const resetForm = () => {
+    setName(""); setCardNumber(""); setExpiry(""); setCvv("")
+    setAddress(""); setCountry("United States"); setZip("")
+    setShowForm(false)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Placeholder — payment integration coming later
-    setShowForm(false)
-    setForm({ nameOnCard: "", cardNumber: "", expiry: "", cvv: "", billingAddress: "", country: "United States", zipCode: "" })
+    const last4 = cardNumber.replace(/\s/g, "").slice(-4)
+    setCards((prev) => [...prev, { id: Date.now().toString(), last4, brand: "Visa", expiry, name }])
+    resetForm()
   }
 
-  const inputCls = "w-full px-3 py-2.5 rounded-lg text-sm border border-gray-200 bg-white text-mist-900 placeholder:text-mist-400 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition"
+  const formatCardNumber = (v: string) =>
+    v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim()
+
+  const formatExpiry = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 4)
+    return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d
+  }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-mist-900">Payment Methods</h1>
-        {!showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition"
-          >
-            <Plus size={14} /> Add Card
-          </button>
-        )}
+    <div className="overflow-hidden">
+
+      {/* ── Heading ─────────────────────────────────────────── */}
+      <div className="px-6 sm:px-8 py-14 border-b-2 border-mist-300 font-medium flex items-center justify-between">
+        <h1 className="text-4xl font-bold text-mist-900">Payment Method</h1>
       </div>
 
-      {showForm ? (
-        <form onSubmit={handleSubmit}>
-          {/* Card Info */}
-          <h2 className="text-lg font-bold text-mist-900 mb-4">Card Info</h2>
+      {/* ── Body ────────────────────────────────────────────── */}
+      <div className="my-16 p-6 mx-7 sm:mx-10 lg:mx-16 bg-white rounded-2xl shadow-xl border border-mist-200">
 
-          <div className="mb-4">
-            <label className="text-sm font-medium text-mist-700 mb-1.5 block">Name on card</label>
-            <input
-              type="text"
-              placeholder="Name on card"
-              value={form.nameOnCard}
-              onChange={(e) => setForm({ ...form, nameOnCard: e.target.value })}
-              className={inputCls}
-            />
+        {!showForm ? (
+          /* ── Cards grid ── */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {cards.map((card) => (
+              <div key={card.id} className="aspect-[1.6/1] bg-mist-900 rounded-2xl p-5 flex flex-col justify-between text-white">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs text-mist-400 uppercase tracking-widest">{card.brand}</span>
+                  <CreditCard size={20} className="text-mist-400" />
+                </div>
+                <div>
+                  <p className="text-sm tracking-widest">•••• •••• •••• {card.last4}</p>
+                  <div className="flex justify-between mt-2">
+                    <p className="text-xs text-mist-400">{card.name}</p>
+                    <p className="text-xs text-mist-400">{card.expiry}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-10 py-20 border-2 border-blue-200 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-blue-50/50 transition-colors group"
+            >
+              <Plus size={28} className="text-blue-500 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium text-blue-500">Add Card</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        ) : (
+          /* ── Inline Add Card Form ── */
+          <form onSubmit={handleSubmit} className="space-y-8">
+
+            {/* Card Info */}
             <div>
-              <label className="text-sm font-medium text-mist-700 mb-1.5 block">Card number</label>
-              <div className="relative">
+              <h2 className="text-xl font-bold text-mist-900 mb-5">Card Info</h2>
+              <div className="mb-4">
+                <label className="text-xs font-medium text-mist-500 block mb-1.5">Name on card</label>
                 <input
-                  type="text"
-                  placeholder="1234 1234 1234 1234"
-                  value={form.cardNumber}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 16)
-                    setForm({ ...form, cardNumber: v.replace(/(.{4})/g, "$1 ").trim() })
-                  }}
-                  className={`${inputCls} pl-10`}
+                  type="text" value={name} onChange={(e) => setName(e.target.value)}
+                  placeholder="Name on card" required
+                  className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition"
                 />
-                <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist-400" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Card number</label>
+                  <div className="relative">
+                    <input
+                      type="text" value={cardNumber}
+                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                      placeholder="1234 1234 1234 1234" required
+                      className="w-full border border-mist-200 rounded-xl pl-9 pr-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition"
+                    />
+                    <CreditCard size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist-300" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Expiration date</label>
+                  <input
+                    type="text" value={expiry}
+                    onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                    placeholder="MM/YY" required
+                    className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Security code</label>
+                  <div className="relative">
+                    <input
+                      type="password" value={cvv}
+                      onChange={(e) => setCvv(e.target.value.slice(0, 4))}
+                      placeholder="CVV" required
+                      className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition pr-10"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-4 bg-mist-200 rounded-sm flex items-center justify-center">
+                      <div className="w-2 h-2 bg-mist-400 rounded-full" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Billing Address */}
             <div>
-              <label className="text-sm font-medium text-mist-700 mb-1.5 block">Expiration date</label>
-              <input
-                type="text"
-                placeholder="MM/YY"
-                value={form.expiry}
-                onChange={(e) => {
-                  let v = e.target.value.replace(/\D/g, "").slice(0, 4)
-                  if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2)
-                  setForm({ ...form, expiry: v })
-                }}
-                className={inputCls}
-              />
+              <h2 className="text-xl font-bold text-mist-900 mb-5">Billing Address</h2>
+              <div className="mb-4">
+                <label className="text-xs font-medium text-mist-500 block mb-1.5">Billing address</label>
+                <input
+                  type="text" value={address} onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter billing address" required
+                  className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Country</label>
+                  <select
+                    value={country} onChange={(e) => setCountry(e.target.value)}
+                    className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 focus:border-mist-400 focus:outline-none transition bg-white"
+                  >
+                    {["United States","United Kingdom","Canada","Australia","Germany","France","Other"].map((c) => (
+                      <option key={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Zip code</label>
+                  <input
+                    type="text" value={zip} onChange={(e) => setZip(e.target.value)}
+                    placeholder="Zip code" required
+                    className="w-full border border-mist-200 rounded-xl px-4 py-3 text-sm text-mist-700 placeholder-mist-300 focus:border-mist-400 focus:outline-none transition"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-mist-700 mb-1.5 block">Security code</label>
-              <input
-                type="text"
-                placeholder="CVV"
-                value={form.cvv}
-                onChange={(e) => setForm({ ...form, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) })}
-                className={inputCls}
-              />
-            </div>
-          </div>
 
-          {/* Billing Address */}
-          <h2 className="text-lg font-bold text-mist-900 mb-4">Billing Address</h2>
+            {/* Terms */}
+            <p className="text-xs text-mist-400 leading-relaxed">
+              By adding the card, I agree to the{" "}
+              <Link href="/terms" className="text-blue-500 hover:underline">Terms & Conditions</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="text-blue-500 hover:underline">Privacy Policy</Link>.
+            </p>
 
-          <div className="mb-4">
-            <label className="text-sm font-medium text-mist-700 mb-1.5 block">Billing address</label>
-            <input
-              type="text"
-              placeholder="Enter billing address"
-              value={form.billingAddress}
-              onChange={(e) => setForm({ ...form, billingAddress: e.target.value })}
-              className={inputCls}
-            />
-          </div>
+            {/* Footer: buttons + payment icons */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pt-1">
+              <div className="flex items-center gap-3">
+                <button type="submit" className="bg-mist-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-mist-700 transition-colors">
+                  Add Card
+                </button>
+                <button type="button" onClick={resetForm} className="text-sm text-mist-600 border border-mist-200 px-6 py-3 rounded-xl hover:bg-mist-50 transition-colors">
+                  Cancel
+                </button>
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="text-sm font-medium text-mist-700 mb-1.5 block">Country</label>
-              <select
-                value={form.country}
-                onChange={(e) => setForm({ ...form, country: e.target.value })}
-                className={inputCls}
-              >
-                <option>United States</option>
-                <option>United Kingdom</option>
-                <option>Canada</option>
-                <option>Australia</option>
-                <option>Germany</option>
-                <option>France</option>
-              </select>
+              {/* Payment icons */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center h-7 px-2.5 bg-white border border-mist-200 rounded-md">
+                  <span className="text-[#1A1F71] text-xs font-black tracking-tight">VISA</span>
+                </div>
+                <div className="flex items-center justify-center h-7 px-2 bg-white border border-mist-200 rounded-md">
+                  <span className="text-[#003087] text-[10px] font-bold">Pay</span>
+                  <span className="text-[#009CDE] text-[10px] font-bold">Pal</span>
+                </div>
+                <div className="flex items-center justify-center h-7 px-2.5 bg-[#5a31f4] rounded-md">
+                  <span className="text-white text-[10px] font-bold tracking-tight">shop</span>
+                </div>
+                <div className="flex items-center justify-center h-7 px-2 bg-white border border-mist-200 rounded-md gap-0.5">
+                  <span className="text-[#4285F4] text-[10px] font-semibold">G</span>
+                  <span className="text-[#5F6368] text-[10px] font-semibold">Pay</span>
+                </div>
+                <div className="flex items-center justify-center h-7 w-10 bg-white border border-mist-200 rounded-md">
+                  <div className="flex -space-x-1.5">
+                    <div className="w-4 h-4 rounded-full bg-[#EB001B]" />
+                    <div className="w-4 h-4 rounded-full bg-[#F79E1B] opacity-90" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-mist-700 mb-1.5 block">Zip code</label>
-              <input
-                type="text"
-                placeholder="Zip code"
-                value={form.zipCode}
-                onChange={(e) => setForm({ ...form, zipCode: e.target.value })}
-                className={inputCls}
-              />
-            </div>
-          </div>
 
-          <p className="text-xs text-mist-500 mb-6">
-            By adding the card, I agree to the{" "}
-            <a href="#" className="text-blue-600 hover:underline">Terms &amp; Conditions</a>{" "}
-            and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
-          </p>
-
-          <div className="flex items-center justify-between">
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition"
-              >
-                Add Card
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="border border-gray-200 text-mist-600 px-6 py-2.5 rounded-lg text-sm font-medium hover:border-gray-400 transition"
-              >
-                Cancel
-              </button>
-            </div>
-            {/* Card brand logos */}
-            <div className="hidden sm:flex items-center gap-2">
-              {["VISA", "PayPal", "Shop", "GPay", "MC"].map((b) => (
-                <span key={b} className="text-[10px] font-bold text-mist-400 border border-gray-200 rounded px-2 py-1">{b}</span>
-              ))}
-            </div>
-          </div>
-        </form>
-      ) : (
-        <div className="border border-dashed border-gray-200 rounded-xl p-10 text-center">
-          <CreditCard size={48} className="mx-auto text-mist-300" />
-          <p className="mt-4 text-lg font-medium text-mist-500">No payment methods</p>
-          <p className="text-sm text-mist-400">Add a card to make bookings faster.</p>
-        </div>
-      )}
+          </form>
+        )}
+      </div>
     </div>
   )
 }

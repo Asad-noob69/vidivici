@@ -88,7 +88,7 @@ function Stars({ rating }: { rating: number }) {
 
 function ReviewCard({ review }: { review: typeof reviews[0] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4 w-full">
+    <div className="bg-white rounded-2xl border border-mist-100 shadow-sm p-4 mb-4 w-full">
       {/* Avatar + name + stars on top */}
       <div className="flex items-center gap-3 mb-3">
         <img

@@ -50,13 +50,13 @@ export default function CarCard({ car }) {
 
         <div className="flex items-center justify-between mt-0.5">
           <StatPill icon={<Users size={12} />} label="Seats" value={car.seats} />
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <StatPill icon={<Gauge size={12} />} label="0-60 mph" value={car.zeroToSixty} />
-          <div className="w-px h-8 bg-gray-100" />
+          <div className="w-px h-8 bg-mist-100" />
           <StatPill icon={<Zap size={12} />} label="Engine" value={car.engine} />
         </div>
 
-        <div className="h-px bg-gray-100 mt-0.5" />
+        <div className="h-px bg-mist-100 mt-0.5" />
 
         <div className="flex items-center justify-between mt-0.5">
           <button className="flex items-center gap-1 text-[11px] font-semibold text-mist-500 hover:text-mist-900 transition-colors">

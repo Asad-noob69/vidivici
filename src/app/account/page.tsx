@@ -9,7 +9,9 @@ interface ProfileForm {
   name: string
   email: string
   phone: string
-  dateOfBirth: string
+  dobMonth: string
+  dobDay: string
+  dobYear: string
   company: string
   address: string
   country: string
@@ -17,12 +19,24 @@ interface ProfileForm {
   state: string
   zipCode: string
   image: string
+  noMarketing: boolean
 }
 
 const EMPTY: ProfileForm = {
-  name: "", email: "", phone: "", dateOfBirth: "", company: "",
-  address: "", country: "", city: "", state: "", zipCode: "", image: "",
+  name: "", email: "", phone: "",
+  dobMonth: "", dobDay: "", dobYear: "",
+  company: "", address: "", country: "",
+  city: "", state: "", zipCode: "", image: "",
+  noMarketing: false,
 }
+
+const MONTHS = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
+]
+const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1))
+const currentYear = new Date().getFullYear()
+const YEARS = Array.from({ length: 100 }, (_, i) => String(currentYear - i))
 
 export default function PersonalInfoPage() {
   const { data: session, update } = useSession()
@@ -41,11 +55,19 @@ export default function PersonalInfoPage() {
       const res = await fetch("/api/account/profile")
       if (res.ok) {
         const data = await res.json()
+        // Parse legacy dateOfBirth string if needed
+        let dobMonth = "", dobDay = "", dobYear = ""
+        if (data.dateOfBirth) {
+          const parts = data.dateOfBirth.split(/[\/\-,\s]+/)
+          if (parts.length >= 3) {
+            dobMonth = parts[0]; dobDay = parts[1]; dobYear = parts[2]
+          }
+        }
         setForm({
           name: data.name || "",
           email: data.email || "",
           phone: data.phone || "",
-          dateOfBirth: data.dateOfBirth || "",
+          dobMonth, dobDay, dobYear,
           company: data.company || "",
           address: data.address || "",
           country: data.country || "",
@@ -53,6 +75,7 @@ export default function PersonalInfoPage() {
           state: data.state || "",
           zipCode: data.zipCode || "",
           image: data.image || "",
+          noMarketing: data.noMarketing || false,
         })
       }
     } catch {}
@@ -69,7 +92,6 @@ export default function PersonalInfoPage() {
       if (res.ok) {
         const { urls } = await res.json()
         const imageUrl = urls[0]
-        // Save image to profile immediately
         const saveRes = await fetch("/api/account/profile", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -94,10 +116,11 @@ export default function PersonalInfoPage() {
     e.preventDefault()
     setLoading(true)
     try {
+      const dateOfBirth = [form.dobMonth, form.dobDay, form.dobYear].filter(Boolean).join("/")
       const res = await fetch("/api/account/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, dateOfBirth }),
       })
       if (res.ok) {
         toast.success("Profile updated")
@@ -113,154 +136,213 @@ export default function PersonalInfoPage() {
     }
   }
 
-  const field = (id: keyof ProfileForm, disabled = false) => (
-    <input
-      id={id}
-      type="text"
-      value={form[id]}
-      disabled={disabled || !editing}
-      onChange={(e) => setForm({ ...form, [id]: e.target.value })}
-      className={`w-full px-3 py-2.5 rounded-lg text-sm outline-none transition border ${
-        disabled || !editing
-          ? "bg-gray-50 border-gray-100 text-mist-600 cursor-default"
-          : "bg-white border-gray-300 text-mist-900 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-      }`}
-    />
-  )
+  const set = (key: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }))
+
+  const inputCls = (disabled = false) =>
+    `w-full px-3 py-2.5 rounded-lg text-sm border outline-none transition-colors placeholder:text-mist-400 ${
+      disabled || !editing
+        ? "bg-mist-50 border-mist-200 text-mist-700 cursor-default"
+        : "bg-white border-mist-300 text-mist-900 focus:border-mist-500 focus:ring-1 focus:ring-mist-400"
+    }`
+
+  const selectCls = () =>
+    `px-2 py-2.5 rounded-lg text-sm border outline-none transition-colors bg-white appearance-none cursor-pointer ${
+      !editing
+        ? "bg-mist-50 border-mist-200 text-mist-700 cursor-default pointer-events-none"
+        : "border-mist-300 text-mist-900 focus:border-mist-500 focus:ring-1 focus:ring-mist-400"
+    }`
 
   const initials = (form.name || form.email || "U").charAt(0).toUpperCase()
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible">
-      {/* Header */}
-      <div className="px-6 sm:px-8 pt-8 pb-6 border-b border-gray-100 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-mist-900">Personal Information</h1>
+    <div className="overflow-hidden">
+
+      {/* ── Heading ─────────────────────────────────────────── */}
+      <div className="px-6 sm:px-8 py-14 border-b-2 border-mist-300 font-medium flex items-center justify-between">
+        <h1 className="text-4xl font-bold text-mist-900">Personal Information</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-6">
-        {/* Avatar row — overflow top */}
-        <div className="flex justify-center -mt-20 mb-6">
-          <div className="relative">
-            <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center">
-              {form.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={form.image} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl font-bold text-mist-500">{initials}</span>
-              )}
-            </div>
-            {/* Edit pencil — top right of avatar */}
+      {/* Avatar — sits between header and card */}
+      <div className="flex justify-start px-7 sm:px-10 lg:px-24">
+        <div className="relative -mb-20 mt-8 z-10">
+          <div className="w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-mist-200 flex items-center justify-center">
+            {form.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={form.image} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-3xl font-bold text-mist-400">{initials}</span>
+            )}
+          </div>
+
+          {/* Camera button — top-right of avatar, shown when editing */}
+          {editing && (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              className="absolute bottom-2 right-2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition disabled:opacity-50"
+              className="absolute -top-1 -right-1 w-8 h-8 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center shadow-md transition disabled:opacity-50"
             >
               {uploading ? (
-                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-700 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               ) : (
-                <Camera size={14} className="text-mist-600" />
+                <Camera size={14} className="text-white" />
               )}
             </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-          </div>
-        </div>
+          )}
 
-        {/* Edit button row */}
-        <div className="flex justify-end mb-6">
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+        </div>
+      </div>
+
+      {/* Card */}
+      <div className="mx-7 sm:mx-10 lg:mx-16 my-10 rounded-2xl bg-white shadow-xl pt-20 pb-10 px-6 sm:px-8 relative">
+
+        {/* Edit pencil — top right of card */}
+        <div className="absolute top-5 right-6">
           {!editing ? (
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="flex items-center gap-2 border border-gray-200 text-mist-700 px-4 py-2 rounded-lg text-sm font-medium hover:border-gray-900 hover:text-mist-900 transition"
+              className="w-9 h-9 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:border-mist-400 hover:text-mist-800 transition"
             >
-              <Pencil size={14} /> Edit
+              <Pencil size={15} />
             </button>
           ) : (
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setEditing(false); fetchProfile() }}
-                className="border border-gray-200 text-mist-600 px-4 py-2 rounded-lg text-sm font-medium hover:border-gray-400 transition"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition disabled:opacity-50"
-              >
-                {loading ? "Saving..." : "Save"}
-              </button>
-            </div>
+            <button
+              type="button"
+              className="w-9 h-9 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:border-mist-400 hover:text-mist-800 transition"
+              onClick={() => { setEditing(false); fetchProfile() }}
+            >
+              <Pencil size={15} />
+            </button>
           )}
         </div>
 
-        {/* Fields Grid */}
-        <div className="space-y-4">
-          {/* Row 1 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Name</label>
-              {field("name")}
-            </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Email</label>
-              {field("email", true)}
-            </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Phone Number</label>
-              {field("phone")}
-            </div>
-          </div>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
 
-          {/* Row 2 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Date of birth</label>
-              {field("dateOfBirth")}
+            {/* Row 1: Name / Email / Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={form.name}
+                  disabled={!editing}
+                  onChange={set("name")}
+                  className={inputCls()}
+                />
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={form.email}
+                  disabled
+                  className={inputCls(true)}
+                />
+              </div>
+              {/* Phone with flag */}
+              <div className="flex items-center border rounded-lg overflow-hidden transition-colors
+                bg-white border-mist-300 focus-within:border-mist-500 focus-within:ring-1 focus-within:ring-mist-400
+                disabled:bg-mist-50">
+                <div className="flex items-center gap-1 px-3 border-r border-mist-200 shrink-0">
+                  <span className="text-base">🇺🇸</span>
+                  <svg className="w-3 h-3 text-mist-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <input
+                  type="tel"
+                  placeholder="Phone number"
+                  value={form.phone}
+                  disabled={!editing}
+                  onChange={set("phone")}
+                  className="flex-1 px-3 py-2.5 text-sm outline-none bg-transparent text-mist-900 placeholder:text-mist-400 disabled:cursor-default disabled:bg-mist-50"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Company</label>
-              {field("company")}
-            </div>
-          </div>
 
-          {/* Row 3 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Address</label>
-              {field("address")}
+            {/* Row 2: Date of Birth / Company */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* DOB with 3 dropdowns */}
+              <div className="">
+                <p className="text-xs text-mist-500 mb-1">Date of birth</p>
+                <div className="flex gap-2">
+                  <select value={form.dobMonth} onChange={set("dobMonth")} disabled={!editing} className={`${selectCls()} flex-1`}>
+                    <option value="">Month</option>
+                    {MONTHS.map((m, i) => <option key={m} value={String(i + 1)}>{m}</option>)}
+                  </select>
+                  <select value={form.dobDay} onChange={set("dobDay")} disabled={!editing} className={`${selectCls()} w-20`}>
+                    <option value="">Day</option>
+                    {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                  <select value={form.dobYear} onChange={set("dobYear")} disabled={!editing} className={`${selectCls()} w-24`}>
+                    <option value="">Year</option>
+                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Company"
+                  value={form.company}
+                  disabled={!editing}
+                  onChange={set("company")}
+                  className={inputCls()}
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Country</label>
-              {field("country")}
-            </div>
-          </div>
 
-          {/* Row 4 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">City</label>
-              {field("city")}
+            {/* Row 3: Address / Country */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" placeholder="Address" value={form.address} disabled={!editing} onChange={set("address")} className={inputCls()} />
+              <input type="text" placeholder="Country" value={form.country} disabled={!editing} onChange={set("country")} className={inputCls()} />
             </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">State</label>
-              {field("state")}
+
+            {/* Row 4: City / State / Zip */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <input type="text" placeholder="City" value={form.city} disabled={!editing} onChange={set("city")} className={inputCls()} />
+              <input type="text" placeholder="State" value={form.state} disabled={!editing} onChange={set("state")} className={inputCls()} />
+              <input type="text" placeholder="Zip code" value={form.zipCode} disabled={!editing} onChange={set("zipCode")} className={inputCls()} />
             </div>
-            <div>
-              <label className="text-xs text-mist-400 mb-1 block">Zip code</label>
-              {field("zipCode")}
-            </div>
+
+            {/* Marketing checkbox + action buttons */}
+            {editing && (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-mist-600">
+                  <input
+                    type="checkbox"
+                    checked={form.noMarketing}
+                    onChange={(e) => setForm((f) => ({ ...f, noMarketing: e.target.checked }))}
+                    className="w-4 h-4 rounded border-mist-300 accent-mist-700"
+                  />
+                  Don&apos;t send me special offers &amp; marketing promotions
+                </label>
+
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-2 bg-mist-700 hover:bg-mist-800 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50"
+                  >
+                    {loading ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setEditing(false); fetchProfile() }}
+                    className="px-5 py-2 border border-mist-300 text-mist-700 rounded-lg text-sm font-medium hover:border-mist-500 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   )
 }

@@ -123,8 +123,8 @@ export default function BlogPage() {
               onClick={() => handleCategoryChange(cat)}
               className={`px-4 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-200 ${
                 activeCategory === cat
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 border border-gray-100 text-mist-600 hover:border-gray-400"
+                  ? "bg-mist-900 text-white"
+                  : "bg-mist-100 border border-mist-100 text-mist-600 hover:border-mist-400"
               }`}
             >
               {cat}
@@ -189,7 +189,7 @@ export default function BlogPage() {
                 <div className="flex justify-center mt-10">
                   <button
                     onClick={() => setVisibleCount((prev) => prev + INITIAL_COUNT)}
-                    className="bg-gray-900 text-white text-[13px] font-semibold px-8 py-3 rounded-full hover:bg-gray-700 transition-colors duration-200"
+                    className="bg-mist-900 text-white text-[13px] font-semibold px-8 py-3 rounded-full hover:bg-mist-700 transition-colors duration-200"
                   >
                     Load More
                   </button>
@@ -216,7 +216,7 @@ export default function BlogPage() {
             <p className="text-base text-mist-400 leading-relaxed">
               Explore our exclusive collection of luxury cars, villas, and nightlife experiences — tailored just for you.
             </p>
-            <button className="w-fit mt-2 bg-gray-900 text-white text-base px-6 py-2.5 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+            <button className="w-fit mt-2 bg-mist-900 text-white text-base px-6 py-2.5 rounded-xl hover:bg-mist-700 transition-colors duration-200">
               Reserve Now
             </button>
           </div>

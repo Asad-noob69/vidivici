@@ -45,7 +45,7 @@ export default function CarFilters() {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-6">
+    <div className="bg-white border border-mist-200 rounded-2xl p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-mist-900">Filters</h3>
         <button onClick={clearAll} className="text-xs text-mist-400 hover:text-mist-700 transition-colors">Clear All</button>
@@ -54,7 +54,7 @@ export default function CarFilters() {
       {/* Brand */}
       <div>
         <label className="text-xs font-medium text-mist-500 block mb-2">Brand</label>
-        <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-gray-400 focus:outline-none">
+        <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
           <option value="">All Brands</option>
           {brands.map((b) => (
             <option key={b.id} value={b.slug}>{b.name}</option>
@@ -65,7 +65,7 @@ export default function CarFilters() {
       {/* Category */}
       <div>
         <label className="text-xs font-medium text-mist-500 block mb-2">Category</label>
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-gray-400 focus:outline-none">
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
           <option value="">All Categories</option>
           {categories.map((c) => (
             <option key={c.id} value={c.slug}>{c.name}</option>
@@ -78,13 +78,13 @@ export default function CarFilters() {
         <label className="text-xs font-medium text-mist-500 block mb-2">Price Range (per day)</label>
         <div className="flex gap-2">
           <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
-            className="w-1/2 bg-gray-50 border border-gray-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-gray-400 focus:outline-none" />
+            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
           <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-1/2 bg-gray-50 border border-gray-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-gray-400 focus:outline-none" />
+            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
         </div>
       </div>
 
-      <button onClick={applyFilters} className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-700 transition-colors">
+      <button onClick={applyFilters} className="w-full bg-mist-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors">
         Apply Filters
       </button>
     </div>

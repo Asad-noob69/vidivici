@@ -27,7 +27,7 @@ export default function ExperiencePage() {
         </h2>
         <a
           href="#"
-          className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-gray-100 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors duration-150 whitespace-nowrap shrink-0"
+          className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-mist-100 rounded-md px-4 py-2 hover:bg-mist-50 transition-colors duration-150 whitespace-nowrap shrink-0"
         >
           View all
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -61,7 +61,7 @@ export default function ExperiencePage() {
   {/* Right: Image Grid */}
   <div className="flex-1 w-full grid grid-cols-2 grid-rows-2 gap-3">
    {/* Top full-width image */}
-            <div className="col-span-2 rounded-xl overflow-hidden h-48 sm:h-56 bg-gray-200">
+            <div className="col-span-2 rounded-xl overflow-hidden h-48 sm:h-56 bg-mist-200">
               <img
                 src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80"
                 alt="Luxury car interior"
@@ -69,14 +69,14 @@ export default function ExperiencePage() {
               />
             </div>
             {/* Bottom two images */}
-            <div className="rounded-xl overflow-hidden h-36 sm:h-44 bg-gray-200">
+            <div className="rounded-xl overflow-hidden h-36 sm:h-44 bg-mist-200">
               <img
                 src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80"
                 alt="Luxury SUV exterior"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="rounded-xl overflow-hidden h-36 sm:h-44 bg-gray-200">
+            <div className="rounded-xl overflow-hidden h-36 sm:h-44 bg-mist-200">
               <img
                 src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80"
                 alt="Luxury sedan"

@@ -110,7 +110,7 @@ export default function ExoticCarRentals({ showHeader = true }) {
           <h2 className="text-xl sm:text-4xl font-bold text-mist-900 tracking-tight">
             Exotic Car Rentals
           </h2>
-          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium text-mist-700 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium text-mist-700 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200">
             View all
             <ArrowUpRight size={15} />
           </button>
@@ -121,7 +121,7 @@ export default function ExoticCarRentals({ showHeader = true }) {
         {canLeft && (
           <button
             onClick={() => scrollTo(activeIndex - 2)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
@@ -129,7 +129,7 @@ export default function ExoticCarRentals({ showHeader = true }) {
         {canRight && (
           <button
             onClick={() => scrollTo(activeIndex + 2)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
@@ -157,8 +157,8 @@ export default function ExoticCarRentals({ showHeader = true }) {
             onClick={() => scrollTo(i)}
             className={`rounded-full transition-all duration-300 ${
               i === activeIndex
-                ? "w-5 h-2 bg-gray-800"
-                : "w-2 h-2 bg-gray-300 hover:bg-gray-400"
+                ? "w-5 h-2 bg-mist-800"
+                : "w-2 h-2 bg-mist-300 hover:bg-mist-400"
             }`}
           />
         ))}

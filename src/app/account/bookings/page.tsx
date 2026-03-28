@@ -33,9 +33,7 @@ export default function MyBookingsPage() {
   const fetchBookings = async () => {
     try {
       const res = await fetch("/api/bookings")
-      if (res.ok) {
-        setBookings(await res.json())
-      }
+      if (res.ok) setBookings(await res.json())
     } catch {} finally {
       setLoading(false)
     }
@@ -55,104 +53,162 @@ export default function MyBookingsPage() {
 
   const statusColor = (status: string) => {
     switch (status) {
-      case "CONFIRMED": return "bg-green-50 text-green-700"
-      case "PENDING": return "bg-yellow-50 text-yellow-700"
-      case "ACTIVE": return "bg-blue-50 text-blue-700"
-      case "COMPLETED": return "bg-gray-100 text-mist-600"
-      case "CANCELLED": return "bg-red-50 text-red-600"
-      default: return "bg-gray-100 text-mist-600"
+      case "CONFIRMED":  return "bg-green-50 text-green-600"
+      case "PENDING":    return "bg-yellow-50 text-yellow-600"
+      case "ACTIVE":     return "bg-blue-50 text-blue-600"
+      case "COMPLETED":  return "bg-mist-100 text-mist-500"
+      case "CANCELLED":  return "bg-red-50 text-red-500"
+      default:           return "bg-mist-100 text-mist-500"
     }
+  }
+
+  const statusLabel = (status: string) => {
+    if (status === "CONFIRMED") return "Confirmed"
+    return status.charAt(0) + status.slice(1).toLowerCase()
   }
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
-      <h1 className="text-2xl font-bold text-mist-900 mb-6">My Bookings</h1>
+    <div className="overflow-hidden">
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2 rounded-full text-sm font-medium border transition ${
-              activeTab === tab
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-mist-600 border-gray-200 hover:border-gray-400"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* ── Heading ─────────────────────────────────────────── */}
+      <div className="px-6 sm:px-8 py-14 border-b-2 border-mist-300 font-medium flex items-center justify-between">
+        <h1 className="text-4xl font-bold text-mist-900">My Bookings</h1>
       </div>
 
-      {loading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-36 bg-gray-100 rounded-xl animate-pulse" />
+      {/* ── Body ────────────────────────────────────────────── */}
+      <div className="py-16 px-7 sm:px-10 lg:px-16">
+
+       
+
+        {/* Content */}
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-40 bg-mist-100 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+
+          /* ── Empty state matching the design ── */
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <p className="text-lg font-bold text-mist-500 mb-2">
+              You don&apos;t have any bookings yet
+            </p>
+            <p className="text-sm text-mist-500 mb-6">
+              Start exploring our premium cars, villas, and events.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {["Explore Cars", "Explore Villas", "Explore Events"].map((label) => (
+                <button
+                  key={label}
+                  className="px-5 py-2 rounded-full text-sm font-medium text-mist-500 bg-white border border-mist-200 hover:border-mist-400 hover:text-mist-900 transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+        ) : (
+          <div className="space-y-5">
+             {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-10">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors ${
+                activeTab === tab
+                  ? "bg-mist-500 text-white"
+                  : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
+              }`}
+            >
+              {tab}
+            </button>
           ))}
         </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-mist-400">
-          <CalendarEmpty />
-          <p className="mt-4 text-lg font-medium text-mist-500">No bookings found</p>
-          <p className="text-sm">Your {activeTab !== "All" ? activeTab.toLowerCase() : ""} bookings will appear here</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filtered.map((booking) => {
-            const img = booking.car.images?.[0]?.url
-            return (
-              <div key={booking.id} className="border border-gray-100 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4">
-                {/* Car badge */}
-                <div className="relative w-full sm:w-44 h-32 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                  <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">Car</span>
-                  {img ? (
-                    <Image src={img} alt={booking.car.name} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-mist-300">
-                      <ImageOff size={32} />
-                    </div>
-                  )}
-                </div>
+            {filtered.map((booking) => {
+              const img = booking.car.images?.[0]?.url
+              const isConfirmed = booking.status === "CONFIRMED"
 
-                {/* Details */}
-                <div className="flex-1 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div>
-                    <p className="text-xs text-mist-400">{booking.car.brand.name}</p>
-                    <p className="font-bold text-mist-900 text-lg">{booking.car.name}</p>
-                    <p className="text-xs text-mist-400 mt-1">Booking ID: VV-{booking.id.slice(-8).toUpperCase()}</p>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-mist-500">
-                      <span className="flex items-center gap-1"><Calendar size={12} />{formatDate(booking.startDate)}–{formatDate(booking.endDate)}</span>
-                      <span className="flex items-center gap-1"><MapPin size={12} />{booking.pickupLocation}</span>
+              return (
+                <div key={booking.id} className="border border-mist-200 rounded-2xl overflow-hidden">
+
+                  {/* ── Top: car info row ── */}
+                  <div className="flex flex-col sm:flex-row gap-0">
+
+                    {/* Image */}
+                    <div className="relative w-full sm:w-52 h-44 sm:h-auto flex-shrink-0 bg-mist-100">
+                      {/* Orange "Car" badge */}
+                      <span className="absolute top-3 left-3 z-10 bg-orange-400 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md">
+                        Car
+                      </span>
+                      {img ? (
+                        <Image src={img} alt={booking.car.name} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-mist-300">
+                          <ImageOff size={32} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex-1 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 p-5 sm:p-6">
+
+                      {/* Left: text info */}
+                      <div className="space-y-1.5">
+                        <p className="text-xs text-mist-400 font-medium">{booking.car.brand.name}</p>
+                        <p className="text-xl font-bold text-mist-900">{booking.car.name}</p>
+                        <p className="text-xs text-mist-400">Booking ID: VV-{booking.id.slice(-8).toUpperCase()}</p>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-mist-500">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar size={12} className="text-mist-400" />
+                            {formatDate(booking.startDate)}–{formatDate(booking.endDate)}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <MapPin size={12} className="text-mist-400" />
+                            {booking.pickupLocation}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right: status + price */}
+                      <div className="flex sm:flex-col items-start sm:items-end gap-3 sm:gap-2 flex-shrink-0">
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusColor(booking.status)}`}>
+                          {statusLabel(booking.status)}
+                        </span>
+                        <p className="text-2xl font-bold text-mist-900 leading-tight">
+                          ${booking.totalPrice.toLocaleString()}
+                          <span className="text-sm font-normal text-mist-400"> /day</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusColor(booking.status)}`}>
-                      {booking.status === "CONFIRMED" ? "Confirmed" : booking.status.charAt(0) + booking.status.slice(1).toLowerCase()}
-                    </span>
-                    <p className="text-xl font-bold text-mist-900">${booking.totalPrice}<span className="text-xs font-normal text-mist-400"> /day</span></p>
+                  {/* ── Bottom: action buttons ── */}
+                  <div className="border-t border-mist-100 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-mist-100">
+                    <button className="flex-1 py-3.5 text-sm text-mist-600 font-medium hover:bg-mist-50 transition-colors text-center">
+                      View Details
+                    </button>
+                    {isConfirmed && (
+                      <button className="flex-1 py-3.5 text-sm text-mist-600 font-medium hover:bg-mist-50 transition-colors text-center">
+                        Download Invoice
+                      </button>
+                    )}
+                    <button className="flex-1 py-3.5 text-sm text-mist-600 font-medium hover:bg-red-50 hover:text-red-500 transition-colors text-center">
+                      Cancel Booking
+                    </button>
                   </div>
+
                 </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
-  )
-}
-
-function CalendarEmpty() {
-  return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mx-auto text-mist-300">
-      <rect x="6" y="10" width="36" height="32" rx="4" stroke="currentColor" strokeWidth="2" />
-      <path d="M6 18H42" stroke="currentColor" strokeWidth="2" />
-      <path d="M16 6V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M32 6V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
   )
 }

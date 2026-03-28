@@ -56,7 +56,7 @@ export default function ExoticCarRentals({
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {[...Array(limit)].map((_, i) => (
-              <div key={i} className="bg-gray-100 rounded-2xl h-80 animate-pulse" />
+              <div key={i} className="bg-mist-100 rounded-2xl h-80 animate-pulse" />
             ))}
           </div>
         ) : cars.length === 0 ? (
@@ -87,7 +87,7 @@ export default function ExoticCarRentals({
         <div className="text-center mt-8">
           <a
             href="/cars"
-            className="inline-block px-8 py-3 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition"
+            className="inline-block px-8 py-3 bg-mist-900 text-white rounded-lg text-sm font-semibold hover:bg-mist-800 transition"
           >
             View All Cars
           </a>

@@ -20,7 +20,7 @@ interface ArticleCardProps {
 
 export default function ArticleCard({ article, onReadMore }: ArticleCardProps) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-pointer">
+    <div className="bg-white rounded-2xl overflow-hidden border border-mist-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-pointer">
 
       {/* Image */}
       <div className="h-48 overflow-hidden">
@@ -50,7 +50,7 @@ export default function ArticleCard({ article, onReadMore }: ArticleCardProps) {
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+        <div className="flex items-center justify-between pt-3 border-t border-mist-100 mt-auto">
           <div className="flex items-center gap-3 text-[11px] text-mist-400">
             <span className="flex items-center gap-1">
               <Calendar size={11} /> {article.date}

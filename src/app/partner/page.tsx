@@ -64,7 +64,7 @@ const whoCanJoin = [
 ];
 
 export default function PartnerPage() {
-    const inputCls = "w-full border border-gray-200 rounded-xl bg-gray-100 px-4 py-2.5 text-sm text-mist-950 placeholder-gray-300 outline-none focus:border-gray-400 transition-colors ";
+    const inputCls = "w-full border border-mist-200 rounded-xl bg-mist-100 px-4 py-2.5 text-sm text-mist-950 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors ";
     return (
         <div className="w-full">
 
@@ -95,7 +95,7 @@ export default function PartnerPage() {
                             unforgettable experiences. By partnering with us, you gain access to an elite marketplace
                             designed to maximize visibility, prestige, and profitability.
                         </p>
-                        <button className="w-fit bg-gray-900 text-white text-base font-medium px-7 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+                        <button className="w-fit bg-mist-900 text-white text-base font-medium px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
                             Apply Now
                         </button>
                     </div>
@@ -132,13 +132,13 @@ export default function PartnerPage() {
                             <div
                                 key={f.title}
                                 className="
-  bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-3
+  bg-white rounded-2xl border border-mist-200 p-6 flex flex-col gap-3
   shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.08)]
   hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_30px_rgba(0,0,0,0.10)]
   transition-all duration-300
 "
                             >
-                                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-mist-600">
+                                <div className="w-10 h-10 rounded-xl bg-mist-50 border border-mist-100 flex items-center justify-center text-mist-600">
                                     {f.icon}
                                 </div>
                                 <h3 className="text-xl font-bold text-mist-900">{f.title}</h3>
@@ -151,7 +151,7 @@ export default function PartnerPage() {
             </section>
 
             {/* Who Can Join */}
-            <section className="relative w-full bg-gray-950 sm:px-16 lg:px-20 px-10 pt-16">
+            <section className="relative w-full bg-mist-950 sm:px-16 lg:px-20 px-10 pt-16">
                 <div className="">
 
                     {/* Heading */}
@@ -213,13 +213,13 @@ export default function PartnerPage() {
                     <div className="relative my-20 top-20">
 
                         {/* Connector Line */}
-                        <div className="hidden md:block absolute top-7 left-10 right-10 border-t-2 border-dashed border-gray-200"></div>
+                        <div className="hidden md:block absolute top-7 left-10 right-10 border-t-2 border-dashed border-mist-200"></div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-0">
 
                             {/* Step 1 */}
                             <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="w-14 h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
+                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
                                     1
                                 </div>
 
@@ -242,14 +242,14 @@ export default function PartnerPage() {
                                     </p>
                                 </div>
 
-                                <div className="w-14 h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
+                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
                                     2
                                 </div>
                             </div>
 
                             {/* Step 3 */}
                             <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="w-14 h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
+                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
                                     3
                                 </div>
 
@@ -272,7 +272,7 @@ export default function PartnerPage() {
                                     </p>
                                 </div>
 
-                                <div className="w-14 h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
+                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
                                     4
                                 </div>
                             </div>
@@ -297,7 +297,7 @@ export default function PartnerPage() {
     </div>
 
     {/* Form card */}
-    <div className="bg-white rounded-3xl border border-gray-100 px-8 py-10  shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.08)]
+    <div className="bg-white rounded-3xl border border-mist-100 px-8 py-10  shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.08)]
   hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_30px_rgba(0,0,0,0.10)]
   transition-all duration-300">
       <div className="flex flex-col gap-5">
@@ -318,9 +318,9 @@ export default function PartnerPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-base font-semibold text-mist-700">Phone</label>
-            <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:border-gray-400 transition-colors bg-white">
-              <span className="px-3 py-2.5 text-sm border-r border-gray-200 bg-gray-50 text-mist-600 flex-shrink-0">🇺🇸</span>
-              <input placeholder="Enter your phone number" className="flex-1 px-3 py-2.5 text-base bg-gray-100 text-mist-900 placeholder-gray-300 outline-none" />
+            <div className="flex items-center border border-mist-200 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors bg-white">
+              <span className="px-3 py-2.5 text-sm border-r border-mist-200 bg-mist-50 text-mist-600 flex-shrink-0">🇺🇸</span>
+              <input placeholder="Enter your phone number" className="flex-1 px-3 py-2.5 text-base bg-mist-100 text-mist-900 placeholder-mist-300 outline-none" />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -396,12 +396,12 @@ export default function PartnerPage() {
 
         {/* Checkbox */}
         <label className="flex items-center gap-2.5 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 accent-gray-900" />
+          <input type="checkbox" className="w-4 h-4 rounded border-mist-300 accent-mist-900" />
           <span className="text-[12.5px] text-mist-500">I agree to be contacted about my application.</span>
         </label>
 
         {/* Submit */}
-        <button className="w-full bg-gray-900 text-white text-[14px] font-semibold py-4 rounded-xl hover:bg-gray-700 transition-colors duration-200 mt-1">
+        <button className="w-full bg-mist-900 text-white text-[14px] font-semibold py-4 rounded-xl hover:bg-mist-700 transition-colors duration-200 mt-1">
           Submit Application
         </button>
 
@@ -409,7 +409,7 @@ export default function PartnerPage() {
         <div className="flex flex-wrap items-center justify-center gap-6 pt-2">
           {["Verified Client Base", "100% Secure Data", "Transparent Commission Structure"].map((badge) => (
             <div key={badge} className="flex items-center gap-1.5 text-[11.5px] text-mist-500 font-medium">
-              <div className="w-4 h-4 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-4 rounded-full bg-mist-900 flex items-center justify-center flex-shrink-0">
                 <svg width="8" height="8" viewBox="0 0 10 8" fill="none">
                   <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -437,7 +437,7 @@ export default function PartnerPage() {
       Our dedicated support team is available 24/7 to assist you with
       bookings, inquiries, or custom requests.
     </p>
-    <button className="mt-2 bg-gray-800 text-white text-base px-7 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+    <button className="mt-2 bg-mist-800 text-white text-base px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
       Contact Us
     </button>
   </div>

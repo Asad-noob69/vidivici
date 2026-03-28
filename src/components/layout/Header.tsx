@@ -119,7 +119,7 @@ export default function Header() {
   return (
     <div ref={headerRef}>
       {/* HEADER */}
-      <header className="absolute top-0 z-50 w-full sm:px-16  lg:px-20 px-10 px-10 font-['Jost',sans-serif]">
+      <header className="absolute top-0 z-50 w-full sm:px-16  lg:px-20 px-10">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 gap-4">
 
           {/* LEFT NAV */}
@@ -205,7 +205,7 @@ export default function Header() {
               Become a Partner
             </button>
 
-            <button className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+            <button className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-mist-50 cursor-pointer transition">
               Reserve Now
             </button>
 

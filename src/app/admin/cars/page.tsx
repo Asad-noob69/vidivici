@@ -61,16 +61,16 @@ export default function AdminCarsPage() {
       <Toaster position="top-right" />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-mist-900">Manage Cars</h1>
-        <Link href="/admin/cars/new" className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">
+        <Link href="/admin/cars/new" className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-mist-800 transition-colors">
           + Add New Car
         </Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-mist-200 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left text-xs text-mist-500 border-b border-gray-200">
+              <tr className="text-left text-xs text-mist-500 border-b border-mist-200">
                 <th className="px-6 py-3">Car</th>
                 <th className="px-6 py-3">Brand</th>
                 <th className="px-6 py-3">Category</th>
@@ -93,13 +93,13 @@ export default function AdminCarsPage() {
                   const status = getStatus(car)
                   const primaryImage = car.images?.[0]?.url
                   return (
-                    <tr key={car.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <tr key={car.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {primaryImage ? (
-                            <img src={primaryImage} alt={car.name} className="w-12 h-10 bg-gray-100 rounded object-cover" />
+                            <img src={primaryImage} alt={car.name} className="w-12 h-10 bg-mist-100 rounded object-cover" />
                           ) : (
-                            <div className="w-12 h-10 bg-gray-100 rounded flex items-center justify-center text-xs text-mist-400">IMG</div>
+                            <div className="w-12 h-10 bg-mist-100 rounded flex items-center justify-center text-xs text-mist-400">IMG</div>
                           )}
                           <span className="text-sm font-medium text-mist-900">{car.name}</span>
                         </div>

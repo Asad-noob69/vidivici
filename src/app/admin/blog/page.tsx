@@ -50,15 +50,15 @@ export default function AdminBlogPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-mist-900">Manage Blog Posts</h1>
-        <Link href="/admin/blog/new" className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">
+        <Link href="/admin/blog/new" className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-mist-800 transition-colors">
           + New Post
         </Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-mist-200 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="text-left text-xs text-mist-500 border-b border-gray-200">
+            <tr className="text-left text-xs text-mist-500 border-b border-mist-200">
               <th className="px-6 py-3">Title</th>
               <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Date</th>
@@ -79,7 +79,7 @@ export default function AdminBlogPage() {
                 const status = p.published ? "Published" : "Draft"
                 const date = new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
                 return (
-                  <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <tr key={p.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-mist-900">{p.title}</td>
                     <td className="px-6 py-4">
                       <span className={`text-xs px-2 py-1 rounded ${status === "Published" ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>{status}</span>
