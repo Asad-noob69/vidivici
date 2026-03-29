@@ -73,11 +73,11 @@ export default function LuxuryServices() {
 
                 {/* Footer */}
                 <div className="mt-5 flex items-center justify-end">
-                  <button className="flex items-center gap-2 text-sm group-hover:bg-gray-100 py-1 pr-2 pl-4 rounded-full text-mist-800 font-medium cursor-pointer transition-all duration-300">
+                  <button className="flex items-center gap-2 text-sm group-hover:bg-mist-100 py-1 pr-2 pl-4 rounded-full text-mist-800 font-medium cursor-pointer transition-all duration-300">
                     <span className="opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-mist-800">
                       View Details
                     </span>
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 text-white">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-mist-900 text-white">
                       <ArrowIcon />
                     </span>
                   </button>

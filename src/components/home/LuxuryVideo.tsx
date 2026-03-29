@@ -38,7 +38,7 @@ export default function LuxuryVideo() {
           how you feel. From the moment you arrive in Los Angeles, every detail
           is curated for sophistication, comfort, and exclusivity.
         </p>
-        <button className="mt-6 bg-mist-900 text-white text-sm font-semibold px-7 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+        <button className="mt-6 bg-mist-900 text-white text-sm font-semibold px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
           Reserve Now
         </button>
       </div>
@@ -46,7 +46,7 @@ export default function LuxuryVideo() {
       {/* Laptop frame + video */}
       <div className="relative max-w-2xl mx-auto -mb-32">
         {/* Laptop screen bezel */}
-        <div className="rounded-2xl overflow-hidden shadow-2xl bg-gray-800">
+        <div className="rounded-2xl overflow-hidden shadow-2xl bg-mist-800">
           {/* Screen area */}
           <div className="relative bg-black" style={{ aspectRatio: "16/9" }}>
 

@@ -112,7 +112,7 @@ export default function FAQPage() {
 
       {/* FAQ Section */}
       <section className="w-full min-h-screen">
-        <div className="bg-gray-200 py-16 px-6">
+        <div className="bg-mist-200 py-16 px-6">
           {/* Heading */}
           <h2 className="text-3xl font-bold text-mist-900 text-center tracking-tight mb-12">
             Frequently Asked Questions
@@ -125,8 +125,8 @@ export default function FAQPage() {
                 key={cat}
                 onClick={() => { setActiveCategory(cat); setOpenId(null); }}
                 className={`px-4 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-200 ${activeCategory === cat
-                    ? "bg-gray-900 text-white"
-                    : "bg-white border border-gray-200 text-mist-600 hover:border-gray-400"
+                    ? "bg-mist-900 text-white"
+                    : "bg-white border border-mist-200 text-mist-600 hover:border-mist-400"
                   }`}
               >
                 {cat}
@@ -142,7 +142,7 @@ export default function FAQPage() {
     return (
       <div
         key={faq.id}
-        className="border border-gray-200 bg-white rounded-2xl overflow-hidden transition-all duration-200 shadow-2xl shadow-gray-300"
+        className="border border-mist-200 bg-white rounded-2xl overflow-hidden transition-all duration-200 shadow-2xl shadow-mist-300"
       >
         <button
           onClick={() => setOpenId(isOpen ? null : faq.id)}
@@ -154,8 +154,8 @@ export default function FAQPage() {
           <span
             className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200 ${
               isOpen
-                ? "bg-gray-900 text-white"
-                : "bg-gray-900 text-white"
+                ? "bg-mist-900 text-white"
+                : "bg-mist-900 text-white"
             }`}
           >
             {isOpen
@@ -170,7 +170,7 @@ export default function FAQPage() {
             isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="bg-gray-50 border-t border-gray-100 px-5 py-4">
+          <div className="bg-mist-50 border-t border-mist-100 px-5 py-4">
             <p className="text-[13px] text-mist-400 leading-relaxed">
               {faq.answer}
             </p>
@@ -192,7 +192,7 @@ export default function FAQPage() {
       Our dedicated support team is available 24/7 to assist you with
       bookings, inquiries, or custom requests.
     </p>
-    <button className="mt-2 bg-gray-800 text-white text-base px-7 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+    <button className="mt-2 bg-mist-800 text-white text-base px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
       Contact Us
     </button>
   </div>

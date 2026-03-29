@@ -77,7 +77,7 @@ export default function AdminMessagesPage() {
       ) : (
         <div className="space-y-3">
           {messages.map((msg) => (
-            <div key={msg.id} className={`bg-white border rounded-xl overflow-hidden ${msg.isRead ? "border-gray-200" : "border-black/20"}`}>
+            <div key={msg.id} className={`bg-white border rounded-xl overflow-hidden ${msg.isRead ? "border-mist-200" : "border-black/20"}`}>
               <button onClick={() => setExpanded(expanded === msg.id ? null : msg.id)} className="w-full p-5 text-left flex items-center gap-4">
                 {!msg.isRead && <div className="w-2 h-2 bg-black rounded-full flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
@@ -89,14 +89,14 @@ export default function AdminMessagesPage() {
                 </div>
               </button>
               {expanded === msg.id && (
-                <div className="px-5 pb-5 border-t border-gray-200 pt-4">
+                <div className="px-5 pb-5 border-t border-mist-200 pt-4">
                   <div className="flex gap-4 mb-3 text-xs text-mist-500">
                     <span>From: {msg.email}</span>
                     <span>Date: {formatDate(msg.createdAt)}</span>
                   </div>
                   <p className="text-sm text-mist-600 mb-4">{msg.message}</p>
                   <div className="flex gap-2">
-                    <a href={`mailto:${msg.email}`} className="text-xs bg-black text-white px-4 py-1.5 rounded font-medium hover:bg-gray-800 transition-colors">Reply via Email</a>
+                    <a href={`mailto:${msg.email}`} className="text-xs bg-black text-white px-4 py-1.5 rounded font-medium hover:bg-mist-800 transition-colors">Reply via Email</a>
                     <button onClick={() => toggleRead(msg)} className="text-xs text-mist-500 hover:text-mist-900 transition-colors">{msg.isRead ? "Mark Unread" : "Mark Read"}</button>
                     <button onClick={() => handleDelete(msg.id)} className="text-xs text-red-500 hover:underline">Delete</button>
                   </div>

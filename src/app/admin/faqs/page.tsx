@@ -88,26 +88,26 @@ export default function AdminFAQsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-mist-900">Manage FAQs</h1>
-        <button onClick={() => { if (showForm && editingId) { resetForm() } else { setShowForm(!showForm) } }} className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">
+        <button onClick={() => { if (showForm && editingId) { resetForm() } else { setShowForm(!showForm) } }} className="bg-black text-white px-6 py-2.5 rounded text-sm font-semibold hover:bg-mist-800 transition-colors">
           {showForm ? "Cancel" : "+ Add FAQ"}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
+        <div className="bg-white border border-mist-200 rounded-xl p-6 mb-6 space-y-4">
           <div>
             <label className="text-xs text-mist-500 block mb-1">Question</label>
-            <input type="text" value={question} onChange={(e) => setQuestion(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
+            <input type="text" value={question} onChange={(e) => setQuestion(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
           </div>
           <div>
             <label className="text-xs text-mist-500 block mb-1">Answer</label>
-            <textarea rows={4} value={answer} onChange={(e) => setAnswer(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none resize-none" />
+            <textarea rows={4} value={answer} onChange={(e) => setAnswer(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none resize-none" />
           </div>
           <div>
             <label className="text-xs text-mist-500 block mb-1">Order</label>
-            <input type="number" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} className="w-32 bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
+            <input type="number" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} className="w-32 bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
           </div>
-          <button onClick={handleSubmit} className="bg-black text-white px-6 py-2 rounded text-sm font-semibold hover:bg-gray-800 transition-colors">Save FAQ</button>
+          <button onClick={handleSubmit} className="bg-black text-white px-6 py-2 rounded text-sm font-semibold hover:bg-mist-800 transition-colors">Save FAQ</button>
         </div>
       )}
 
@@ -116,11 +116,11 @@ export default function AdminFAQsPage() {
       ) : (
         <div className="space-y-3">
           {faqs.map((faq) => (
-            <div key={faq.id} className="bg-white border border-gray-200 rounded-xl p-6">
+            <div key={faq.id} className="bg-white border border-mist-200 rounded-xl p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs bg-gray-100 text-mist-900 px-2 py-0.5 rounded font-medium">#{faq.order}</span>
+                    <span className="text-xs bg-mist-100 text-mist-900 px-2 py-0.5 rounded font-medium">#{faq.order}</span>
                     <h3 className="text-sm font-semibold text-mist-900">{faq.question}</h3>
                   </div>
                   <p className="text-sm text-mist-500">{faq.answer}</p>

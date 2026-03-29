@@ -118,7 +118,7 @@ export default function LongTermPage() {
             {features.map((feature, index) => (
               <div key={index} className="flex flex-col gap-3 bg-mist-100 p-4 rounded-lg">
                 {/* Icon */}
-                <div className="w-9 h-9 flex items-center justify-center border border-gray-200 rounded-md">
+                <div className="w-9 h-9 flex items-center justify-center border border-mist-200 rounded-md">
                   {feature.icon}
                 </div>
                 {/* Title */}
@@ -171,7 +171,7 @@ export default function LongTermPage() {
         {/* Right: View All Link */}
         <a
           href="#"
-          className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-gray-100 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors duration-150 whitespace-nowrap shrink-0"
+          className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-mist-100 rounded-md px-4 py-2 hover:bg-mist-50 transition-colors duration-150 whitespace-nowrap shrink-0"
         >
           View all
           <svg
@@ -225,7 +225,7 @@ export default function LongTermPage() {
         <div className="px-10 sm:px-16 lg:px-20 py-16">
           <div className="flex flex-col sm:flex-row items-start gap-8">
             {/* Left: Image */}
-            <div className="w-full sm:w-64 lg:w-lg shrink-0 rounded-2xl overflow-hidden h-96 sm:h-52 bg-gray-100">
+            <div className="w-full sm:w-64 lg:w-lg shrink-0 rounded-2xl overflow-hidden h-96 sm:h-52 bg-mist-100">
               <img
                 src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&q=80"
                 alt="Luxury car on road"

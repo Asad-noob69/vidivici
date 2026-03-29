@@ -88,7 +88,7 @@ export default function TermsPage() {
         </section>
 
         {/* CAR RENTAL TERMS */}
-        <section className="mb-12 pb-12 border-b border-gray-200">
+        <section className="mb-12 pb-12 border-b border-mist-200">
           <h2 className="text-3xl font-bold text-mist-900 mb-8">
             CAR RENTAL TERMS OF SERVICE
           </h2>
@@ -574,7 +574,7 @@ export default function TermsPage() {
         </section>
 
         {/* Acknowledgment Section */}
-        <section className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+        <section className="bg-mist-50 p-8 rounded-lg border border-mist-200">
           <p className="text-mist-700 leading-relaxed text-center font-semibold">
             By using Vidi Vici Rental services, you acknowledge that you have
             read, understood, and agreed to these Terms of Service in full.

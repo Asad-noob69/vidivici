@@ -196,7 +196,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-10">
-      <h2 className="text-2xl font-bold text-mist-900 mb-4 pb-3 border-b border-gray-200">
+      <h2 className="text-2xl font-bold text-mist-900 mb-4 pb-3 border-b border-mist-200">
         {title}
       </h2>
       <div className="flex flex-col gap-4 text-base text-mist-700 leading-relaxed">
@@ -226,7 +226,7 @@ function NumberedGroup({ number, title, children }: { number: number; title: str
 function Bullet({ text }: { text: string }) {
   return (
     <li className="flex items-start gap-3 text-sm text-mist-700 leading-relaxed list-none">
-      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
+      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-mist-400 flex-shrink-0" />
       {text}
     </li>
   );

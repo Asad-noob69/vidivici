@@ -52,14 +52,14 @@ export default function CustomersPage() {
           placeholder="Search by name, email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-mist-900 placeholder:text-mist-400 outline-none focus:border-gray-900 transition"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-mist-200 rounded-lg text-sm text-mist-900 placeholder:text-mist-400 outline-none focus:border-mist-900 transition"
         />
       </div>
 
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-16 bg-mist-100 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -68,10 +68,10 @@ export default function CustomersPage() {
           <p className="text-mist-500">No customers found</p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-mist-200 rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 text-mist-500 text-xs uppercase tracking-wide bg-gray-50">
+              <tr className="border-b border-mist-200 text-mist-500 text-xs uppercase tracking-wide bg-mist-50">
                 <th className="text-left px-5 py-3">Customer</th>
                 <th className="text-left px-5 py-3 hidden sm:table-cell">Email</th>
                 <th className="text-left px-5 py-3 hidden md:table-cell">Phone</th>
@@ -86,11 +86,11 @@ export default function CustomersPage() {
                 return (
                   <tr
                     key={c.id}
-                    className={`border-b border-gray-100 hover:bg-gray-50 transition ${i === filtered.length - 1 ? "border-b-0" : ""}`}
+                    className={`border-b border-mist-100 hover:bg-mist-50 transition ${i === filtered.length - 1 ? "border-b-0" : ""}`}
                   >
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center text-sm font-bold text-mist-500">
+                        <div className="w-9 h-9 rounded-full bg-mist-200 overflow-hidden flex-shrink-0 flex items-center justify-center text-sm font-bold text-mist-500">
                           {c.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={c.image} alt={c.name || ""} className="w-full h-full object-cover" />

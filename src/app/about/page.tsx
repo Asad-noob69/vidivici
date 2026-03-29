@@ -88,7 +88,7 @@ export default function AboutPage() {
             Our dedicated support team is available 24/7 to assist you with
             bookings, inquiries, or custom requests.
           </p>
-          <button className="mt-2 bg-gray-800 text-white text-base px-7 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+          <button className="mt-2 bg-mist-800 text-white text-base px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
             Reserve Now
           </button>
         </div>

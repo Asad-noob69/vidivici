@@ -57,7 +57,7 @@ export default function WhyChooseUs({ bg = "#f0f0ee" }: { bg?: string }) {
               service in Los Angeles.
             </p>
           </div>
-          <button className="w-fit bg-mist-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-gray-700 transition-colors duration-200">
+          <button className="w-fit bg-mist-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
             Reserve Now
           </button>
         </div>

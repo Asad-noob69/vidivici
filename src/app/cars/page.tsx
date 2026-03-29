@@ -116,14 +116,14 @@ function CarsContent() {
           {/* Mobile filter toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-mist-700 w-fit"
+            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-mist-200 rounded-xl text-sm font-medium text-mist-700 w-fit"
           >
             <SlidersHorizontal size={16} /> {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
 
           {/* Sidebar */}
           <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <Suspense fallback={<div className="h-96 bg-gray-100 rounded-xl animate-pulse" />}>
+            <Suspense fallback={<div className="h-96 bg-mist-100 rounded-xl animate-pulse" />}>
               <CarFilters />
             </Suspense>
           </aside>
@@ -135,7 +135,7 @@ function CarsContent() {
               <select
                 value={sort}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="bg-white border border-gray-200 text-mist-700 text-sm px-3 py-2 rounded-lg focus:border-gray-400 focus:outline-none"
+                className="bg-white border border-mist-200 text-mist-700 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
               >
                 <option value="newest">Sort by: Newest</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -146,7 +146,7 @@ function CarsContent() {
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-gray-100 rounded-2xl h-80 animate-pulse" />
+                  <div key={i} className="bg-mist-100 rounded-2xl h-80 animate-pulse" />
                 ))}
               </div>
             ) : cars.length === 0 ? (
@@ -186,8 +186,8 @@ function CarsContent() {
                     onClick={() => goToPage(p)}
                     className={`w-10 h-10 rounded-lg font-semibold text-sm transition-colors ${
                       p === currentPage
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-mist-500 hover:bg-gray-200"
+                        ? "bg-mist-900 text-white"
+                        : "bg-mist-100 text-mist-500 hover:bg-mist-200"
                     }`}
                   >
                     {p}

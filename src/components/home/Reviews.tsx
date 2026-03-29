@@ -130,7 +130,7 @@ export default function Testimonials() {
         {canLeft && (
           <button
             onClick={() => scroll(-1)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
@@ -138,7 +138,7 @@ export default function Testimonials() {
         {canRight && (
           <button
             onClick={() => scroll(1)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-gray-50 transition-all"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
@@ -152,13 +152,13 @@ export default function Testimonials() {
           {reviews.map((r) => (
             <div
               key={r.id}
-              className="flex-shrink-0 bg-white border border-gray-100 rounded-2xl shadow-sm p-5 flex flex-col justify-between"
+              className="flex-shrink-0 bg-white border border-mist-100 rounded-2xl shadow-sm p-5 flex flex-col justify-between"
               style={{ width: `${CARD_WIDTH}px` }}
             >
               <p className="text-[13px] text-mist-500 leading-relaxed">
                 {r.text}
               </p>
-              <div className="flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-3 mt-5 pt-4 border-t border-mist-100">
                 <img
                   src={r.avatar}
                   alt={r.name}
@@ -185,8 +185,8 @@ export default function Testimonials() {
             onClick={() => scrollToIndex(i)}
             className={`rounded-full transition-all duration-300 ${
               i === activeIndex
-                ? "w-5 h-2 bg-gray-900"
-                : "w-2 h-2 bg-gray-300 hover:bg-gray-500"
+                ? "w-5 h-2 bg-mist-900"
+                : "w-2 h-2 bg-mist-300 hover:bg-mist-500"
             }`}
           />
         ))}

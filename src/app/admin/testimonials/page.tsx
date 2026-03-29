@@ -105,30 +105,30 @@ export default function AdminTestimonialsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-mist-900">Manage Testimonials</h1>
-        <button onClick={() => { if (showForm && editingId) { resetForm() } else { setShowForm(!showForm) } }} className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+        <button onClick={() => { if (showForm && editingId) { resetForm() } else { setShowForm(!showForm) } }} className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-mist-800 transition-colors">
           {showForm ? "Cancel" : "+ Add Testimonial"}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
+        <div className="bg-white border border-mist-200 rounded-xl p-6 mb-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-mist-500 block mb-1">Customer Name</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none" />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none" />
             </div>
             <div>
               <label className="text-xs text-mist-500 block mb-1">Rating</label>
-              <select value={rating} onChange={(e) => setRating(parseInt(e.target.value))} className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none">
+              <select value={rating} onChange={(e) => setRating(parseInt(e.target.value))} className="w-full bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none">
                 <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
               </select>
             </div>
           </div>
           <div>
             <label className="text-xs text-mist-500 block mb-1">Content</label>
-            <textarea rows={3} value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none resize-none" />
+            <textarea rows={3} value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded-lg focus:border-black focus:outline-none resize-none" />
           </div>
-          <button onClick={handleSubmit} className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">Save Testimonial</button>
+          <button onClick={handleSubmit} className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-mist-800 transition-colors">Save Testimonial</button>
         </div>
       )}
 
@@ -137,16 +137,16 @@ export default function AdminTestimonialsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {testimonials.map((t) => (
-            <div key={t.id} className="bg-white border border-gray-200 rounded-xl p-6">
+            <div key={t.id} className="bg-white border border-mist-200 rounded-xl p-6">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-medium text-sm">{t.name.charAt(0)}</div>
+                  <div className="w-10 h-10 bg-mist-900 rounded-full flex items-center justify-center text-white font-medium text-sm">{t.name.charAt(0)}</div>
                   <div>
                     <p className="text-sm font-medium text-mist-900">{t.name}</p>
-                    <div className="flex gap-0.5">{Array.from({ length: t.rating }).map((_, i) => <Star key={i} size={12} className="fill-gray-900 text-mist-900" />)}</div>
+                    <div className="flex gap-0.5">{Array.from({ length: t.rating }).map((_, i) => <Star key={i} size={12} className="fill-mist-900 text-mist-900" />)}</div>
                   </div>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${t.isVisible ? "bg-green-50 text-green-600" : "bg-gray-100 text-mist-500"}`}>
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${t.isVisible ? "bg-green-50 text-green-600" : "bg-mist-100 text-mist-500"}`}>
                   {t.isVisible ? "Visible" : "Hidden"}
                 </span>
               </div>

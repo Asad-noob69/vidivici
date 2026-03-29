@@ -62,7 +62,7 @@ export default function ContactPage() {
     console.log(form);
   };
 
-  const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-[13px] text-mist-900 placeholder-gray-300 outline-none focus:border-gray-400 transition-colors bg-white";
+  const inputCls = "w-full border border-mist-200 rounded-xl px-4 py-2.5 text-[13px] text-mist-900 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors bg-white";
 
   return (
     <div className="w-full">
@@ -90,9 +90,9 @@ export default function ContactPage() {
             {contactDetails.map((item) => (
               <div
                 key={item.label}
-                className="bg-white border border-gray-100 rounded-2xl py-4 flex flex-col items-center text-center gap-2 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="bg-white border border-mist-100 rounded-2xl py-4 flex flex-col items-center text-center gap-2 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                <div className="w-10 h-10 rounded-full border border-gray-100 bg-gray-50 flex items-center justify-center text-mist-500">
+                <div className="w-10 h-10 rounded-full border border-mist-100 bg-mist-50 flex items-center justify-center text-mist-500">
                   {item.icon}
                 </div>
                 <p className="text-[13px] font-bold text-mist-900">{item.label}</p>
@@ -109,7 +109,7 @@ export default function ContactPage() {
       </section>
       <section className="-mt-96 relative z-10">
         <div className="w-full pt-16">
-          <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 px-8 py-10">
+          <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-mist-100 px-8 py-10">
 
             <h2 className="text-2xl font-bold text-mist-900 text-center tracking-tight mb-8">
               Start Planning Your Luxury Experience
@@ -133,9 +133,9 @@ export default function ContactPage() {
                   <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Enter your email" className={inputCls} />
                 </Field>
                 <Field label="Phone Number">
-                  <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:border-gray-400 transition-colors bg-white">
-                    <span className="px-3 py-2.5 text-sm border-r border-gray-200 bg-gray-50 text-mist-600 flex-shrink-0">🇺🇸 +1</span>
-                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="(555) 555-5555" className="flex-1 px-3 py-2.5 text-[13px] text-mist-900 placeholder-gray-300 outline-none" />
+                  <div className="flex items-center border border-mist-200 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors bg-white">
+                    <span className="px-3 py-2.5 text-sm border-r border-mist-200 bg-mist-50 text-mist-600 flex-shrink-0">🇺🇸 +1</span>
+                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="(555) 555-5555" className="flex-1 px-3 py-2.5 text-[13px] text-mist-900 placeholder-mist-300 outline-none" />
                   </div>
                 </Field>
               </div>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                   <div className="flex items-center gap-4 h-[42px] px-1">
                     {(["House", "Car", "VIP events"] as const).map((need) => (
                       <label key={need} className="flex items-center gap-1.5 cursor-pointer text-[13px] text-mist-700">
-                        <input type="radio" name="tripNeed" value={need} checked={form.tripNeed === need} onChange={handleChange} className="accent-gray-900 w-4 h-4" />
+                        <input type="radio" name="tripNeed" value={need} checked={form.tripNeed === need} onChange={handleChange} className="accent-mist-900 w-4 h-4" />
                         {need}
                       </label>
                     ))}
@@ -187,7 +187,7 @@ export default function ContactPage() {
                 <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Write any special requests or notes here..." rows={4} className={`${inputCls} resize-none`} />
               </Field>
 
-              <button type="submit" className="w-full bg-gray-900 text-white text-[14px] font-semibold py-3.5 rounded-xl hover:bg-gray-700 transition-colors duration-200 mt-1">
+              <button type="submit" className="w-full bg-mist-900 text-white text-[14px] font-semibold py-3.5 rounded-xl hover:bg-mist-700 transition-colors duration-200 mt-1">
                 Send Request
               </button>
 

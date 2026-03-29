@@ -71,7 +71,7 @@ export default function AdminBookingsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white border border-gray-200 text-mist-900 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+          className="bg-white border border-mist-200 text-mist-900 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
         >
           <option>All Statuses</option>
           <option>Pending</option>
@@ -85,11 +85,11 @@ export default function AdminBookingsPage() {
       {loading ? (
         <div className="text-center py-12 text-mist-500">Loading bookings...</div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-mist-200 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-xs text-mist-500 border-b border-gray-200">
+                <tr className="text-left text-xs text-mist-500 border-b border-mist-200">
                   <th className="px-6 py-3">ID</th>
                   <th className="px-6 py-3">Customer</th>
                   <th className="px-6 py-3">Car</th>
@@ -103,7 +103,7 @@ export default function AdminBookingsPage() {
               <tbody>
                 {filteredBookings.map((b) => (
                   <>
-                    <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <tr key={b.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-mist-900">{b.id.slice(0, 8)}</td>
                       <td className="px-6 py-4"><p className="text-sm text-mist-900">{b.user.name || "N/A"}</p><p className="text-xs text-mist-400">{b.user.email}</p></td>
                       <td className="px-6 py-4 text-sm text-mist-600">{b.car.brand.name} {b.car.name}</td>
@@ -113,7 +113,7 @@ export default function AdminBookingsPage() {
                         <span className={`text-xs px-2 py-1 rounded ${
                           b.status === "CONFIRMED" ? "bg-blue-50 text-blue-600" :
                           b.status === "ACTIVE" ? "bg-green-50 text-green-600" :
-                          b.status === "COMPLETED" ? "bg-gray-100 text-mist-600" :
+                          b.status === "COMPLETED" ? "bg-mist-100 text-mist-600" :
                           b.status === "CANCELLED" ? "bg-red-50 text-red-600" :
                           "bg-yellow-50 text-yellow-600"
                         }`}>{displayStatus(b.status)}</span>
@@ -130,7 +130,7 @@ export default function AdminBookingsPage() {
                       </td>
                     </tr>
                     {expandedId === b.id && (
-                      <tr key={`${b.id}-details`} className="border-b border-gray-100 bg-gray-50">
+                      <tr key={`${b.id}-details`} className="border-b border-mist-100 bg-mist-50">
                         <td colSpan={8} className="px-6 py-4">
                           <div className="space-y-3">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -144,7 +144,7 @@ export default function AdminBookingsPage() {
                               <select
                                 value={b.status}
                                 onChange={(e) => updateStatus(b.id, e.target.value)}
-                                className="text-xs border border-gray-200 rounded px-2 py-1 focus:border-black focus:outline-none"
+                                className="text-xs border border-mist-200 rounded px-2 py-1 focus:border-black focus:outline-none"
                               >
                                 <option value="PENDING">Pending</option>
                                 <option value="CONFIRMED">Confirmed</option>

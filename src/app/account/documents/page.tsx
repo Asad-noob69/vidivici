@@ -1,36 +1,144 @@
 "use client"
 
-import { FileText, Upload } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { MoreVertical, Plus, Pencil } from "lucide-react"
+
+interface Document {
+  id: string
+  type: string
+  number: string
+  expiration: string
+  status: "Pending" | "Approved" | "Rejected"
+  imageUrl?: string
+}
+
+const EXISTING_DOCUMENTS: Document[] = [
+  {
+    id: "1",
+    type: "Driver's License",
+    number: "3546546454",
+    expiration: "02/01",
+    status: "Pending",
+  },
+]
+
+const ADD_SLOTS = [
+  { label: "Add Insurance Policy", href: "/account/documents/add-insurance"   },
+  { label: "Add ID / Passport",    href: "/account/documents/add-id" },
+]
+
+const EDIT_ROUTES: Record<string, string> = {
+  "Driver's License": "/account/documents/add-license",
+  "Insurance Policy": "/account/documents/add-insurance",
+  "ID / Passport":    "/account/documents/add-id",
+}
+
+const statusColor = (status: string) => {
+  switch (status) {
+    case "Approved": return "bg-green-50 text-green-600"
+    case "Rejected": return "bg-red-50 text-red-500"
+    default:         return "bg-orange-50 text-orange-500"
+  }
+}
+
+function DocMenu({ docType, onClose }: { docType: string; onClose: () => void }) {
+  const router = useRouter()
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [onClose])
+
+  return (
+    <div
+      ref={ref}
+      className="absolute right-0 top-8 z-20 w-36 bg-white border border-mist-100 rounded-xl shadow-lg overflow-hidden"
+    >
+      <button
+        onClick={() => {
+          router.push(EDIT_ROUTES[docType] || "/account/documents/add-license")
+          onClose()
+        }}
+        className="flex items-center gap-2 w-full px-4 py-3 text-sm text-mist-700 hover:bg-mist-50 transition-colors"
+      >
+        <Pencil size={14} className="text-mist-400" />
+        Edit
+      </button>
+    </div>
+  )
+}
 
 export default function DocumentsPage() {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
-      <h1 className="text-2xl font-bold text-mist-900 mb-2">Documents</h1>
-      <p className="text-mist-500 text-sm mb-8">Upload and manage your documents for seamless bookings.</p>
+  const router = useRouter()
+  const [docs] = useState<Document[]>(EXISTING_DOCUMENTS)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        {[
-          { label: "Driving License", desc: "Upload front and back" },
-          { label: "Passport / National ID", desc: "Government-issued photo ID" },
-          { label: "Proof of Address", desc: "Utility bill or bank statement" },
-        ].map((doc) => (
-          <div key={doc.label} className="border border-dashed border-gray-200 rounded-xl p-5 flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <FileText size={20} className="text-mist-400" />
+  return (
+    <div className="overflow-hidden">
+
+      {/* ── Heading ─────────────────────────────────────────── */}
+      <div className="px-6 sm:px-8 py-14 border-b-2 border-mist-300 font-medium flex items-center justify-between">
+        <h1 className="text-4xl font-bold text-mist-900">Documents</h1>
+      </div>
+
+      {/* ── Body ────────────────────────────────────────────── */}
+      <div className="my-16 p-6 mx-7 sm:mx-10 lg:mx-16 space-y-4 bg-white rounded-2xl">
+
+        {/* Existing document cards */}
+        {docs.map((doc) => (
+          <div
+            key={doc.id}
+            className="flex items-start gap-4 border border-mist-200 rounded-2xl p-4 sm:p-5"
+          >
+            {/* Thumbnail */}
+            <div className="w-56 h-36 rounded-xl bg-mist-200 flex-shrink-0 overflow-hidden">
+              {doc.imageUrl && (
+                <img src={doc.imageUrl} alt={doc.type} className="w-full h-full object-cover" />
+              )}
             </div>
-            <div className="flex-1">
-              <p className="font-medium text-mist-900 text-sm">{doc.label}</p>
-              <p className="text-xs text-mist-400 mt-0.5">{doc.desc}</p>
-              <button className="mt-3 flex items-center gap-1.5 text-xs font-medium text-mist-600 hover:text-mist-900 transition">
-                <Upload size={12} /> Upload
+
+            {/* Info */}
+            <div className="flex-1 min-w-0 space-y-2 mt-3">
+              <p className="font-semibold text-mist-900 text-base">{doc.type}</p>
+              <p className="text-sm text-mist-400">License Number: {doc.number}</p>
+              <p className="text-sm text-mist-400">Expiration Date: {doc.expiration}</p>
+            </div>
+
+            {/* Status + menu */}
+            <div className="relative flex items-center gap-2 flex-shrink-0">
+              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md ${statusColor(doc.status)}`}>
+                {doc.status}
+              </span>
+              <button
+                onClick={() => setOpenMenu(openMenu === doc.id ? null : doc.id)}
+                className="p-1 hover:bg-mist-100 rounded-lg transition-colors"
+              >
+                <MoreVertical size={16} className="text-mist-400" />
               </button>
+              {openMenu === doc.id && (
+                <DocMenu docType={doc.type} onClose={() => setOpenMenu(null)} />
+              )}
             </div>
           </div>
         ))}
-      </div>
 
-      <div className="bg-gray-50 rounded-xl p-5 text-center text-mist-400 text-sm">
-        <p>Document upload functionality coming soon.</p>
+        {/* Add slots */}
+        {ADD_SLOTS.map((slot) => (
+          <button
+            key={slot.label}
+            onClick={() => router.push(slot.href)}
+            className="w-full flex flex-col items-center justify-center gap-2 border border-blue-200 rounded-2xl py-16 hover:bg-blue-50/50 transition-colors group"
+          >
+            <Plus size={22} className="text-blue-500 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-medium text-blue-500">{slot.label}</span>
+          </button>
+        ))}
+
       </div>
     </div>
   )

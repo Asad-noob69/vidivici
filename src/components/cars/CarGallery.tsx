@@ -12,7 +12,7 @@ export default function CarGallery({ images }: CarGalleryProps) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="bg-gray-100 rounded-2xl h-96 flex items-center justify-center">
+      <div className="bg-mist-100 rounded-2xl h-96 flex items-center justify-center">
         <ImageOff size={48} className="text-mist-300" />
       </div>
     )
@@ -20,7 +20,7 @@ export default function CarGallery({ images }: CarGalleryProps) {
 
   return (
     <div>
-      <div className="bg-gray-100 rounded-2xl overflow-hidden h-80 sm:h-96 mb-3">
+      <div className="bg-mist-100 rounded-2xl overflow-hidden h-80 sm:h-96 mb-3">
         <img
           src={images[activeIndex].url}
           alt={images[activeIndex].alt || "Car image"}
@@ -34,7 +34,7 @@ export default function CarGallery({ images }: CarGalleryProps) {
               key={i}
               onClick={() => setActiveIndex(i)}
               className={`w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
-                i === activeIndex ? "border-gray-900" : "border-gray-200 hover:border-gray-400"
+                i === activeIndex ? "border-mist-900" : "border-mist-200 hover:border-mist-400"
               }`}
             >
               <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" />

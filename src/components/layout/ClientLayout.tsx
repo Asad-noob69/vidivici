@@ -1,25 +1,43 @@
-"use client"
+"use client";
 
-import { usePathname } from "next/navigation"
-import { SessionProvider } from "next-auth/react"
-import Header from "@/components/layout/Header"
-import Footer from "@/components/layout/Footer"
+import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
+
+import Header from "./Header";
+import Footer from "./Footer";
+
+import AccountHeader from "./AccountHeader";
+import AccountFooter from "./AccountFooter";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isAdmin = pathname.startsWith("/admin")
+  const pathname = usePathname();
 
+  const isAdmin = pathname.startsWith("/admin");
+  const isAccount = pathname.startsWith("/account");
+  const isAuth = pathname === "/login" || pathname === "/register";
+
+  // Admin layout
   if (isAdmin) {
-    return <SessionProvider>{children}</SessionProvider>
+    return <SessionProvider>{children}</SessionProvider>;
   }
 
+  // Account + Login/Register layout
+  if (isAccount || isAuth) {
+    return (
+      <SessionProvider>
+        <AccountHeader />
+        <main className="min-h-screen">{children}</main>
+        <AccountFooter />
+      </SessionProvider>
+    );
+  }
+
+  // Default website layout
   return (
     <SessionProvider>
       <Header />
-      <main className="min-h-screen">
-        {children}
-      </main>
+      <main className="min-h-screen">{children}</main>
       <Footer />
     </SessionProvider>
-  )
+  );
 }

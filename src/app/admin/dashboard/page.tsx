@@ -70,9 +70,9 @@ export default function AdminDashboard() {
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <div key={stat.label} className="bg-white border border-gray-200 rounded-xl p-6">
+            <div key={stat.label} className="bg-white border border-mist-200 rounded-xl p-6">
               <div className="flex justify-between items-start mb-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-mist-100 rounded-lg flex items-center justify-center">
                   <Icon size={18} className="text-mist-600" />
                 </div>
                 <span className="text-xs text-mist-400">{stat.change}</span>
@@ -85,20 +85,20 @@ export default function AdminDashboard() {
       </div>
 
       <div className="flex gap-3 mb-10">
-        <Link href="/admin/cars/new" className="bg-black text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">+ Add Car</Link>
-        <Link href="/admin/messages" className="border border-gray-200 text-mist-600 px-5 py-2.5 rounded-lg text-sm hover:border-gray-400 transition-colors">View Messages</Link>
-        <Link href="/admin/blog/new" className="border border-gray-200 text-mist-600 px-5 py-2.5 rounded-lg text-sm hover:border-gray-400 transition-colors">New Blog Post</Link>
+        <Link href="/admin/cars/new" className="bg-black text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-mist-800 transition-colors">+ Add Car</Link>
+        <Link href="/admin/messages" className="border border-mist-200 text-mist-600 px-5 py-2.5 rounded-lg text-sm hover:border-mist-400 transition-colors">View Messages</Link>
+        <Link href="/admin/blog/new" className="border border-mist-200 text-mist-600 px-5 py-2.5 rounded-lg text-sm hover:border-mist-400 transition-colors">New Blog Post</Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+      <div className="bg-white border border-mist-200 rounded-xl overflow-hidden">
+        <div className="px-6 py-5 border-b border-mist-200 flex justify-between items-center">
           <h2 className="text-base font-semibold text-mist-900">Recent Bookings</h2>
           <Link href="/admin/bookings" className="text-sm text-mist-500 hover:text-mist-900 transition-colors">View All</Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left text-xs font-medium text-mist-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left text-xs font-medium text-mist-500 uppercase tracking-wider border-b border-mist-100">
                 <th className="px-6 py-3">ID</th>
                 <th className="px-6 py-3">Customer</th>
                 <th className="px-6 py-3">Car</th>
@@ -107,14 +107,14 @@ export default function AdminDashboard() {
                 <th className="px-6 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-mist-50">
               {loading ? (
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-mist-500">Loading...</td></tr>
               ) : recentBookings.length === 0 ? (
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-mist-500">No bookings yet</td></tr>
               ) : (
                 recentBookings.map((b) => (
-                  <tr key={b.id} className="hover:bg-gray-50/50 transition-colors">
+                  <tr key={b.id} className="hover:bg-mist-50/50 transition-colors">
                     <td className="px-6 py-4 text-sm font-medium text-mist-900">{b.id.slice(0, 8)}</td>
                     <td className="px-6 py-4 text-sm text-mist-700">{b.user.name || b.user.email}</td>
                     <td className="px-6 py-4 text-sm text-mist-500">{b.car.brand.name} {b.car.name}</td>
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                         b.status === "CONFIRMED" ? "bg-blue-50 text-blue-600" :
                         b.status === "ACTIVE" ? "bg-green-50 text-green-600" :
-                        b.status === "COMPLETED" ? "bg-gray-100 text-mist-600" :
+                        b.status === "COMPLETED" ? "bg-mist-100 text-mist-600" :
                         b.status === "CANCELLED" ? "bg-red-50 text-red-600" :
                         "bg-yellow-50 text-yellow-600"
                       }`}>{displayStatus(b.status)}</span>
