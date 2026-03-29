@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, BedDouble, Users, Bath, Maximize2, MapPin, Plane, ChefHat, Shield, ArrowUpRight, Heart } from "lucide-react"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
@@ -47,6 +48,7 @@ const TABS = ["Stay", "Event", "Production"] as const
 type TabType = (typeof TABS)[number]
 
 export default function VillaDetailClient({ villa, relatedVillas }: { villa: Villa; relatedVillas: RelatedVilla[] }) {
+  const router = useRouter()
   const [currentImage, setCurrentImage] = useState(0)
   const [activeTab, setActiveTab] = useState<TabType>("Stay")
   const [checkIn, setCheckIn] = useState("")
@@ -368,7 +370,22 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                 </div>
               </div>
 
-              <button className="w-full bg-mist-900 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors">
+              <button
+                onClick={() => {
+                  const params = new URLSearchParams({
+                    type: "villa",
+                    villa: villa.slug,
+                    ...(checkIn && { checkIn }),
+                    ...(checkOut && { checkOut }),
+                    ...(guestCount > 1 && { guests: String(guestCount) }),
+                    ...(airportTransfer && { airportTransfer: "1" }),
+                    ...(privateChef && { privateChef: "1" }),
+                    ...(securityService && { securityService: "1" }),
+                  })
+                  router.push(`/booking?${params.toString()}`)
+                }}
+                className="w-full bg-mist-900 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors"
+              >
                 Reserve Now
               </button>
 

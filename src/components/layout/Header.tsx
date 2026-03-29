@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -50,11 +50,9 @@ const NAV_ITEMS = [
   },
   {
     label: "Villas",
-    href: "#",
+    href: "/villas",
     sub: [
-      { label: "Beachfront", href: "#" },
-      { label: "Mountain", href: "#" },
-      { label: "Private Estates", href: "#" },
+      { label: "Browse All Villas", href: "/villas" },
     ],
   },
   {
@@ -79,15 +77,21 @@ const SearchIcon = () => (
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session } = useSession();
   const [openDropdown, setOpenDropdown] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
 
   const headerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Pages with dark hero where header can start transparent
+  const hasDarkHero = pathname === "/" || pathname === "/partner";
+  const showBg = scrolled || !hasDarkHero;
 
   const handleSearch = () => {
     const q = searchQuery.trim();
@@ -109,6 +113,13 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
@@ -119,7 +130,7 @@ export default function Header() {
   return (
     <div ref={headerRef}>
       {/* HEADER */}
-      <header className="absolute top-0 z-50 w-full sm:px-16  lg:px-20 px-10">
+      <header className={`fixed top-0 z-50 w-full sm:px-16 lg:px-20 px-10 transition-colors duration-300 ${showBg ? "bg-[#0a0d12]/95 backdrop-blur-md border-b border-white/[0.06]" : ""}`}>
         <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 gap-4">
 
           {/* LEFT NAV */}
@@ -205,9 +216,9 @@ export default function Header() {
               Become a Partner
             </button>
 
-            <button className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-mist-50 cursor-pointer transition">
+            <Link href="/booking" className="px-4 py-2 text-[13px] font-medium text-[#0a0d12] bg-white border border-white/80 rounded-lg hover:bg-mist-50 cursor-pointer transition">
               Reserve Now
-            </button>
+            </Link>
 
             <Link
               href={session?.user ? "/account" : "/login"}
