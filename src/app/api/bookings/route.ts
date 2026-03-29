@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { carId, startDate, endDate, pickupLocation, dropoffLocation, notes } = body
+    const { carId, startDate, endDate, pickupLocation, dropoffLocation, deliveryType, deliveryAddress, returnAddress, isOneWay, notes } = body
 
     const car = await prisma.car.findUnique({ where: { id: carId } })
     if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
@@ -59,6 +59,10 @@ export async function POST(request: NextRequest) {
         endDate: end,
         pickupLocation,
         dropoffLocation: dropoffLocation || pickupLocation,
+        deliveryType: deliveryType || 'pickup',
+        deliveryAddress: deliveryAddress || null,
+        returnAddress: returnAddress || null,
+        isOneWay: isOneWay || false,
         totalPrice,
         notes,
       },

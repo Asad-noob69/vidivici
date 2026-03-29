@@ -166,6 +166,12 @@ function ReservationContent() {
   const [uploadingLicense, setUploadingLicense] = useState(false)
   const [uploadingInsurance, setUploadingInsurance] = useState(false)
 
+  /* ---- Delivery state ---- */
+  const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">("pickup")
+  const [deliveryAddress, setDeliveryAddress] = useState("")
+  const [returnAddress, setReturnAddress] = useState("")
+  const [isOneWay, setIsOneWay] = useState(false)
+
   /* ---- Pay step state ---- */
   const [cardName, setCardName] = useState("")
   const [cardNumber, setCardNumber] = useState("")
@@ -411,6 +417,10 @@ function ReservationContent() {
             endDate,
             pickupLocation: selectedCar.location,
             dropoffLocation: selectedCar.location,
+            deliveryType,
+            deliveryAddress: deliveryType === "delivery" ? deliveryAddress : undefined,
+            returnAddress: deliveryType === "delivery" ? returnAddress : undefined,
+            isOneWay,
             notes: needDriver
               ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days`
               : undefined,
@@ -551,6 +561,14 @@ function ReservationContent() {
                 uploadingLicense={uploadingLicense}
                 uploadingInsurance={uploadingInsurance}
                 onDocUpload={handleDocUpload}
+                deliveryType={deliveryType}
+                setDeliveryType={setDeliveryType}
+                deliveryAddress={deliveryAddress}
+                setDeliveryAddress={setDeliveryAddress}
+                returnAddress={returnAddress}
+                setReturnAddress={setReturnAddress}
+                isOneWay={isOneWay}
+                setIsOneWay={setIsOneWay}
               />
             )}
 
@@ -658,6 +676,10 @@ function CarSelectStep({
   email, setEmail, phone, setPhone,
   driverLicenseUrl, insuranceUrl,
   uploadingLicense, uploadingInsurance, onDocUpload,
+  deliveryType, setDeliveryType,
+  deliveryAddress, setDeliveryAddress,
+  returnAddress, setReturnAddress,
+  isOneWay, setIsOneWay,
 }: {
   brands: BrandOption[]
   selectedBrandSlug: string
@@ -693,6 +715,14 @@ function CarSelectStep({
   driverLicenseUrl: string; insuranceUrl: string
   uploadingLicense: boolean; uploadingInsurance: boolean
   onDocUpload: (file: File, type: "license" | "insurance") => void
+  deliveryType: "pickup" | "delivery"
+  setDeliveryType: (v: "pickup" | "delivery") => void
+  deliveryAddress: string
+  setDeliveryAddress: (v: string) => void
+  returnAddress: string
+  setReturnAddress: (v: string) => void
+  isOneWay: boolean
+  setIsOneWay: (v: boolean) => void
 }) {
   return (
     <div className="space-y-8">
@@ -741,6 +771,47 @@ function CarSelectStep({
       {/* When & Where */}
       <div>
         <h2 className="text-lg font-semibold text-mist-900 mb-4">When & Where</h2>
+
+        {/* Pickup / Delivery Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-0 border border-mist-200 rounded-xl overflow-hidden">
+            <button type="button" onClick={() => setDeliveryType("pickup")}
+              className={`px-5 py-2 text-sm font-medium transition-colors ${
+                deliveryType === "pickup" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
+              }`}>
+              Pickup
+            </button>
+            <button type="button" onClick={() => setDeliveryType("delivery")}
+              className={`px-5 py-2 text-sm font-medium transition-colors ${
+                deliveryType === "delivery" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
+              }`}>
+              Delivery
+            </button>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={isOneWay} onChange={(e) => setIsOneWay(e.target.checked)}
+              className="w-4 h-4 rounded border-mist-300 text-blue-600 focus:ring-blue-500" />
+            <span className="text-sm text-mist-600">One-way</span>
+          </label>
+        </div>
+
+        {deliveryType === "delivery" && (
+          <div className="space-y-3 mb-4">
+            <div>
+              <label className="text-xs text-mist-500 block mb-1.5">Delivery Address</label>
+              <input type="text" placeholder="Delivery address" value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+            </div>
+            <div>
+              <label className="text-xs text-mist-500 block mb-1.5">Return Address</label>
+              <input type="text" placeholder="Return address" value={returnAddress}
+                onChange={(e) => setReturnAddress(e.target.value)}
+                className="w-full border border-mist-200 rounded-xl px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>

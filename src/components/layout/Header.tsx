@@ -60,7 +60,7 @@ const NAV_ITEMS = [
     href: "#",
     sub: [
       { label: "Corporate", href: "#" },
-      { label: "Weddings", href: "#" },
+      { label: "Weddings", href: "/wedding-villas" },
       { label: "Private Parties", href: "#" },
     ],
   },

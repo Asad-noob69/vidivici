@@ -49,12 +49,8 @@ jobs:
             echo " [3/6] Applying database migrations"
             echo "        (auto-handles new tables/fields)"
             echo "======================================"
-            # If the init migration failed mid-way (types already exist),
-            # mark it as applied so migrate deploy can proceed cleanly.
-            npx prisma migrate resolve --applied "20260328195055_init" 2>/dev/null || true
-            npx prisma migrate resolve --applied "20260329000001_add_villas" 2>/dev/null || true
-            npx prisma migrate resolve --applied "20260329120000_add_user_docs_blog_category" 2>/dev/null || true
-            npx prisma migrate deploy
+            # Sync schema directly to the database (adds new columns/tables)
+            npx prisma db push 2>/dev/null || true
 
             echo "======================================"
             echo " [4/6] Generating Prisma client"

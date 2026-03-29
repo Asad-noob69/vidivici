@@ -40,10 +40,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const slug = body.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
-    const post = await prisma.blogPost.create({ data: { ...body, slug } })
+    const { title, content, excerpt, coverImage, published, author, category } = body
+    if (!title || !content) {
+      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
+    }
+    const slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').slice(0, 100)
+    const post = await prisma.blogPost.create({
+      data: {
+        title,
+        content,
+        excerpt: excerpt || null,
+        coverImage: coverImage || null,
+        published: published ?? false,
+        author: author || 'Vidi Vici',
+        category: category || 'News & Updates',
+        slug,
+      },
+    })
     return NextResponse.json(post, { status: 201 })
   } catch (error) {
+    console.error('Blog create error:', error)
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
   }
 }

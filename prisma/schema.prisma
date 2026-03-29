@@ -124,6 +124,10 @@ model Booking {
   endDate         DateTime
   pickupLocation  String
   dropoffLocation String
+  deliveryType    String        @default("pickup")
+  deliveryAddress String?
+  returnAddress   String?
+  isOneWay        Boolean       @default(false)
   totalPrice      Float
   status          BookingStatus @default(PENDING)
   paymentStatus   PaymentStatus @default(UNPAID)
@@ -248,4 +252,19 @@ model VillaBooking {
   notes           String?       @db.Text
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+model WeddingInquiry {
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String?
+  email          String
+  phone          String?
+  eventType      String
+  eventDate      DateTime
+  guestCount     Int      @default(50)
+  addOns         String?
+  specialRequests String? @db.Text
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
 }

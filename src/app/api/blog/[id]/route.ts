@@ -32,20 +32,28 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
+    const { title, content, excerpt, coverImage, published, author, category } = body
 
     const existing = await prisma.blogPost.findUnique({ where: { id } })
     if (!existing) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
     }
 
-    if (body.title && body.title !== existing.title) {
-      body.slug = body.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+    const updateData: any = {}
+    if (title !== undefined) {
+      updateData.title = title
+      if (title !== existing.title) {
+        updateData.slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').slice(0, 100)
+      }
     }
+    if (content !== undefined) updateData.content = content
+    if (excerpt !== undefined) updateData.excerpt = excerpt
+    if (coverImage !== undefined) updateData.coverImage = coverImage
+    if (published !== undefined) updateData.published = published
+    if (author !== undefined) updateData.author = author
+    if (category !== undefined) updateData.category = category
 
-    const post = await prisma.blogPost.update({
-      where: { id },
-      data: body,
-    })
+    const post = await prisma.blogPost.update({ where: { id }, data: updateData })
 
     return NextResponse.json(post)
   } catch (error) {
