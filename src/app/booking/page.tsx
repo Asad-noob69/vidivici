@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
@@ -104,6 +104,18 @@ function calcVillaPricing(villa: VillaData, nights: number) {
 /*  Main Page                                                          */
 /* ================================================================== */
 export default function ReservationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center pt-20">
+        <div className="w-8 h-8 border-2 border-mist-300 border-t-mist-900 rounded-full animate-spin" />
+      </div>
+    }>
+      <ReservationContent />
+    </Suspense>
+  )
+}
+
+function ReservationContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { data: session } = useSession()
