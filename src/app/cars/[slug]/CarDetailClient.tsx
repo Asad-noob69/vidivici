@@ -857,7 +857,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                 {days > 0 ? (
                   <>
                     <button
-                      onClick={() => alert("Proceeding to next step…")}
+                      onClick={handleNext}
                       className="w-full bg-gray-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-gray-700 transition-colors"
                     >
                       Next
