@@ -53,6 +53,7 @@ const NAV_ITEMS = [
     href: "/villas",
     sub: [
       { label: "Browse All Villas", href: "/villas" },
+      { label: "Film & TV Production", href: "/film-tv-production" },
     ],
   },
   {
@@ -62,6 +63,7 @@ const NAV_ITEMS = [
       { label: "Browse All Events", href: "/events" },
       { label: "Ballroom", href: "/events/ballroom" },
       { label: "Weddings", href: "/wedding-villas" },
+      { label: "FIFA World Cup 2026", href: "/fifa-world-cup" },
     ],
   },
   { label: "About", href: "/about", sub: [] },
