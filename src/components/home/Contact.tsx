@@ -55,15 +55,23 @@ export default function ContactForm() {
   };
 
   return (
-    <section className="w-full bg-white py-12 sm:px-16 lg:px-20 px-10">
+    <section className="w-full bg-white py-12 sm:px-16 lg:px-20 px-6">
       <div className="">
-        <div className="border border-mist-200 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm">
+        <div className="border border-mist-200 rounded-3xl overflow-hidden gap-8 sm:p-8 px-4 py-6 flex flex-col md:flex-row shadow-sm">
           {/* Left Panel - Contact Info */}
-          <div className="bg-mist-100 p-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden">
+          <div className="bg-mist-100 px-4 sm:px-8 py-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden rounded-2xl">
             {/* Decorative background */}
             <div className="absolute inset-0 opacity-5 pointer-events-none">
               <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-mist-400 to-transparent rounded-full blur-3xl"></div>
             </div>
+
+
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
+            />
 
             {/* Header Text */}
             <div className="relative z-10">
@@ -104,7 +112,7 @@ export default function ContactForm() {
           </div>
 
           {/* Right Panel - Form */}
-          <div className="flex-1 p-8 md:p-12">
+          <div className="flex-1">
             <h2 className="text-3xl md:text-4xl font-bold text-mist-900 mb-8 tracking-tight">
               Get in touch with us
             </h2>

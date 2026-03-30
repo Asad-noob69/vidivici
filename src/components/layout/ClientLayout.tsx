@@ -16,6 +16,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isAccount = pathname.startsWith("/account");
   const isAuth = pathname === "/login" || pathname === "/register";
 
+  const isVillaOrCar =
+    pathname.startsWith("/villas") || pathname.startsWith("/cars");
+
   // Admin layout
   if (isAdmin) {
     return <SessionProvider>{children}</SessionProvider>;
@@ -28,6 +31,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <AccountHeader />
         <main className="min-h-screen">{children}</main>
         <AccountFooter />
+      </SessionProvider>
+    );
+  }
+
+  // Villas + Cars layout
+  if (isVillaOrCar) {
+    return (
+      <SessionProvider>
+        <AccountHeader />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
       </SessionProvider>
     );
   }

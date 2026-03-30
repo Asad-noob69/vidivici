@@ -118,7 +118,7 @@ export default function InsurancePage() {
         </div>
       </div>
     </section>
-       <section className="w-full bg-white sm:px-16 lg:px-20 px-10 py-20">
+       <section className="w-full bg-white sm:px-16 lg:px-20 px-6 py-20">
                 <div className="">
 
                     {/* Heading */}

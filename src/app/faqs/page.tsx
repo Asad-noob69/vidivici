@@ -125,8 +125,8 @@ export default function FAQPage() {
                 key={cat}
                 onClick={() => { setActiveCategory(cat); setOpenId(null); }}
                 className={`px-4 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-200 ${activeCategory === cat
-                    ? "bg-mist-900 text-white"
-                    : "bg-white border border-mist-200 text-mist-600 hover:border-mist-400"
+                  ? "bg-mist-900 text-white"
+                  : "bg-white border border-mist-200 text-mist-600 hover:border-mist-400"
                   }`}
               >
                 {cat}
@@ -136,68 +136,66 @@ export default function FAQPage() {
         </div>
 
         {/* Accordion */}
-       <div className="flex flex-col gap-3 mx-auto max-w-3xl px-6 py-20">
-  {filtered.map((faq) => {
-    const isOpen = openId === faq.id;
-    return (
-      <div
-        key={faq.id}
-        className="border border-mist-200 bg-white rounded-2xl overflow-hidden transition-all duration-200 shadow-2xl shadow-mist-300"
-      >
-        <button
-          onClick={() => setOpenId(isOpen ? null : faq.id)}
-          className="w-full flex items-center justify-between px-5 py-4 text-left"
-        >
-          <span className="text-[14px] font-semibold text-mist-900 pr-4 leading-snug">
-            {faq.question}
-          </span>
-          <span
-            className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200 ${
-              isOpen
-                ? "bg-mist-900 text-white"
-                : "bg-mist-900 text-white"
-            }`}
-          >
-            {isOpen
-              ? <Minus size={14} strokeWidth={2.5} />
-              : <Plus size={14} strokeWidth={2.5} />
-            }
-          </span>
-        </button>
+        <div className="flex flex-col gap-3 mx-auto max-w-3xl px-6 py-20">
+          {filtered.map((faq) => {
+            const isOpen = openId === faq.id;
+            return (
+              <div
+                key={faq.id}
+                className="border border-mist-200 bg-white rounded-2xl overflow-hidden transition-all duration-200 shadow-mist-300"
+              >
+                <button
+                  onClick={() => setOpenId(isOpen ? null : faq.id)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left"
+                >
+                  <span className="text-[14px] font-semibold text-mist-900 pr-4 leading-snug">
+                    {faq.question}
+                  </span>
+                  <span
+                    className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200 ${isOpen
+                        ? "bg-mist-900 text-white"
+                        : "bg-mist-900 text-white"
+                      }`}
+                  >
+                    {isOpen
+                      ? <Minus size={14} strokeWidth={2.5} />
+                      : <Plus size={14} strokeWidth={2.5} />
+                    }
+                  </span>
+                </button>
 
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="bg-mist-50 border-t border-mist-100 px-5 py-4">
-            <p className="text-[13px] text-mist-400 leading-relaxed">
-              {faq.answer}
-            </p>
-          </div>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                >
+                  <div className="bg-mist-50 border-t border-mist-100 px-5 py-4">
+                    <p className="text-[13px] text-mist-500 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
-    );
-  })}
-</div>
 
-<div className="relative w-full bg-[#eeeeed] py-16 px-6 text-center">
+        <div className="relative w-full bg-[#eeeeed] py-16 px-6 text-center">
 
-  <div className="relative z-10 max-w-md mx-auto flex flex-col items-center gap-8">
-    
-    <h2 className="text-5xl font-bold text-mist-900 tracking-tight">
-      Still have questions?
-    </h2>
-    <p className="text-base text-mist-500 leading-relaxed">
-      Our dedicated support team is available 24/7 to assist you with
-      bookings, inquiries, or custom requests.
-    </p>
-    <button className="mt-2 bg-mist-800 text-white text-base px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
-      Contact Us
-    </button>
-  </div>
+          <div className="relative z-10 max-w-md mx-auto flex flex-col items-center gap-8">
 
-</div>
+            <h2 className="text-5xl font-bold text-mist-900 tracking-tight">
+              Still have questions?
+            </h2>
+            <p className="text-base text-mist-500 leading-relaxed">
+              Our dedicated support team is available 24/7 to assist you with
+              bookings, inquiries, or custom requests.
+            </p>
+            <button className="mt-2 bg-mist-800 text-white text-base px-7 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
+              Contact Us
+            </button>
+          </div>
+
+        </div>
       </section>
 
     </div>

@@ -31,7 +31,7 @@ export default function AboutPage() {
       />
 
       {/* About Vidi Vici */}
-      <section className="w-full bg-white sm:px-16 lg:px-20 px-10 py-40">
+      <section className="w-full bg-white sm:px-16 lg:px-20 px-6 py-40">
         <div className="flex flex-col md:flex-row items-center gap-12">
 
           {/* Left text */}

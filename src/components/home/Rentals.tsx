@@ -106,34 +106,34 @@ export default function ExoticCarRentals({ showHeader = true }) {
 
       {/* Header */}
       {showHeader && (
-        <div className="flex items-center justify-between mb-8 px-10 sm:px-16 lg:px-20 gap-4">
-          <h2 className="text-xl sm:text-4xl font-bold text-mist-900 tracking-tight">
-            Exotic Car Rentals
-          </h2>
-          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium text-mist-700 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200">
-            View all
-            <ArrowUpRight size={15} />
-          </button>
-        </div>
-      )}
+  <div className="flex items-center justify-between mb-8 px-10 sm:px-16 lg:px-20 gap-4 pb-10">
+    <h2 className="text-2xl sm:text-4xl font-bold text-mist-900 tracking-tight">
+      Exotic Car Rentals
+    </h2>
+
+    <button className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
+      View all
+      <ArrowUpRight size={15} />
+    </button>
+  </div>
+)}
 
       <div className="relative">
-        {canLeft && (
+        
           <button
             onClick={() => scrollTo(activeIndex - 2)}
             className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
-        )}
-        {canRight && (
+       
           <button
             onClick={() => scrollTo(activeIndex + 2)}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
           </button>
-        )}
+
 
         {/* Carousel track */}
         <div

@@ -143,7 +143,7 @@ function ScrollColumn({ reviews, duration, tilt }: ColProps) {
 
 export default function Testimonials() {
   return (
-    <section className="relative w-full bg-white py-32 sm:px-16 lg:px-20 px-10 overflow-hidden">
+    <section className="relative w-full bg-white py-32 sm:px-16 lg:px-20 px-6 overflow-hidden">
 
       {/* Header */}
       <div className="text-center mb-20">

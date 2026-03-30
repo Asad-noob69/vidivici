@@ -115,7 +115,7 @@ export default function Testimonials() {
     <section className="w-full bg-white py-16 overflow-hidden">
 
       {/* Header */}
-      <div className="text-center mb-10 sm:px-16 lg:px-20 px-10">
+      <div className="text-center mb-10 sm:px-16 lg:px-20 px-6">
         <h2 className="text-3xl font-bold text-mist-900 tracking-tight">
           What Our Customers Are Saying
         </h2>
@@ -127,23 +127,21 @@ export default function Testimonials() {
 
       {/* Carousel wrapper */}
       <div className="relative">
-        {canLeft && (
-          <button
-            onClick={() => scroll(-1)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
-          >
-            <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
-          </button>
-        )}
-        {canRight && (
-          <button
-            onClick={() => scroll(1)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
-          >
-            <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
-          </button>
-        )}
+        <button
+  onClick={() => scroll(-1)}
+  disabled={!canLeft}
+  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+>
+  <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700" />
+</button>
 
+<button
+  onClick={() => scroll(1)}
+  disabled={!canRight}
+  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+>
+  <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700" />
+</button>
         <div
           ref={trackRef}
           className="flex gap-4 overflow-x-auto px-14 pb-2"

@@ -14,17 +14,16 @@
 .accordion-content.open {
   max-height: 500px;
 }
-:root {
-  --font-sans: var(--font-mantrope);
+
+
+@theme {
+  --font-outfit: var(--font-outfit);
+  --font-raleway: var(--font-raleway);
 }
 
-
-body {
-  font-family: var(--font-sans), sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+h2 {
+  font-family: var(--font-raleway);
 }
-
 
 @keyframes scrollXReverse {
   0% {

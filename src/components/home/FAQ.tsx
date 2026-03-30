@@ -40,7 +40,7 @@ export default function FAQ() {
   const [openId, setOpenId] = useState(1);
 
   return (
-    <section className="w-full bg-white py-16 sm:px-24 lg:px-32 px-16">
+    <section className="w-full bg-white py-16 sm:px-24 lg:px-32 px-10">
       <div className="">
 
         {/* Header */}
@@ -62,7 +62,7 @@ export default function FAQ() {
                   onClick={() => setOpenId(isOpen ? null : faq.id)}
                   className="w-full flex items-center justify-between px-5 py-4 text-left"
                 >
-                  <span className="text-[14px] font-semibold text-mist-900 pr-4 leading-snug">
+                  <span className="text-base font-medium text-mist-900 pr-4 leading-snug">
                     {faq.question}
                   </span>
                   <span
@@ -78,13 +78,14 @@ export default function FAQ() {
 
                 {/* Answer */}
                 <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                  }`}
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                    }`}
                 >
-                  <p className="px-5 pb-5 text-[13px] text-mist-400 leading-relaxed">
-                    {faq.answer}
-                  </p>
+                  <div className="bg-mist-50 border-t border-mist-100 px-5 py-4">
+                    <p className="text-sm text-mist-500 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
                 </div>
               </div>
             );
