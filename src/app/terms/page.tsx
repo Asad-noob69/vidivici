@@ -18,7 +18,7 @@ export default function TermsPage() {
                             height="h-96"
                           />
       {/* Content */}
-      <div className="sm:px-16 lg:px-20 px-10 py-12 lg:py-16">
+      <div className="sm:px-16 lg:px-20 px-6 py-12 lg:py-16">
         {/* Welcome Section */}
         <section className="mb-12">
           <p className="text-mist-700 leading-relaxed mb-4">

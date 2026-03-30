@@ -26,7 +26,7 @@ const features = [
 export default function WhyChooseUs({ bg = "#f0f0ee" }: { bg?: string }) {
   return (
     <section
-      className="w-full px-10 sm:px-16 lg:px-20 py-20 relative overflow-visible"
+      className="w-full px-6 sm:px-16 lg:px-20 py-20 relative overflow-visible"
       style={{ backgroundColor: bg }}
     >
 
@@ -49,30 +49,30 @@ export default function WhyChooseUs({ bg = "#f0f0ee" }: { bg?: string }) {
         {/* Left: Heading + CTA */}
         <div className="flex flex-col h-full gap-8">
           <div>
-            <h2 className="text-4xl font-bold text-mist-900 leading-tight tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-bold text-mist-900 leading-tight tracking-tight">
               Why Choose Vidi Vici?
             </h2>
-            <p className="mt-4 text-sm text-mist-600 leading-relaxed">
+            <p className="mt-4 text-md text-mist-600 leading-relaxed">
               Experience the ultimate in luxury, convenience, and personalized
               service in Los Angeles.
             </p>
           </div>
-          <button className="w-fit bg-mist-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
+          <button className="w-fit bg-mist-900 text-white text-md font-medium px-6 py-3 rounded-xl hover:bg-mist-700 transition-colors duration-200">
             Reserve Now
           </button>
         </div>
 
         {/* Right: 2x2 Feature Grid */}
-        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-16">
+        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-x-44 md:pl-10 pt-14 sm:pt-0">
           {features.map((f) => (
             <div key={f.title} className="flex flex-col gap-3">
               <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm">
                 <CircleCheckBig size={18} strokeWidth={2} className="text-mist-700" />
               </div>
-              <h3 className="text-base font-bold text-mist-900 leading-snug">
+              <h3 className=" text-2xl sm:text-3xl font-bold text-mist-900 leading-snug">
                 {f.title}
               </h3>
-              <p className="text-sm text-mist-600 leading-relaxed">
+              <p className="text-md text-mist-600 leading-relaxed">
                 {f.description}
               </p>
             </div>

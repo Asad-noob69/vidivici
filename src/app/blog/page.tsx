@@ -111,7 +111,7 @@ export default function BlogPage() {
 
       {/* Featured Articles */}
       {featuredArticles.length > 0 && (
-        <section className="w-full py-14 sm:px-16 lg:px-20 px-10 mt-40">
+        <section className="w-full py-14 sm:px-16 lg:px-20 px-6 mt-40">
           <h2 className="text-3xl font-bold text-mist-900 text-center tracking-tight mb-10">
             Featured Articles
           </h2>
@@ -128,7 +128,7 @@ export default function BlogPage() {
       )}
 
       {/* All Articles */}
-      <section className={`w-full py-14 sm:px-16 lg:px-20 px-10 ${featuredArticles.length === 0 ? "mt-40" : ""}`}>
+      <section className={`w-full py-14 sm:px-16 lg:px-20 px-6 ${featuredArticles.length === 0 ? "mt-40" : ""}`}>
         <h2 className="text-3xl font-bold text-mist-900 text-center tracking-tight mb-10">
           All Articles
         </h2>
@@ -172,7 +172,7 @@ export default function BlogPage() {
       </div>
 
       {/* CTA Banner */}
-      <div className="w-full bg-white sm:px-16 lg:px-20 px-10 py-20">
+      <div className="w-full bg-white sm:px-16 lg:px-20 px-6 py-20">
         <div className="overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-3 max-w-md">
             <h3 className="text-4xl font-bold text-mist-900 leading-snug">

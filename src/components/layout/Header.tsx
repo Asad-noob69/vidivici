@@ -91,7 +91,7 @@ export default function Header() {
 
   // Pages with dark hero where header can start transparent
   const hasDarkHero = pathname === "/" || pathname === "/partner";
-  const showBg = scrolled || !hasDarkHero;
+  const showBg = scrolled;
 
   const handleSearch = () => {
     const q = searchQuery.trim();
@@ -130,7 +130,7 @@ export default function Header() {
   return (
     <div ref={headerRef}>
       {/* HEADER */}
-      <header className={`fixed top-0 z-50 w-full sm:px-16 lg:px-20 px-10 transition-colors duration-300 ${showBg ? "bg-[#0a0d12]/95 backdrop-blur-md border-b border-white/[0.06]" : ""}`}>
+      <header className={`fixed top-0 z-50 w-full sm:px-16 lg:px-20 px-6 transition-colors duration-300 ${showBg ? "bg-[#0a0d12]/95 backdrop-blur-md border-b border-white/[0.06]" : ""}`}>
         <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 gap-4">
 
           {/* LEFT NAV */}

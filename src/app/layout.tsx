@@ -1,20 +1,24 @@
-import { Inter } from "next/font/google";
+import { Outfit, Raleway } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
 
-import { Manrope } from "next/font/google";
-
-const manrope = Manrope({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-outfit",
   weight: ["300","400","500","600","700"],
+});
+
+const raleway = Raleway({
+  subsets: ["latin"],
+  variable: "--font-raleway",
+  weight: ["400","500","600","700"],
 });
 
 export const metadata: Metadata = {
   title: "Falcon Car Rental | Exotic & Luxury Car Rental Los Angeles",
   description:
-    "Premium luxury and exotic car rental in Los Angeles and Miami. Rent Lamborghini, Ferrari, Rolls-Royce, Bentley, Porsche and more. Free delivery available.",
+    "Premium luxury and exotic car rental in Los Angeles and Miami. Rent Lamborghini, Ferrari, Rolls-Royce, Bentley, Porsche and more.",
 };
 
 export default function RootLayout({
@@ -24,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} antialiased`}>
+      <body className={`${outfit.variable} ${raleway.variable} antialiased font-outfit`}>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

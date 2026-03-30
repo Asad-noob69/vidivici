@@ -79,7 +79,7 @@ export default function PartnerPage() {
             />
 
             {/* Hero pitch — Your Assets section */}
-            <section className="w-full bg-white sm:px-16 lg:px-20 px-10 py-16">
+            <section className="w-full bg-white sm:px-16 lg:px-20 px-6 py-16">
                 <div className="flex flex-col md:flex-row items-center gap-10">
 
                     {/* Left text */}
@@ -115,7 +115,7 @@ export default function PartnerPage() {
             </section>
 
             {/* Why Partner With Us */}
-            <section className="w-full sm:px-16 lg:px-20 px-10 py-16">
+            <section className="w-full sm:px-16 lg:px-20 px-6 py-16">
                 <div className="">
 
                     <div className="text-center mb-12 space-y-6">
@@ -151,7 +151,7 @@ export default function PartnerPage() {
             </section>
 
             {/* Who Can Join */}
-            <section className="relative w-full bg-mist-950 sm:px-16 lg:px-20 px-10 pt-16">
+            <section className="relative w-full bg-mist-950 sm:px-16 lg:px-20 px-6 pt-16">
                 <div className="">
 
                     {/* Heading */}
@@ -196,7 +196,7 @@ export default function PartnerPage() {
             </section>
 
             {/* How It Works */}
-            <section className="w-full bg-white sm:px-16 lg:px-20 px-10 my-56">
+            <section className="w-full bg-white sm:px-16 lg:px-20 px-6 my-56">
                 <div className="">
 
                     {/* Heading */}
@@ -284,7 +284,7 @@ export default function PartnerPage() {
             </section>
 
             {/* Become a Partner Form */}
-<section className="w-full sm:px-16 lg:px-20 px-10 py-16">
+<section className="w-full sm:px-16 lg:px-20 px-6 py-16">
   <div className="">
 
     {/* Heading */}

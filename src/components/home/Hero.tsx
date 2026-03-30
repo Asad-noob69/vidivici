@@ -41,7 +41,7 @@ export default function Hero() {
 
       <section
         className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
-        style={{ fontFamily: "'Jost', sans-serif" }}
+        
       >
         {/* Background image */}
         <div
@@ -94,7 +94,7 @@ export default function Hero() {
                 type="text"
                 placeholder="Search cars, villas, or events..."
                 className="flex-1 bg-transparent placeholder:text-white/60 text-white tracking-wide outline-none border-none text-sm sm:text-base"
-                style={{ fontFamily: "'Jost', sans-serif" }}
+               
               />
             </div>
           </div>

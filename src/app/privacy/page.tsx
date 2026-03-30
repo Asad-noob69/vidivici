@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Content Section */}
-      <div className="sm:px-16 lg:px-20 px-10 py-16">
+      <div className="sm:px-16 lg:px-20 px-6 py-16">
         <Section title="Introduction">
           <p>
             Vidi Vici Rental operates this website and store, including all related information, content, features, tools, products, and

@@ -8,7 +8,7 @@ import WhyChooseUs from "@/components/home/WhyChooseUs"
 import FAQ from "@/components/home/FAQ"
 import Reviews from "@/components/home/Reviews"
 import Contact from "@/components/home/Contact"
-import { SlidersHorizontal, BedDouble, Users, Maximize2, Heart, ArrowUpRight } from "lucide-react"
+import { SlidersHorizontal, BedDouble, Users, Maximize2, Heart, ArrowUpRight, ChevronRight, RotateCcw, X } from "lucide-react"
 
 interface VillaFromAPI {
   id: string
@@ -130,8 +130,8 @@ function VillasContent() {
         }}
       />
 
-      <section className="bg-white py-10 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+      <section className="bg-white py-16 sm:px-16 lg:px-20 px-6">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Mobile filter toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -141,8 +141,9 @@ function VillasContent() {
           </button>
 
           {/* Sidebar Filters */}
+
           <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <VillaFilters />
+            <VillaFilters onHide={() => setShowFilters(false)} />
           </aside>
 
           {/* Villas Grid */}
@@ -172,7 +173,7 @@ function VillasContent() {
                 <p className="text-mist-300 text-sm">Try adjusting your filters or search</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
                 {villas.map((villa) => (
                   <VillaListCard key={villa.id} villa={villa} />
                 ))}
@@ -185,11 +186,10 @@ function VillasContent() {
                   <button
                     key={p}
                     onClick={() => goToPage(p)}
-                    className={`w-10 h-10 rounded-lg font-semibold text-sm transition-colors ${
-                      p === currentPage
-                        ? "bg-mist-900 text-white"
-                        : "bg-mist-100 text-mist-500 hover:bg-mist-200"
-                    }`}
+                    className={`w-10 h-10 rounded-lg font-semibold text-sm transition-colors ${p === currentPage
+                      ? "bg-mist-900 text-white"
+                      : "bg-mist-100 text-mist-500 hover:bg-mist-200"
+                      }`}
                   >
                     {p}
                   </button>
@@ -199,7 +199,68 @@ function VillasContent() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-6 sm:px-12 lg:px-20 bg-white">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
+          {/* Left */}
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-mist-900 leading-tight mb-4">
+              Beyond the Villa:<br />Concierge Services
+            </h2>
+            <p className="text-base text-mist-500 leading-relaxed mb-7">
+              Vidi Vici doesn't just rent homes—we create experiences.<br />
+              Our concierge services include:
+            </p>
+            <ul className="space-y-4">
+              {[
+                "Chauffeur-driven cars or luxury SUV rentals",
+                "Daily housekeeping and maid service",
+                "Private chef and in-villa catering",
+                "Event planning for corporate or influencer gatherings",
+                "Filming and photo shoot locations approved by Hollywood studios",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-mist-800 flex items-center justify-center">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span className="text-base text-mist-600 leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right — 2x2 mosaic */}
+          <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-3 w-full">
+  {/* Top left — spans 2 cols */}
+  <img
+    src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80"
+    alt="Living room"
+    className="col-span-2 row-span-1 w-full h-52 object-cover rounded-2xl"
+  />
+  {/* Top right */}
+  <img
+    src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80"
+    alt="Dining area"
+    className="col-span-1 row-span-1 w-full h-52 object-cover rounded-2xl"
+  />
+  {/* Bottom left — small */}
+  <img
+    src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80"
+    alt="Staircase"
+    className="col-span-1 row-span-1 w-full h-52 object-cover rounded-2xl"
+  />
+  {/* Bottom right — spans 2 cols */}
+  <img
+    src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&q=80"
+    alt="Interior"
+    className="col-span-2 row-span-1 w-full h-52 object-cover rounded-2xl"
+  />
+</div>
+
+        </div>
+      </section>
       <WhyChooseUs />
       <Reviews />
       <FAQ />
@@ -208,7 +269,7 @@ function VillasContent() {
   )
 }
 
-function VillaFilters() {
+function VillaFilters({ onHide }: { onHide?: () => void }) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -242,86 +303,188 @@ function VillaFilters() {
   }
 
   return (
-    <div className="bg-white border border-mist-200 rounded-2xl p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-mist-900">Filters</h3>
-        <button onClick={clearAll} className="text-xs text-mist-400 hover:text-mist-700 transition-colors">Clear All</button>
+    <div className="bg-white p-2 sm:p-0 space-y-6 w-full">
+
+      {/* Header — fix: calls onHide, not clearAll */}
+      <button
+        onClick={onHide}
+        className="flex items-center gap-2 text-sm text-mist-600 hover:text-mist-900 transition-colors"
+      >
+        <X size={16} />
+        Hide Filter
+      </button>
+
+      {/* Location — fix: use value= not defaultValue= */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Location</label>
+        <select
+          value={selectedLocation}
+          onChange={(e) => setSelectedLocation(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
+          <option value="">Search location</option>
+          {LOCATION_TAGS.map((loc) => (
+            <option key={loc} value={loc}>{loc}</option>
+          ))}
+        </select>
+        {selectedLocation && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {selectedLocation}
+              <button onClick={() => setSelectedLocation("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Location */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Location</label>
-        <div className="flex flex-wrap gap-2">
-          {LOCATION_TAGS.map((loc) => (
-            <button
-              key={loc}
-              onClick={() => setSelectedLocation(selectedLocation === loc ? "" : loc)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                selectedLocation === loc
-                  ? "bg-mist-900 text-white border-mist-900"
-                  : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
-              }`}
-            >
-              {loc}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="h-px bg-neutral-100" />
 
       {/* Bedrooms */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Bedrooms</label>
-        <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Bedrooms</label>
+        <select
+          value={minBedrooms}
+          onChange={(e) => setMinBedrooms(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
           {BEDROOM_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+        {minBedrooms && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {BEDROOM_OPTIONS.find(o => o.value === minBedrooms)?.label}
+              <button onClick={() => setMinBedrooms("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Square Footage */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Square Footage</label>
-        <div className="flex flex-wrap gap-2">
-          {SQFT_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setMinSqft(minSqft === opt.value ? "" : opt.value)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                minSqft === opt.value
-                  ? "bg-mist-900 text-white border-mist-900"
-                  : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
-              }`}
-            >
-              {opt.label}
-            </button>
+      <div className="h-px bg-neutral-100" />
+
+      {/* Square Footage — fix: use value= not defaultValue= */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Square</label>
+        <select
+          value={minSqft}
+          onChange={(e) => setMinSqft(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
+          <option value="">Select square footage</option>
+          {SQFT_OPTIONS.filter(o => o.value !== "").map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
-        </div>
+        </select>
+        {minSqft && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {SQFT_OPTIONS.find(o => o.value === minSqft)?.label}
+              <button onClick={() => setMinSqft("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
+
+      <div className="h-px bg-neutral-100" />
 
       {/* Guests */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Guests</label>
-        <select value={minGuests} onChange={(e) => setMinGuests(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Guests</label>
+        <select
+          value={minGuests}
+          onChange={(e) => setMinGuests(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
           {GUEST_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+        {minGuests && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {GUEST_OPTIONS.find(o => o.value === minGuests)?.label}
+              <button onClick={() => setMinGuests("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
+      <div className="h-px bg-neutral-100" />
+
       {/* Price Range */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Price Range (per night)</label>
-        <div className="flex gap-2">
-          <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
-            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
-          <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Price Range</label>
+        <input
+          type="range"
+          min={0}
+          max={10000}
+          value={maxPrice || 0}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="w-full accent-neutral-500 h-1"
+        />
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <p className="text-[10px] text-mist-400 mb-1">Minimum</p>
+            <div className="flex items-center bg-neutral-100 border border-mist-200 rounded-md px-3 py-2 gap-1">
+              <span className="text-xs text-mist-400">$</span>
+              <input
+                type="number"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="w-full text-sm text-mist-700 focus:outline-none"
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <span className="text-mist-300 mt-4">–</span>
+          <div className="flex-1">
+            <p className="text-[10px] text-mist-400 mb-1">Maximum</p>
+            <div className="flex items-center bg-neutral-100 border border-mist-200 rounded-md px-3 py-2 gap-1">
+              <span className="text-xs text-mist-400">$</span>
+              <input
+                type="number"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-full text-sm text-mist-700 focus:outline-none"
+                placeholder="10000"
+              />
+            </div>
+          </div>
+          <button
+            onClick={applyFilters}
+            className="mt-4 w-9 h-9 flex-shrink-0 bg-mist-200 hover:bg-mist-200 rounded-md flex items-center justify-center transition-colors"
+          >
+            <ChevronRight size={16} className="text-mist-600" />
+          </button>
         </div>
       </div>
 
-      <button onClick={applyFilters} className="w-full bg-mist-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors">
-        Apply Filters
-      </button>
+      {/* Apply + Reset */}
+      <div className="space-y-2 pt-2">
+        <button
+          onClick={applyFilters}
+          className="w-full bg-mist-900 text-white py-3 rounded-lg text-sm hover:bg-mist-800 transition-colors"
+        >
+          Apply
+        </button>
+        <button
+          onClick={clearAll}
+          className="w-full bg-white border border-mist-200 text-mist-700 py-3 rounded-lg text-sm hover:bg-mist-50 transition-colors flex items-center justify-center gap-2"
+        >
+          <RotateCcw size={14} />
+          Reset
+        </button>
+      </div>
+
     </div>
   )
 }
@@ -335,62 +498,64 @@ function VillaListCard({ villa }: { villa: VillaFromAPI }) {
   }
 
   return (
-    <div className="relative flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div className="relative h-56 overflow-hidden">
+    <div className="relative flex flex-col bg-white rounded-2xl overflow-hidden shadow-xl border border-mist-200 hover:shadow-md transition-all duration-300 group cursor-pointer">
+
+      {/* Image */}
+      <div className="relative h-56 overflow-hidden p-3">
         {image ? (
-          <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl" />
         ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm">No Image</div>
+          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
         )}
         <button
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${
-            fav ? "bg-red-500 text-white" : "bg-white/75 text-mist-500 hover:bg-white hover:text-red-400"
-          }`}
+          className={`absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav ? "bg-mist-700 text-red-500" : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
+            }`}
         >
           <Heart size={13} fill={fav ? "currentColor" : "none"} strokeWidth={2} />
         </button>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
       </div>
 
-      <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
-        <p className="text-[10px] text-mist-400 font-medium tracking-wide uppercase truncate">
+      {/* Body */}
+      <div className="flex flex-col gap-2 px-6 pt-3.5 pb-4">
+        <p className="text-xs text-mist-400 font-medium tracking-wide uppercase truncate">
           Luxury Villa for Rent | {villa.location}
         </p>
-        <h3 className="text-[15px] font-semibold text-mist-900 leading-snug -mt-0.5">{villa.name}</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-mist-900 leading-snug -mt-0.5">{villa.name}</h3>
 
-        <div className="flex items-center justify-between mt-0.5">
+        <div className="flex items-center justify-between py-3">
           <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><BedDouble size={12} /></div>
-            <span className="text-[10px] text-mist-400">Bedrooms</span>
-            <span className="text-[11px] font-semibold text-mist-700">{villa.bedrooms}</span>
+            <div className="text-mist-600"><BedDouble size={12} /></div>
+            <span className="text-xs text-mist-900 font-semibold">Bedrooms</span>
+            <span className="text-[10px] text-mist-600">{villa.bedrooms}</span>
           </div>
           <div className="w-px h-8 bg-mist-100" />
           <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><Users size={12} /></div>
-            <span className="text-[10px] text-mist-400">Guests</span>
-            <span className="text-[11px] font-semibold text-mist-700">{villa.guests}</span>
+            <div className="text-mist-600"><Users size={12} /></div>
+            <span className="text-xs text-mist-900 font-semibold">Guests</span>
+            <span className="text-[10px] text-mist-600">{villa.guests}</span>
           </div>
           <div className="w-px h-8 bg-mist-100" />
           <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><Maximize2 size={12} /></div>
-            <span className="text-[10px] text-mist-400">Sq.ft</span>
-            <span className="text-[11px] font-semibold text-mist-700">{formatSqft(villa.sqft)}</span>
+            <div className="text-mist-600"><Maximize2 size={12} /></div>
+            <span className="text-xs text-mist-900 font-semibold">Sq.ft</span>
+            <span className="text-[10px] text-mist-600">{formatSqft(villa.sqft)}</span>
           </div>
         </div>
 
         <div className="h-px bg-mist-100 mt-0.5" />
 
         <div className="flex items-center justify-between mt-0.5">
-          <Link href={`/villas/${villa.slug}`} className="flex items-center gap-1 text-[11px] font-semibold text-mist-500 hover:text-mist-900 transition-colors">
+          <Link href={`/villas/${villa.slug}`} className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-900 transition-colors">
             View Details <ArrowUpRight size={11} strokeWidth={2.5} />
           </Link>
           <div className="flex flex-col items-end">
-            <span className="text-[15px] font-bold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
+            <span className="text-base font-semibold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
             <span className="text-[10px] text-mist-400">/night</span>
           </div>
         </div>
       </div>
+
     </div>
   )
 }

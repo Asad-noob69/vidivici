@@ -86,7 +86,9 @@ function WeddingBookingInquiry() {
     return (
       <div className="text-center py-12">
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
         <h3 className="text-xl font-bold text-mist-900 mb-2">Inquiry Submitted!</h3>
         <p className="text-sm text-mist-500">Our team will get back to you within 24 hours.</p>
@@ -95,110 +97,147 @@ function WeddingBookingInquiry() {
   }
 
   return (
-    <section className="bg-mist-50 py-16 px-4" id="inquiry">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 bg-white rounded-3xl overflow-hidden shadow-sm">
-          {/* Left: Contact Info */}
-          <div className="lg:col-span-2 bg-mist-900 text-white p-8 flex flex-col justify-center space-y-8">
-            <div>
-              <h3 className="text-xl font-bold mb-2">Have questions or want to book your luxury experience?</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
+    <section className="w-full bg-white py-12 sm:px-16 lg:px-20 px-6" id="inquiry">
+      <div className="">
+        <div className="border border-mist-200 rounded-3xl overflow-hidden gap-8 sm:p-8 px-4 py-6  flex flex-col md:flex-row shadow-sm">
+
+          {/* Left Panel - Contact Info */}
+          <div className="bg-mist-100 p-8 md:w-1/3 flex-shrink-0 flex flex-col gap-8 relative overflow-hidden rounded-2xl">
+            <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-mist-400 to-transparent rounded-full blur-3xl" />
+            </div>
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none rotate-180"
+            />
+
+            <div className="relative z-10">
+              <h3 className="text-xl md:text-2xl font-bold text-mist-900 leading-snug mb-3">
+                Have questions or want to book your wedding experience?
+              </h3>
+              <p className="text-sm text-mist-600 leading-relaxed">
                 Our team is here to assist you with villas, cars, and VIP events across Los Angeles.
               </p>
             </div>
-            <div className="space-y-5">
-              <div className="flex items-start gap-3">
-                <Phone size={18} className="text-white/60 mt-0.5" />
+
+            <div className="border-t border-mist-300" />
+
+            <div className="relative z-10 flex flex-col gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full border border-mist-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
+                  <Phone size={16} />
+                </div>
                 <div>
-                  <p className="font-semibold text-sm">Phone</p>
-                  <p className="text-sm text-white/70">(310) 555-0991</p>
+                  <p className="text-sm font-bold text-mist-900">Phone</p>
+                  <p className="text-sm text-mist-600 leading-relaxed">(310) 555-0991</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Mail size={18} className="text-white/60 mt-0.5" />
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full border border-mist-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
+                  <Mail size={16} />
+                </div>
                 <div>
-                  <p className="font-semibold text-sm">Email</p>
-                  <p className="text-sm text-white/70">admin@vidivicirental.com</p>
+                  <p className="text-sm font-bold text-mist-900">Email</p>
+                  <p className="text-sm text-mist-600 leading-relaxed">admin@vidivicirental.com</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <MapPin size={18} className="text-white/60 mt-0.5" />
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full border border-mist-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
+                  <MapPin size={16} />
+                </div>
                 <div>
-                  <p className="font-semibold text-sm">Address</p>
-                  <p className="text-sm text-white/70">8687 Melrose Ave, Los Angeles CA 90069, United States</p>
+                  <p className="text-sm font-bold text-mist-900">Address</p>
+                  <p className="text-sm text-mist-600 leading-relaxed">8687 Melrose Ave, Los Angeles CA 90069, United States</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Clock size={18} className="text-white/60 mt-0.5" />
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full border border-mist-300 bg-white flex items-center justify-center text-mist-600 flex-shrink-0 mt-0.5">
+                  <Clock size={16} />
+                </div>
                 <div>
-                  <p className="font-semibold text-sm">Working Hours</p>
-                  <p className="text-sm text-white/70">Mon-Sun: 8 AM – 8 PM</p>
+                  <p className="text-sm font-bold text-mist-900">Working Hours</p>
+                  <p className="text-sm text-mist-600 leading-relaxed">Mon-Sun: 8 AM – 8 PM</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right: Form */}
-          <div className="lg:col-span-3 p-8">
-            <h2 className="text-2xl font-bold text-mist-900 mb-6">Wedding Booking Inquiry</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Full Name</label>
+          {/* Right Panel - Form */}
+          <div className="flex-1">
+            <h2 className="text-3xl md:text-4xl font-bold text-mist-900 mb-8 tracking-tight">
+              Wedding Booking Inquiry
+            </h2>
+
+            <div className="flex flex-col gap-6">
+
+              {/* Name Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Full Name</label>
                   <input type="text" placeholder="Enter your full name" value={form.firstName}
                     onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                    className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white" />
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Last Name</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Last Name</label>
                   <input type="text" placeholder="Enter your last name" value={form.lastName}
                     onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                    className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Email Address</label>
+              {/* Email & Phone Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Email Address</label>
                   <input type="email" placeholder="Enter your email address" value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white" />
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Phone</label>
-                  <input type="tel" placeholder="Enter your phone number" value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Phone</label>
+                  <div className="flex items-center border border-mist-300 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
+                    <span className="px-4 py-3 text-lg border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
+                      🇺🇸
+                    </span>
+                    <input type="tel" placeholder="Enter your phone number" value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="flex-1 px-4 py-3 text-sm text-mist-900 placeholder-mist-400 outline-none bg-white" />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Event Type</label>
-                  <select value={form.eventType}
-                    onChange={(e) => setForm({ ...form, eventType: e.target.value })}
-                    className="w-full appearance-none border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 bg-white focus:border-mist-400 focus:outline-none">
-                    <option value="">Event Type</option>
+              {/* Event Type & Date Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Event Type</label>
+                  <select value={form.eventType} onChange={(e) => setForm({ ...form, eventType: e.target.value })}
+                    className="w-full appearance-none border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 bg-white focus:outline-none focus:border-mist-400 transition-colors duration-200 cursor-pointer">
+                    <option value="">Select event type</option>
                     {EVENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-mist-500 block mb-1.5">Event Date</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Event Date</label>
                   <input type="date" value={form.eventDate}
                     onChange={(e) => setForm({ ...form, eventDate: e.target.value })}
-                    className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 focus:border-mist-400 focus:outline-none" />
+                    className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white" />
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-mist-500 block mb-1.5">Number of Guests</label>
+              {/* Guest Count */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Number of Guests</label>
                 <input type="number" placeholder="e.g. 120" value={form.guestCount}
                   onChange={(e) => setForm({ ...form, guestCount: e.target.value })}
-                  className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none" />
+                  className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white" />
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-mist-500 block mb-1.5">Add-Ons</label>
+              {/* Add-Ons */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Add-Ons</label>
                 <div className="flex flex-wrap gap-3">
                   {ADD_ONS.map((addon) => (
                     <label key={addon} className="flex items-center gap-2 cursor-pointer">
@@ -213,19 +252,23 @@ function WeddingBookingInquiry() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-mist-500 block mb-1.5">Special Requests / Notes</label>
-                <textarea placeholder="Tell us more about your event ..." value={form.specialRequests}
-                  onChange={(e) => setForm({ ...form, specialRequests: e.target.value })} rows={3}
-                  className="w-full border border-mist-200 rounded-xl px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-mist-400 focus:outline-none resize-none" />
+              {/* Special Requests */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Special Requests / Notes</label>
+                <textarea placeholder="Tell us more about your event..." value={form.specialRequests}
+                  onChange={(e) => setForm({ ...form, specialRequests: e.target.value })} rows={5}
+                  className="w-full border border-mist-300 rounded-xl px-4 py-3 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white resize-none" />
               </div>
 
-              <button onClick={handleSubmit} disabled={submitting || !form.firstName || !form.email || !form.eventType || !form.eventDate}
-                className="w-full bg-mist-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              {/* Submit */}
+              <button onClick={handleSubmit}
+                className="w-full bg-mist-900 text-white cursor-pointer font-semibold py-4 rounded-xl hover:bg-mist-800 transition-colors duration-200 mt-2 disabled:opacity-40 disabled:cursor-not-allowed">
                 {submitting ? "Sending..." : "Send"}
               </button>
+
             </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -239,61 +282,46 @@ function WeddingVillaCard({ villa }: { villa: VillaFromAPI }) {
   const [fav, setFav] = useState(false)
   const image = villa.images?.[0]?.url
 
-  const formatSqft = (sqft: number) => sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
-
   return (
     <div className="relative flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-      <div className="relative h-56 overflow-hidden">
+
+      {/* Image */}
+      <div className="relative overflow-hidden p-3">
         {image ? (
-          <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img
+            src={image}
+            alt={villa.name}
+            className="w-full h-64 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
+          />
         ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm">No Image</div>
+          <div className="w-full h-64 bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
         )}
         <button
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${
-            fav ? "bg-red-500 text-white" : "bg-white/75 text-mist-500 hover:bg-white hover:text-red-400"
-          }`}
+          className={`absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav ? "bg-white text-red-500" : "bg-white text-mist-400 hover:text-red-400"
+            }`}
         >
-          <Heart size={13} fill={fav ? "currentColor" : "none"} strokeWidth={2} />
+          <Heart size={15} fill={fav ? "currentColor" : "none"} strokeWidth={2} />
         </button>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
       </div>
-      <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
-        <p className="text-[10px] text-mist-400 font-medium tracking-wide uppercase truncate">
+
+      {/* Body */}
+      <div className="flex flex-col px-4 pb-5 pt-1 gap-1">
+        <p className="text-xs text-mist-400 font-medium">
           Luxury Villa for Rent | {villa.location}
         </p>
-        <h3 className="text-[15px] font-semibold text-mist-900 leading-snug -mt-0.5">{villa.name}</h3>
-        <div className="flex items-center justify-between mt-0.5">
-          <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><BedDouble size={12} /></div>
-            <span className="text-[10px] text-mist-400">Bedrooms</span>
-            <span className="text-[11px] font-semibold text-mist-700">{villa.bedrooms}</span>
-          </div>
-          <div className="w-px h-8 bg-mist-100" />
-          <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><Users size={12} /></div>
-            <span className="text-[10px] text-mist-400">Guests</span>
-            <span className="text-[11px] font-semibold text-mist-700">{villa.guests}</span>
-          </div>
-          <div className="w-px h-8 bg-mist-100" />
-          <div className="flex flex-col items-center gap-0.5">
-            <div className="text-mist-400"><Maximize2 size={12} /></div>
-            <span className="text-[10px] text-mist-400">Sq.ft</span>
-            <span className="text-[11px] font-semibold text-mist-700">{formatSqft(villa.sqft)}</span>
-          </div>
-        </div>
-        <div className="h-px bg-mist-100 mt-0.5" />
-        <div className="flex items-center justify-between mt-0.5">
-          <Link href={`/villas/${villa.slug}`} className="flex items-center gap-1 text-[11px] font-semibold text-mist-500 hover:text-mist-900 transition-colors">
-            View Details <ArrowUpRight size={11} strokeWidth={2.5} />
-          </Link>
-          <div className="flex flex-col items-end">
-            <span className="text-[15px] font-bold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
-            <span className="text-[10px] text-mist-400">/night</span>
-          </div>
-        </div>
+        <h3 className="text-2xl font-bold text-mist-900 leading-snug">{villa.name}</h3>
+
+        <div className="h-px bg-mist-100 mt-3 mb-2" />
+
+        <Link
+          href={`/villas/${villa.slug}`}
+          className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-900 transition-colors w-fit"
+        >
+          View Details <ArrowUpRight size={13} strokeWidth={2.5} />
+        </Link>
       </div>
+
     </div>
   )
 }
@@ -363,9 +391,9 @@ function WeddingVillasContent() {
       />
 
       {/* Luxury Wedding Venues Section */}
-      <section className="bg-white py-14 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-mist-900 text-center mb-8">
+      <section className="bg-white py-16 sm:px-16 lg:px-20 px-6">
+        <div className="">
+          <h2 className="text-4xl font-bold text-mist-900 text-center my-20">
             Luxury Wedding Venues Los Angeles
           </h2>
 
@@ -380,7 +408,7 @@ function WeddingVillasContent() {
             <select
               value={sort}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="bg-white border border-mist-200 text-mist-700 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
+              className="bg-neutral-100 border border-mist-200 text-mist-600 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
             >
               <option value="popular">Sort by: Most Popular</option>
               <option value="price-asc">Price: Low to High</option>
@@ -407,13 +435,190 @@ function WeddingVillasContent() {
         </div>
       </section>
 
-      {/* Wedding Booking Inquiry */}
-      <WeddingBookingInquiry />
+      <section className="py-16 px-6 sm:px-12 lg:px-20 bg-white">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 ">
+
+          {/* Left */}
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-mist-900 leading-tight mb-4">
+              About Our Wedding Venues
+            </h2>
+            <p className="text-base text-mist-500 leading-relaxed mb-7">
+              Our exclusive collection of villas and estates offers the perfect backdrop for weddings,
+              receptions, and private celebrations. Each venue has been carefully selected for its
+              beauty, ambiance, and world-class amenities — ensuring your big day is as special as
+              you imagined.
+            </p>
+            <ul className="space-y-4">
+              {[
+                "Spacious layouts with breathtaking views",
+                "Elegant indoor and outdoor settings",
+                "Perfect for ceremonies, receptions, and photoshoots",
+                "Complete privacy and personalized service",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-mist-800 flex items-center justify-center">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span className="text-base text-mist-700 leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right — bento grid */}
+          <div className="grid grid-cols-3 grid-rows-2 gap-3 w-full">
+            <img
+              src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80"
+              alt="Wedding ceremony"
+              className="col-span-2 row-span-1 w-full h-52 object-cover rounded-2xl"
+            />
+            <img
+              src="https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=600&q=80"
+              alt="Wedding venue"
+              className="col-span-1 row-span-1 w-full h-52 object-cover rounded-2xl"
+            />
+            <img
+              src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=80"
+              alt="Wedding decor"
+              className="col-span-1 row-span-1 w-full h-52 object-cover rounded-2xl"
+            />
+            <img
+              src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80"
+              alt="Outdoor wedding"
+              className="col-span-2 row-span-1 w-full h-52 object-cover rounded-2xl"
+            />
+          </div>
+
+        </div>
+      </section>
+
+      <section className="py-16 px-6 sm:px-12 lg:px-20 bg-white">
+        <div className="">
+
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-mist-900 mb-3">
+              Enhance Your Celebration
+            </h2>
+            <p className="text-sm text-mist-400 max-w-sm mx-auto leading-relaxed">
+              Make your celebration seamless with our exclusive add-on
+              services available across all venues
+            </p>
+          </div>
+
+          {/* 2x2 Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+
+            {/* Mixologist */}
+            <div className="flex items-center gap-4 bg-mist-100 rounded-2xl p-4">
+              <img
+                src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300&q=80"
+                alt="Mixologist"
+                className="w-48 h-48 object-cover rounded-lg flex-shrink-0"
+              />
+              <div className="pt-1">
+                <h3 className="text-base font-bold text-mist-900 mb-1">Mixologist</h3>
+                <p className="text-base text-mist-500 font-normal leading-relaxed">
+                  Professional bartenders to craft signature drinks for your guests.
+                </p>
+              </div>
+            </div>
+
+            {/* Valet Parking */}
+            <div className="flex items-center gap-4 bg-mist-100 rounded-2xl p-4">
+              <img
+                src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=300&q=80"
+                alt="Valet Parking"
+                className="w-48 h-48 object-cover rounded-lg flex-shrink-0"
+              />
+              <div className="pt-1">
+                <h3 className="text-base font-bold text-mist-900 mb-1">Valet Parking</h3>
+                <p className="text-base text-mist-500 font-normal leading-relaxed">
+                  Hassle-free parking management for you and your guests.
+                </p>
+              </div>
+            </div>
+
+            {/* Driver */}
+            <div className="flex items-center gap-4 bg-mist-100 rounded-2xl p-4">
+              <img
+                src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=300&q=80"
+                alt="Driver"
+                className="w-48 h-48 object-cover rounded-lg flex-shrink-0"
+              />
+              <div className="pt-1">
+                <h3 className="text-base font-bold text-mist-900 mb-1">Driver</h3>
+                <p className="text-base text-mist-500 font-normal leading-relaxed">
+                  Private drivers and guest transportation available upon request.
+                </p>
+              </div>
+            </div>
+
+            {/* Security Team */}
+            <div className="flex items-center gap-4 bg-mist-100 rounded-2xl p-4">
+              <img
+                src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300&q=80"
+                alt="Security Team"
+                className="w-48 h-48 object-cover rounded-lg flex-shrink-0"
+              />
+              <div className="pt-1">
+                <h3 className="text-base font-bold text-mist-900 mb-1">Security Team</h3>
+                <p className="text-base text-mist-500 font-normal leading-relaxed">
+                  On-site security professionals to ensure a smooth event.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+
+
 
       {/* Reuse existing sections */}
       <WhyChooseUs />
       <Reviews />
+      <section className="py-16 px-6 sm:px-16 lg:px-20 bg-white">
+        <div className="">
+          <div className="relative bg-mist-100 rounded-3xl px-8 py-16 text-center overflow-hidden">
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
+            />
+
+            {/* Right side vector decoration */}
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180"
+            />
+
+
+            {/* Content */}
+            <h2 className="text-3xl sm:text-4xl font-bold text-mist-900 leading-tight mb-4">
+              Plan Your Dream<br />Wedding With Us
+            </h2>
+            <p className="text-sm text-mist-400 max-w-sm mx-auto leading-relaxed mb-8">
+              Tell us about your celebration and let our team help you create an unforgettable experience.
+            </p>
+            <button className="bg-mist-900 text-white text-sm font-semibold px-7 py-3.5 rounded-xl hover:bg-mist-700 transition-colors">
+              Request a Quote
+            </button>
+
+          </div>
+        </div>
+      </section>
       <FAQ />
+      {/* Wedding Booking Inquiry */}
+      <WeddingBookingInquiry />
     </div>
   )
 }
