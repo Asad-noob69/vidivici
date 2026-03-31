@@ -12,6 +12,8 @@ import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
 import Contact from "@/components/home/Contact"
+import Services from "@/components/home/Services"
+import Events from "@/components/home/Events"
 
 /* ================================================================== */
 /*  Match Fixtures Data                                                */
@@ -169,7 +171,7 @@ function GalleryBentoGrid() {
 /* ================================================================== */
 const HERO_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1400&q=80",
+    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1400&q=80",
     title: "Feel the Energy of LA × World Cup 2026",
     subtitle: "Matches, celebrations, nightlife — enjoy it all with seamless VIP services.",
   },
@@ -191,97 +193,111 @@ const HERO_SLIDES = [
 ]
 
 function BigImageSlider() {
-  const [current, setCurrent] = useState(0)
-  const total = HERO_SLIDES.length
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [current, setCurrent] = useState(0);
+  const total = HERO_SLIDES.length;
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const resetTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current)
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setCurrent((p) => (p + 1) % total)
-    }, 5000)
-  }, [total])
+      setCurrent((p) => (p + 1) % total);
+    }, 5000);
+  }, [total]);
 
   useEffect(() => {
-    resetTimer()
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [resetTimer])
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [resetTimer]);
 
   const go = (dir: "prev" | "next") => {
-    setCurrent((p) => (dir === "prev" ? (p - 1 + total) % total : (p + 1) % total))
-    resetTimer()
-  }
+    setCurrent((p) => (dir === "prev" ? (p - 1 + total) % total : (p + 1) % total));
+    resetTimer();
+  };
 
   return (
-    <section className="bg-mist-50 py-14 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="relative overflow-hidden rounded-2xl">
-          {/* Slides wrapper */}
+    <section className="py-16 overflow-hidden bg-white">
+      <div className="relative max-w-[1400px] mx-auto px-4 sm:px-10 lg:px-20">
+        
+        {/* Main Viewport */}
+        <div className="relative overflow-visible">
           <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${current * 100}%)` }}
+            className="flex transition-transform duration-700 ease-out"
+            style={{ 
+              transform: `translateX(-${current * 85}%)`, // Adjusted for partial visibility
+              gap: '24px' 
+            }}
           >
             {HERO_SLIDES.map((slide, i) => (
-              <div key={i} className="w-full flex-shrink-0 relative">
-                <div className="relative h-[320px] sm:h-[400px] md:h-[480px]">
+              <div 
+                key={i} 
+                className={`w-[85%] flex-shrink-0 relative transition-all duration-500 transform ${
+                  i === current ? "scale-100 opacity-100" : "scale-95 backdrop-opacity-80 opacity-70"
+                }`}
+              >
+                <div className="relative h-[400px] lg:h-[550px] rounded-[2.5rem] overflow-hidden shadow-2xl">
                   <img
                     src={slide.image}
                     alt={slide.title}
                     className="w-full h-full object-cover"
                   />
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  {/* Text */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight max-w-xl">
+                  
+                  {/* High-end Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-12 left-12 right-12">
+                    <h3 className="text-3xl lg:text-5xl font-bold text-white mb-4 tracking-tight leading-tight max-w-2xl">
                       {slide.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-white/80 max-w-lg">
+                    <p className="text-lg lg:text-xl text-white/90 max-w-xl font-medium">
                       {slide.subtitle}
                     </p>
                   </div>
-                  {/* FIFA badge */}
-                  <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 w-14 h-14 sm:w-16 sm:h-16 bg-white/90 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-[10px] sm:text-xs font-black text-mist-900 leading-tight text-center">
-                      FIFA<br />2026
-                    </span>
+
+                  {/* Image/FIFA Badge Branding */}
+                  <div className="absolute bottom-12 right-12 w-20 h-20 flex items-center justify-center">
+                     <img 
+                       src="/fifa-logo.png" 
+                       alt="FIFA 2026" 
+                       className="w-14 h-14 object-contain"
+                     />
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Prev / Next buttons */}
+          {/* Navigation Controls - Positioned exactly as in the reference */}
           <button
             onClick={() => go("prev")}
-            className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
-            aria-label="Previous slide"
+            className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black transition-all shadow-xl"
           >
-            <ChevronLeft size={20} className="text-mist-800" />
+            <ChevronLeft size={24} />
           </button>
+          
           <button
             onClick={() => go("next")}
-            className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
-            aria-label="Next slide"
+            className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black transition-all shadow-xl"
           >
-            <ChevronRight size={20} className="text-mist-800" />
+            <ChevronRight size={24} />
           </button>
+        </div>
 
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-            {HERO_SLIDES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setCurrent(i); resetTimer() }}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? "bg-white w-5" : "bg-white/50"}`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
+        {/* Progress Indicators (Optional - hidden in your target image) */}
+        <div className="mt-10 flex justify-center gap-3">
+          {HERO_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setCurrent(i); resetTimer(); }}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i === current ? "w-12 bg-[#1a1a1a]" : "w-2 bg-gray-300"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 /* ================================================================== */
@@ -295,7 +311,7 @@ function FifaContent() {
         heading="Los Angeles FIFA World Cup 2026"
         description="Exclusive cars, luxury villas, elite nightlife & concierge services for the world's biggest event."
         height="h-[520px]"
-        image="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1400&q=80"
+        image="/fifa.png"
         searchBar={{
           placeholder: "Search cars, villas, or events...",
           onSearch: () => {},
@@ -336,30 +352,38 @@ function FifaContent() {
         </div>
       </section>
 
+      <Services/>
+
       {/* Match Fixtures */}
-      <section className="bg-mist-50 py-14 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-mist-900 text-center mb-2">
-            FIFA World Cup 2026&#8482; Fixtures
+    {/* FIFA World Cup Fixtures Section */}
+      <section className="px-6 sm:px-16 lg:px-20 py-20 bg-white">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl lg:text-5xl font-bold text-[#1a1a1a] mb-2">
+            FIFA World Cup 2026™ Fixtures
           </h2>
-          <p className="text-center text-sm text-mist-500 mb-8">in Los Angeles</p>
-          <div className="bg-white rounded-2xl border border-mist-200 overflow-hidden">
-            <table className="w-full">
+          <p className="text-xl text-gray-600 font-medium">in Los Angeles</p>
+        </div>
+
+        {/* Table Container */}
+        <div className=" bg-mist-200 rounded-[2.5rem] shadow-sm border border-gray-100">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
-                <tr className="text-left text-xs font-semibold text-mist-500 border-b border-mist-200">
-                  <th className="px-6 py-3.5">Date</th>
-                  <th className="px-6 py-3.5">Match No.</th>
-                  <th className="px-6 py-3.5">Stage</th>
-                  <th className="px-6 py-3.5">Stadium</th>
+                <tr className="text-left border-b border-mist-300">
+                  <th className="px-6 py-5 text-base font-bold text-[#1a1a1a] border-r border-mist-300">Date</th>
+                  <th className="px-6 py-5 text-base font-bold text-[#1a1a1a] border-r border-mist-300">Match No.</th>
+                  <th className="px-6 py-5 text-base font-bold text-[#1a1a1a] border-r border-mist-300">Stage</th>
+                  <th className="px-6 py-5 text-base font-bold text-[#1a1a1a] ">Stadium</th>
                 </tr>
               </thead>
               <tbody>
                 {FIXTURES.map((f, i) => (
-                  <tr key={i} className="border-b border-mist-100 last:border-0 text-sm">
-                    <td className="px-6 py-3.5 text-mist-700">{f.date}</td>
-                    <td className="px-6 py-3.5 text-mist-500">{f.matchNo}</td>
-                    <td className="px-6 py-3.5 text-mist-700">{f.stage}</td>
-                    <td className="px-6 py-3.5 text-mist-500">{f.stadium}</td>
+                  <tr key={i} className="border-b border-mist-300 last:border-0 hover:bg-gray-100/50 transition-colors">
+                    <td className="px-6 py-5 text-sm font-medium text-gray-700 border-r border-mist-300">{f.date}</td>
+                    <td className="px-6 py-5 text-sm text-gray-500 border-r border-mist-300">{f.matchNo}</td>
+                    <td className="px-6 py-5 text-sm text-gray-600 italic lg:not-italic border-r border-mist-300">{f.stage}</td>
+                    <td className="px-6 py-5 text-sm text-gray-500">{f.stadium}</td>
                   </tr>
                 ))}
               </tbody>
@@ -367,12 +391,11 @@ function FifaContent() {
           </div>
         </div>
       </section>
-
       {/* Gallery Bento Grid */}
-      <GalleryBentoGrid />
+    
 
       {/* Big Image Slider */}
-      <BigImageSlider />
+      
 
       {/* Car Rentals Slider */}
       <div className="py-4">
@@ -382,17 +405,21 @@ function FifaContent() {
       {/* Browse by Make & Type */}
       <CarBrowse />
 
+      <BigImageSlider />
+
       {/* Villa Slider */}
       <Villa showHeader={true} />
 
       {/* Event Slider */}
-      <EventSlider />
+      <Events showHeader={true} />
 
       {/* Why Choose Vidi Vici */}
       <WhyChooseUs />
 
       {/* Client Testimonials */}
       <Reviews />
+
+        <GalleryBentoGrid />
 
       {/* FAQ */}
       <FAQ />

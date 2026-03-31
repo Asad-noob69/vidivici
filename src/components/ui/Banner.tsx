@@ -90,9 +90,9 @@ export default function Banner({
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 w-full max-w-2xl mx-auto gap-3">
-        <h1 className="text-3xl sm:text-5xl text-white tracking-tight drop-shadow-md font-medium">
+        <h2 className="text-3xl sm:text-5xl text-white tracking-tight drop-shadow-md font-medium">
           {heading}
-        </h1>
+        </h2>
 
         {description !== false && description && (
           <p className="text-sm text-white/70 leading-relaxed max-w-md">

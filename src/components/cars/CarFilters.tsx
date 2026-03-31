@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
+import { RotateCcw, X, ChevronRight } from "lucide-react"
+
 
 interface Option {
   id: string
@@ -9,7 +11,7 @@ interface Option {
   slug: string
 }
 
-export default function CarFilters() {
+export default function CarFilters({ onHide }: { onHide?: () => void }) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -45,48 +47,130 @@ export default function CarFilters() {
   }
 
   return (
-    <div className="bg-white border border-mist-200 rounded-2xl p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-mist-900">Filters</h3>
-        <button onClick={clearAll} className="text-xs text-mist-400 hover:text-mist-700 transition-colors">Clear All</button>
-      </div>
+    <div className="bg-white p-2 sm:p-0 space-y-6 w-full">
+      {/* Add close button for mobile if onHide provided */}
+      {onHide && (
+        <div className="flex justify-end lg:hidden mb-2">
+          <button onClick={onHide} className="p-2 text-mist-400 hover:text-mist-600">
+            <X size={20} />
+          </button>
+        </div>
+      )}
 
-      {/* Brand */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Brand</label>
-        <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
-          <option value="">All Brands</option>
-          {brands.map((b) => (
-            <option key={b.id} value={b.slug}>{b.name}</option>
-          ))}
+      {/* Brand Filter */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Brand</label>
+        <select
+          value={selectedBrand}
+          onChange={(e) => setSelectedBrand(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
+          <option value="">Select brand</option>
+          {/* brand options */}
         </select>
+        {selectedBrand && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {selectedBrand}
+              <button onClick={() => setSelectedBrand("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Category */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Category</label>
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none">
-          <option value="">All Categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.slug}>{c.name}</option>
-          ))}
+      <div className="h-px bg-neutral-100" />
+
+      {/* Category Filter */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Category</label>
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full bg-neutral-100 border border-mist-200 text-mist-500 text-sm px-3 py-2.5 rounded-md focus:border-mist-300 focus:outline-none appearance-none"
+        >
+          <option value="">Select category</option>
+          {/* category options */}
         </select>
+        {selectedCategory && (
+          <div className="flex flex-wrap gap-2">
+            <span className="flex items-center gap-1 text-xs bg-mist-100 text-mist-600 px-3 py-1.5 rounded-full">
+              {selectedCategory}
+              <button onClick={() => setSelectedCategory("")} className="hover:text-mist-900">
+                <X size={10} />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Price Range */}
-      <div>
-        <label className="text-xs font-medium text-mist-500 block mb-2">Price Range (per day)</label>
-        <div className="flex gap-2">
-          <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
-            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
-          <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-1/2 bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2.5 rounded-xl focus:border-mist-400 focus:outline-none" />
+      <div className="h-px bg-neutral-100" />
+
+      {/* Price Range - Match VillaFilters style */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-mist-500 block">Price Range</label>
+        <input
+          type="range"
+          min={0}
+          max={5000}
+          value={maxPrice || 0}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="w-full accent-neutral-500 h-1"
+        />
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <p className="text-[10px] text-mist-400 mb-1">Minimum</p>
+            <div className="flex items-center bg-neutral-100 border border-mist-200 rounded-md px-3 py-2 gap-1">
+              <span className="text-xs text-mist-400">$</span>
+              <input
+                type="number"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="w-full text-sm text-mist-700 focus:outline-none"
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <span className="text-mist-300 mt-4">–</span>
+          <div className="flex-1">
+            <p className="text-[10px] text-mist-400 mb-1">Maximum</p>
+            <div className="flex items-center bg-neutral-100 border border-mist-200 rounded-md px-3 py-2 gap-1">
+              <span className="text-xs text-mist-400">$</span>
+              <input
+                type="number"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-full text-sm text-mist-700 focus:outline-none"
+                placeholder="5000"
+              />
+            </div>
+          </div>
+          <button
+            onClick={applyFilters}
+            className="mt-4 w-9 h-9 flex-shrink-0 bg-mist-200 hover:bg-mist-200 rounded-md flex items-center justify-center transition-colors"
+          >
+            <ChevronRight size={16} className="text-mist-600" />
+          </button>
         </div>
       </div>
 
-      <button onClick={applyFilters} className="w-full bg-mist-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors">
-        Apply Filters
-      </button>
+      {/* Apply + Reset Buttons */}
+      <div className="space-y-2 pt-2">
+        <button
+          onClick={applyFilters}
+          className="w-full bg-mist-900 text-white py-3 rounded-lg text-sm hover:bg-mist-800 transition-colors"
+        >
+          Apply
+        </button>
+        <button
+          onClick={clearAll}
+          className="w-full bg-white border border-mist-200 text-mist-700 py-3 rounded-lg text-sm hover:bg-mist-50 transition-colors flex items-center justify-center gap-2"
+        >
+          <RotateCcw size={14} />
+          Reset
+        </button>
+      </div>
     </div>
   )
 }

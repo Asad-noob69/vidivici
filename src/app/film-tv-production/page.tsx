@@ -602,69 +602,76 @@ function FilmTVContent() {
       />
 
       {/* Listing Section */}
+      {/* Listing Section - UPDATED to match villas page */}
       <section className="bg-white py-16 sm:px-16 lg:px-20 px-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-mist-900 text-center mb-10">
-          Film &amp; TV Production House Rentals
-        </h2>
+        <div className="">
+          <h2 className="text-4xl font-bold text-mist-900 text-center my-20">
+            Film & TV Production House Rentals
+          </h2>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Mobile filter toggle */}
-          <button onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-mist-200 rounded-xl text-sm font-medium text-mist-700 w-fit">
-            <SlidersHorizontal size={16} /> {showFilters ? "Hide Filters" : "Show Filters"}
-          </button>
+          {/* Filter toggle + Sort - MOVED HERE to match villas layout */}
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 border border-mist-200 rounded-xl text-sm text-mist-600 hover:bg-mist-50 transition-colors"
+            >
+              <SlidersHorizontal size={14} />
+              {showFilters ? "Hide Filter" : "Show Filter"}
+            </button>
+            <select
+              value={sort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="bg-neutral-100 border border-mist-200 text-mist-600 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
+            >
+              <option value="newest">Sort by: Newest</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
 
-          {/* Sidebar Filters */}
-          <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <FilmFilters onHide={() => setShowFilters(false)} />
-          </aside>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar Filters - FIXED: removed lg:block */}
+            <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden"}`}>
+              <FilmFilters onHide={() => setShowFilters(false)} />
+            </aside>
 
-          {/* Villa Grid */}
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-mist-500">{total} properties available</p>
-              <select value={sort} onChange={(e) => handleSortChange(e.target.value)}
-                className="bg-white border border-mist-200 text-mist-700 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none">
-                <option value="newest">Sort by: Most Popular</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
+            {/* Villa Grid - FIXED: dynamic columns */}
+            <div className="flex-1">
+              {loading ? (
+                <div className={`grid gap-6 ${showFilters ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-mist-100 rounded-2xl h-80 animate-pulse" />
+                  ))}
+                </div>
+              ) : villas.length === 0 ? (
+                <div className="text-center py-20">
+                  <p className="text-mist-400 text-lg mb-2">No properties found</p>
+                  <p className="text-mist-300 text-sm">Try adjusting your filters or search</p>
+                </div>
+              ) : (
+                <div className={`grid gap-6 ${showFilters ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
+                  {villas.map((villa) => <VillaListCard key={villa.id} villa={villa} />)}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pages > 1 && (
+                <div className="flex justify-center gap-2 mt-10">
+                  {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => goToPage(p)}
+                      className={`w-10 h-10 rounded-lg font-semibold text-sm transition-colors ${p === currentPage
+                          ? "bg-mist-900 text-white"
+                          : "bg-mist-100 text-mist-500 hover:bg-mist-200"
+                        }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => <div key={i} className="bg-mist-100 rounded-2xl h-80 animate-pulse" />)}
-              </div>
-            ) : villas.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-mist-400 text-lg mb-2">No properties found</p>
-                <p className="text-mist-300 text-sm">Try adjusting your filters or search</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
-                {villas.map((villa) => <VillaListCard key={villa.id} villa={villa} />)}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {pages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-10">
-                <button onClick={() => goToPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}
-                  className="w-10 h-10 rounded-lg bg-mist-100 text-mist-500 hover:bg-mist-200 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed">
-                  <ChevronLeft size={16} />
-                </button>
-                {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
-                  <button key={p} onClick={() => goToPage(p)}
-                    className={`w-10 h-10 rounded-lg font-semibold text-sm transition-colors ${p === currentPage ? "bg-mist-900 text-white" : "bg-mist-100 text-mist-500 hover:bg-mist-200"}`}>
-                    {p}
-                  </button>
-                ))}
-                <button onClick={() => goToPage(Math.min(pages, currentPage + 1))} disabled={currentPage === pages}
-                  className="w-10 h-10 rounded-lg bg-mist-100 text-mist-500 hover:bg-mist-200 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed">
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -685,7 +692,11 @@ function FilmTVContent() {
             <ul className="space-y-4">
               {ABOUT_BULLETS.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <CheckCircle2 size={20} className="text-mist-600 flex-shrink-0 mt-0.5" />
+                  <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-mist-300 flex items-center justify-center">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="gray" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
                   <span className="text-base text-mist-600 leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -711,6 +722,40 @@ function FilmTVContent() {
 
       {/* Testimonials */}
       <Reviews />
+
+        <section className="py-16 px-6 sm:px-16 lg:px-20 bg-white">
+        <div className="">
+          <div className="relative bg-mist-100 rounded-3xl px-8 py-16 text-center overflow-hidden">
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
+            />
+
+            {/* Right side vector decoration */}
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180"
+            />
+
+
+            {/* Content */}
+            <h2 className="text-3xl sm:text-4xl font-bold text-mist-900 leading-tight mb-4">
+             Ready to book your next <br/> shoot location?
+            </h2>
+            <p className="text-sm text-mist-400 max-w-sm mx-auto leading-relaxed mb-8">
+              Tell us about your celebration and let our team help you create an unforgettable experience.
+            </p>
+            <button className="bg-mist-900 text-white text-sm font-semibold px-7 py-3.5 rounded-xl hover:bg-mist-700 transition-colors">
+              Request a Quote
+            </button>
+
+          </div>
+        </div>
+      </section>
 
       {/* FAQ */}
       <FAQ />
