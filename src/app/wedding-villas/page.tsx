@@ -704,9 +704,9 @@ function WeddingVillasContent() {
                 "Complete privacy and personalized service",
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-mist-800 flex items-center justify-center">
+                  <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-mist-300 flex items-center justify-center">
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2 6l3 3 5-5" stroke="gray" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                   <span className="text-base text-mist-700 leading-relaxed">{item}</span>

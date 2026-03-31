@@ -27,7 +27,7 @@ interface CarFromAPI {
   images: { url: string; isPrimary: boolean }[]
 }
 
-function CarsContent() {
+export function CarsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -92,59 +92,65 @@ function CarsContent() {
     router.push(`/cars?${params.toString()}`)
   }
 
-  return (
-    <div>
-      <Banner
-        heading="Exotic Car Rentals"
-        description="Browse our collection of exotic and luxury vehicles available for rent"
-        height="h-96"
-        searchBar={{
-          placeholder: "Search cars by name, brand...",
-          onSearch: (value: string) => {
-            const params = new URLSearchParams(searchParams.toString())
-            if (value.trim()) params.set("search", value.trim())
-            else params.delete("search")
-            params.set("page", "1")
-            router.push(`/cars?${params.toString()}`)
-          },
-        }}
-      />
+  // REPLACE the entire CarsContent function return statement with this:
 
-      {/* Cars Content */}
-      <section className="bg-white py-10 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
-          {/* Mobile filter toggle */}
+return (
+  <div>
+    <Banner
+      heading="Exotic Car Rentals"
+      description="Browse our collection of exotic and luxury vehicles available for rent"
+      height="h-96"
+      searchBar={{
+        placeholder: "Search cars by name, brand...",
+        onSearch: (value: string) => {
+          const params = new URLSearchParams(searchParams.toString())
+          if (value.trim()) params.set("search", value.trim())
+          else params.delete("search")
+          params.set("page", "1")
+          router.push(`/cars?${params.toString()}`)
+        },
+      }}
+    />
+
+    {/* Cars Content */}
+    <section className="bg-white py-16 sm:px-16 lg:px-20 px-6">
+      <div className="">
+        <h2 className="text-4xl font-bold text-mist-900 text-center my-20">
+          Exotic Car Rentals
+        </h2>
+
+        {/* Filter toggle + Sort - MOVED HERE to match villas layout */}
+        <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-mist-200 rounded-xl text-sm font-medium text-mist-700 w-fit"
+            className="flex items-center gap-2 px-4 py-2 border border-mist-200 rounded-xl text-sm text-mist-600 hover:bg-mist-50 transition-colors"
           >
-            <SlidersHorizontal size={16} /> {showFilters ? "Hide Filters" : "Show Filters"}
+            <SlidersHorizontal size={14} />
+            {showFilters ? "Hide Filter" : "Show Filter"}
           </button>
+          <select
+            value={sort}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="bg-neutral-100 border border-mist-200 text-mist-600 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
+          >
+            <option value="newest">Sort by: Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
 
-          {/* Sidebar */}
-          <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar - FIXED: removed lg:block, added onHide prop */}
+          <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? "block" : "hidden"}`}>
             <Suspense fallback={<div className="h-96 bg-mist-100 rounded-xl animate-pulse" />}>
-              <CarFilters />
+              <CarFilters onHide={() => setShowFilters(false)} />
             </Suspense>
           </aside>
 
-          {/* Cars Grid */}
+          {/* Cars Grid - FIXED: dynamic columns based on filter visibility */}
           <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-mist-500">{total} vehicles available</p>
-              <select
-                value={sort}
-                onChange={(e) => handleSortChange(e.target.value)}
-                className="bg-white border border-mist-200 text-mist-700 text-sm px-3 py-2 rounded-lg focus:border-mist-400 focus:outline-none"
-              >
-                <option value="newest">Sort by: Newest</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
-            </div>
-
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className={`grid gap-6 ${showFilters ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-mist-100 rounded-2xl h-80 animate-pulse" />
                 ))}
@@ -155,7 +161,7 @@ function CarsContent() {
                 <p className="text-mist-300 text-sm">Try adjusting your filters or search</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className={`grid gap-6 ${showFilters ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
                 {cars.map((car) => (
                   <CarCard
                     key={car.id}
@@ -197,15 +203,17 @@ function CarsContent() {
             )}
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* Extra Sections */}
-      <WhyChooseUs />
-      <Reviews />
-      <FAQ />
-      <Contact />
-    </div>
-  )
+    {/* Extra Sections */}
+    <WhyChooseUs />
+    <Reviews />
+    <FAQ />
+    <Contact />
+  </div>
+)
+
 }
 
 export default function CarsPage() {
