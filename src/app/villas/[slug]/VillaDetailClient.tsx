@@ -403,40 +403,59 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       {/* <span className="text-sm text-mist-400 line-through">${villa.originalPrice?.toLocaleString()} </span> */}
                       <span className="text-sm text-mist-400">USD / night</span>
                     </div>
-                    {/* Date + Time Rows */}
+                    {/* Date + Time Rows - UPDATED with focus/blur behavior like car form */}
                     <div className="space-y-3 border-t border-mist-300 pt-6">
+                      {/* Check-in date + time */}
                       <div className="grid grid-cols-2 gap-3">
-                        <input
-                          type="date"
-                          value={checkIn}
-                          onChange={(e) => setCheckIn(e.target.value)}
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400"
-                          placeholder="Start date*"
-                        />
-                        <input
-                          type="time"
-                          value={checkIn}
-                          onChange={(e) => setCheckIn(e.target.value)}
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400"
-                          placeholder="Time*"
-                        />
+                        <div className="relative">
+                          <input
+                            type={checkIn ? "date" : "text"}
+                            onFocus={(e) => (e.target.type = "date")}
+                            onBlur={(e) => !checkIn && (e.target.type = "text")}
+                            value={checkIn}
+                            onChange={(e) => setCheckIn(e.target.value)}
+                            placeholder="Start date*"
+                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          />
+                        </div>
+                        <div className="relative">
+                          <input
+                            type={checkIn ? "time" : "text"}
+                            onFocus={(e) => (e.target.type = "time")}
+                            onBlur={(e) => !checkIn && (e.target.type = "text")}
+                            value={checkIn}
+                            onChange={(e) => setCheckIn(e.target.value)}
+                            placeholder="Time*"
+                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          />
+                        </div>
                       </div>
 
+                      {/* Check-out date + time */}
                       <div className="grid grid-cols-2 gap-3">
-                        <input
-                          type="date"
-                          value={checkOut}
-                          onChange={(e) => setCheckOut(e.target.value)}
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400"
-                          placeholder="End date*"
-                        />
-                        <input
-                          type="time"
-                          value={checkOut}
-                          onChange={(e) => setCheckOut(e.target.value)}
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400"
-                          placeholder="Time*"
-                        />
+                        <div className="relative">
+                          <input
+                            type={checkOut ? "date" : "text"}
+                            onFocus={(e) => (e.target.type = "date")}
+                            onBlur={(e) => !checkOut && (e.target.type = "text")}
+                            min={checkIn}
+                            value={checkOut}
+                            onChange={(e) => setCheckOut(e.target.value)}
+                            placeholder="End date*"
+                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          />
+                        </div>
+                        <div className="relative">
+                          <input
+                            type={checkOut ? "time" : "text"}
+                            onFocus={(e) => (e.target.type = "time")}
+                            onBlur={(e) => !checkOut && (e.target.type = "text")}
+                            value={checkOut}
+                            onChange={(e) => setCheckOut(e.target.value)}
+                            placeholder="Time*"
+                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          />
+                        </div>
                       </div>
                     </div>
 

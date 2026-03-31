@@ -495,13 +495,13 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const [showMore, setShowMore] = useState(false);
   const today = new Date().toISOString().split("T")[0]
 
- const days: number =
-  startDate && endDate
-    ? Math.ceil(
+  const days: number =
+    startDate && endDate
+      ? Math.ceil(
         (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-          (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
       )
-    : 0
+      : 0
 
   let discountPercent = 0
   if (days >= 270) discountPercent = 65
@@ -514,9 +514,9 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const subtotal = car.pricePerDay * days
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const actualDriverDays: number =
-  driverAvailability === "full" ? days : driverDays
+    driverAvailability === "full" ? days : driverDays
   const driverTotal: number =
-  needDriver ? actualDriverDays * driverHours * 45 : 0
+    needDriver ? actualDriverDays * driverHours * 45 : 0
   const taxRate = 0.085
   const preTax = subtotal - discountAmount + driverTotal
   const tax = Math.round(preTax * taxRate)
@@ -541,390 +541,431 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
     router.push(`/booking/${car.slug}?${params.toString()}`)
   }
 
+  const fieldBox = "w-full px-5 py-4 bg-white border border-gray-200 rounded-lg text-gray-400 text-lg transition-all";
+
   return (
     <div className="bg-white min-h-screen">
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4">
-        <div className="flex items-center gap-2 text-sm text-mist-400">
-          <Link href="/" className="hover:text-mist-700">Los Angeles</Link>
-          <span>/</span>
-          <Link href={`/cars?brand=${car.brandSlug}`} className="hover:text-mist-700">{car.brandName}</Link>
-          <span>/</span>
-          <Link href={`/cars?category=${car.categorySlug}`} className="hover:text-mist-700">{car.categoryName}</Link>
+      <div className="px-6 sm:px-16 lg:px-20 py-16">
+
+
+        {/* Breadcrumb */}
+        <div className=" flex flex-col sm:flex-row justify-between items-center pb-10">
+          <div className="flex items-center gap-2 text-sm sm:text-base text-mist-400">
+            <Link href="/" className="hover:text-mist-700">Los Angeles</Link>
+            <span>{">"}</span>
+            <Link href={`/cars?brand=${car.brandSlug}`} className="hover:text-mist-700">{car.brandName}</Link>
+            <span>{">"}</span>
+            <Link href={`/cars?category=${car.categorySlug}`} className="hover:text-mist-700">{car.categoryName}</Link>
+          </div>
+          {/* Share / Save */}
+          <div className="flex justify-end gap-3">
+            <button className="flex items-center gap-1.5 text-sm text-mist-500 hover:text-mist-800">
+              <Share2 size={14} /> Share
+            </button>
+            <button className="flex items-center gap-1.5 text-sm text-mist-500 hover:text-mist-800">
+              <Bookmark size={14} /> Save
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        {/* Share / Save */}
-        <div className="flex justify-end gap-3 mb-4">
-          <button className="flex items-center gap-1.5 text-sm text-mist-500 hover:text-mist-800">
-            <Share2 size={14} /> Share
-          </button>
-          <button className="flex items-center gap-1.5 text-sm text-mist-500 hover:text-mist-800">
-            <Bookmark size={14} /> Save
-          </button>
-        </div>
+        <div className="pb-16">
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* LEFT COLUMN — 3/5 */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Gallery */}
-            <CarGallery images={car.images} />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* LEFT COLUMN — 3/5 */}
+            <div className="lg:col-span-3 space-y-8">
+              {/* Gallery */}
+              <CarGallery images={car.images} />
 
-            {/* Title + Price */}
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-mist-900">{car.name}</h1>
-              {car.shortDescription && (
-                <p className="text-sm text-mist-400 mt-1">{car.shortDescription}</p>
-              )}
-              <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold text-mist-900">
-                  ${car.pricePerDay.toLocaleString()}.00
-                </span>
-                <span className="text-sm text-mist-400 line-through">
-                  ${originalDayRate.toLocaleString()}.00 USD / day
-                </span>
-              </div>
-            </div>
-
-            {/* ── Quick Info — two mist boxes side by side ── */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Left box */}
-              <div className="bg-mist-50 border border-mist-100 rounded-xl px-4 py-3 space-y-1.5">
-                <div className="flex items-start gap-2 text-xs text-mist-500">
-                  <Shield size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
-                  <span>
-                    <span className="font-medium text-mist-700">Security Deposit:</span>{" "}
-                    ${securityDeposit.toLocaleString()} fully refundable
-                  </span>
-                </div>
-                <div className="flex items-start gap-2 text-xs text-mist-500">
-                  <DollarSign size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
-                  <span>
-                    <span className="font-medium text-mist-700">Tax:</span> 8.5%
-                  </span>
-                </div>
-              </div>
-
-              {/* Right box */}
-              <div className="bg-mist-50 border border-mist-100 rounded-xl px-4 py-3 space-y-1.5">
-                <div className="flex items-start gap-2 text-xs text-mist-500">
-                  <Clock size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
-                  <span>
-                    <span className="font-medium text-mist-700">Rental Duration:</span>{" "}
-                    {car.minRentalDays}+ days min
-                  </span>
-                </div>
-                <div className="flex items-start gap-2 text-xs text-mist-500">
-                  <AlertCircle size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
-                  <span>
-                    <span className="font-medium text-mist-700">Extra Hours:</span>{" "}
-                    25% of the daily rate
-                  </span>
-                </div>
-                <div className="flex items-start gap-2 text-xs text-mist-500">
-                  <Route size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
-                  <span>
-                    <span className="font-medium text-mist-700">Extra Miles:</span>{" "}
-                    Charged at an extra day
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* ── Specs Grid — icons + label + value ── */}
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {[
-                { label: "Seats", value: car.seats, icon: Users },
-                { label: "0-60 mph", value: car.acceleration, icon: Zap },
-                { label: "Engine", value: car.horsepower, icon: Gauge },
-                { label: "Top Speed", value: car.topSpeed, icon: Activity },
-                { label: "Transmission", value: car.transmission, icon: Settings2 },
-                { label: "Fuel", value: car.fuelType, icon: Fuel },
-                { label: "Year", value: car.year, icon: Calendar },
-                { label: "Miles/Day", value: `${car.milesIncluded}`, icon: Route },
-              ].map(({ label, value, icon: Icon }) => (
-                <div key={label} className="bg-mist-50 border border-mist-100 rounded-xl p-3">
-                  <Icon size={14} className="text-mist-400 mb-1" />
-                  <p className="text-[10px] text-mist-400 leading-tight">{label}</p>
-                  <p className="text-sm font-semibold text-mist-800 mt-0.5">{value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* ── Long-Term Rental Discounts ── */}
-            <div>
-              {/* Section header */}
-              <button
-                type="button"
-                onClick={() => setDiscountsOpen(!discountsOpen)}
-                className="w-full flex items-center justify-between mb-3"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
-                    <Tag size={13} className="text-blue-500" />
+              {/* ── Quick Info — two mist boxes side by side ── */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Left box */}
+                <div className="bg-mist-50 border border-mist-100 rounded-xl px-4 py-3 space-y-1.5">
+                  <div className="flex items-start gap-2 text-xs text-mist-500">
+                    <Shield size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
+                    <span>
+                      <span className="font-medium text-mist-700">Security Deposit:</span>{" "}
+                      ${securityDeposit.toLocaleString()} fully refundable
+                    </span>
                   </div>
-                  <span className="text-base font-bold text-mist-900">Long-Term Rental Discounts</span>
-                </div>
-                {discountsOpen
-                  ? <ChevronUp size={16} className="text-mist-400" />
-                  : <ChevronDown size={16} className="text-mist-400" />}
-              </button>
-
-              {discountsOpen && (
-                <>
-                  {/* Table with blue-tinted bg */}
-                  <div className="bg-blue-50 rounded-xl overflow-hidden border border-blue-100">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr>
-                          <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Duration</th>
-                          <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Discount</th>
-                          <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Mileage</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {discountTiers.map((tier, i) => (
-                          <tr key={i} className="border-t border-blue-100 bg-white/60">
-                            <td className="px-4 py-2.5 text-mist-600 text-sm">{tier.duration}</td>
-                            <td className="px-4 py-2.5 font-semibold text-mist-800 text-sm">{tier.discount}</td>
-                            <td className="px-4 py-2.5 text-mist-500 text-sm">{tier.miles}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="flex items-start gap-2 text-xs text-mist-500">
+                    <DollarSign size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
+                    <span>
+                      <span className="font-medium text-mist-700">Tax:</span> 8.5%
+                    </span>
                   </div>
+                </div>
 
-                  <p className="text-xs text-mist-400 mt-2 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-mist-300 inline-block flex-shrink-0" />
-                    Vehicle Swap Option: Available with 30-day notice
-                  </p>
-                </>
-              )}
-            </div>
+                {/* Right box */}
+                <div className="bg-mist-50 border border-mist-100 rounded-xl px-4 py-3 space-y-1.5">
+                  <div className="flex items-start gap-2 text-xs text-mist-500">
+                    <Clock size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
+                    <span>
+                      <span className="font-medium text-mist-700">Rental Duration:</span>{" "}
+                      {car.minRentalDays}+ days min
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-mist-500">
+                    <AlertCircle size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
+                    <span>
+                      <span className="font-medium text-mist-700">Extra Hours:</span>{" "}
+                      25% of the daily rate
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-mist-500">
+                    <Route size={12} className="mt-0.5 flex-shrink-0 text-mist-400" />
+                    <span>
+                      <span className="font-medium text-mist-700">Extra Miles:</span>{" "}
+                      Charged at an extra day
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-            {/* ── Description ── */}
-            {car.description && (
+              {/* ── Specs Grid — icons + label + value ── */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {[
+                  { label: "Seats", value: car.seats, icon: Users },
+                  { label: "0-60 mph", value: car.acceleration, icon: Zap },
+                  { label: "Engine", value: car.horsepower, icon: Gauge },
+                  { label: "Top Speed", value: car.topSpeed, icon: Activity },
+                  { label: "Transmission", value: car.transmission, icon: Settings2 },
+                  { label: "Fuel", value: car.fuelType, icon: Fuel },
+                  { label: "Year", value: car.year, icon: Calendar },
+                  { label: "Miles/Day", value: `${car.milesIncluded}`, icon: Route },
+                ].map(({ label, value, icon: Icon }) => (
+                  <div key={label} className="bg-mist-50 border border-mist-100 rounded-xl p-3">
+                    <Icon size={14} className="text-mist-400 mb-1" />
+                    <p className="text-[10px] text-mist-400 leading-tight">{label}</p>
+                    <p className="text-sm font-semibold text-mist-800 mt-0.5">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Long-Term Rental Discounts ── */}
               <div>
+                {/* Section header */}
                 <button
                   type="button"
-                  onClick={() => setShowMore(!showMore)}
-                  className="w-full flex items-center justify-between mb-2"
+                  onClick={() => setDiscountsOpen(!discountsOpen)}
+                  className="w-full flex items-center justify-between mb-3"
                 >
-                  <h2 className="text-base font-bold text-mist-900 text-left">
-                    Rent a {car.name} in {car.location}
-                  </h2>
-                  <ChevronDown
-                    size={16}
-                    className={`text-mist-400 flex-shrink-0 transition-transform duration-200 ${showMore ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                <p className={`text-sm text-mist-500 leading-relaxed ${showMore ? "" : "line-clamp-3"}`}>
-                  {car.description}
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => setShowMore(!showMore)}
-                  className="mt-1 text-sm text-mist-700 font-medium hover:text-mist-900"
-                >
-                  {showMore ? "Show less ›" : "Show more ›"}
-                </button>
-              </div>
-            )}
-
-
-            {/* RIGHT COLUMN — Booking Form 2/5 */}
-
-          </div>
-          <div className="lg:col-span-2">
-            <div className="sticky top-24">
-              <div className="bg-white border border-mist-200 rounded-2xl p-6 shadow-sm space-y-3">
-
-                {/* Start date + time */}
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="date" min={today} value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    placeholder="Start date*"
-                    className={fieldBox + " focus:border-mist-400 focus:outline-none placeholder:text-mist-400"}
-                  />
-                  <input
-                    type="time" value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className={fieldBox + " focus:border-mist-400 focus:outline-none"}
-                  />
-                </div>
-
-                {/* End date + time */}
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="date" min={startDate || today} value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    placeholder="End date*"
-                    className={fieldBox + " focus:border-mist-400 focus:outline-none placeholder:text-mist-400"}
-                  />
-                  <input
-                    type="time" value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className={fieldBox + " focus:border-mist-400 focus:outline-none"}
-                  />
-                </div>
-
-                {/* Need a Driver label */}
-                <p className="text-sm font-medium text-mist-700 pt-1">Need a Driver?</p>
-
-                {/* Driver checkbox — field-box styled row */}
-                <label className={fieldBox + " flex items-center gap-2.5 cursor-pointer"}>
-                  <RadioDot active={needDriver} />
-                  <input
-                    type="checkbox" checked={needDriver}
-                    onChange={(e) => setNeedDriver(e.target.checked)}
-                    className="sr-only"
-                  />
-                  <span className="text-mist-600">Yes, I will need a driver ($45/hour)</span>
-                </label>
-
-                {needDriver && (
-                  <>
-                    {/* Driver Hours Slider — field-box styled row */}
-                    <div className={fieldBox + " space-y-2"}>
-                      <p className="text-xs text-mist-500">Driver Hours per Day</p>
-                      <input
-                        type="range" min={1} max={16} value={driverHours}
-                        onChange={(e) => setDriverHours(Number(e.target.value))}
-                        className="w-full accent-mist-900"
-                      />
-                      <div className="flex justify-between text-[10px] text-mist-400">
-                        <span>0 hr</span>
-                        <span className="font-medium text-mist-600">{driverHours} hr</span>
-                        <span>16 hr</span>
-                      </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                      <Tag size={13} className="text-blue-500" />
                     </div>
-
-                    {/* Driver Availability label */}
-                    <p className="text-sm font-medium text-mist-700 pt-1">Driver Availability:</p>
-
-                    {/* Full Rental radio — field-box styled row */}
-                    <label className={fieldBox + " flex items-center gap-2.5 cursor-pointer"}>
-                      <RadioDot active={driverAvailability === "full"} />
-                      <input
-                        type="radio" name="driverAvail"
-                        checked={driverAvailability === "full"}
-                        onChange={() => setDriverAvailability("full")}
-                        className="sr-only"
-                      />
-                      <span className="text-mist-600">Full Rental</span>
-                    </label>
-
-                    {/* Select Days radio — field-box styled row */}
-                    <label className={fieldBox + " flex items-center gap-2.5 cursor-pointer"}>
-                      <RadioDot active={driverAvailability === "select"} />
-                      <input
-                        type="radio" name="driverAvail"
-                        checked={driverAvailability === "select"}
-                        onChange={() => setDriverAvailability("select")}
-                        className="sr-only"
-                      />
-                      <span className="text-mist-600">Select Days</span>
-                    </label>
-
-                    {/* Day counter — field-box styled row */}
-                    {driverAvailability === "select" && (
-                      <div className={fieldBox + " flex items-center justify-between"}>
-                        <button
-                          type="button"
-                          onClick={() => setDriverDays(Math.max(1, driverDays - 1))}
-                          className="w-8 h-8 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50 transition-colors"
-                        >
-                          <Minus size={14} />
-                        </button>
-                        <span className="text-sm font-medium text-mist-900">{driverDays}</span>
-                        <button
-                          type="button"
-                          onClick={() => setDriverDays(Math.min(days || 365, driverDays + 1))}
-                          className="w-8 h-8 rounded-lg border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50 transition-colors"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* Next + Pricing */}
-                {days > 0 ? (
-                  <>
-                    <button
-                      onClick={handleNext}
-                      className="w-full bg-mist-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-mist-700 transition-colors"
-                    >
-                      Next
-                    </button>
-
-                    {/* Price breakdown — field-box styled container */}
-                    <div className={fieldBox + " space-y-2 py-3"}>
-                      <div className="flex justify-between text-mist-500">
-                        <span>Car Total · ${car.pricePerDay} × {days}d</span>
-                        <span className="text-mist-900 font-medium">${subtotal.toLocaleString()}</span>
-                      </div>
-                      {discountPercent > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Discount · {days} days – {discountPercent}%</span>
-                          <span>-${discountAmount.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {driverTotal > 0 && (
-                        <div className="flex justify-between text-mist-500">
-                          <span>Driver Total · {driverHours}hr × $45 × {actualDriverDays}d</span>
-                          <span className="text-mist-900 font-medium">${driverTotal.toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between text-mist-500">
-                        <span>Tax · 8.5%</span>
-                        <span className="text-mist-900 font-medium">${tax.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-mist-500">
-                        <span>Security Deposit · Fully refundable</span>
-                        <span className="text-mist-900 font-medium">${securityDeposit.toLocaleString()}</span>
-                      </div>
-                      <hr className="border-mist-100" />
-                      <div className="flex justify-between font-bold text-mist-900 text-base">
-                        <span>Total Charges</span>
-                        <span>${total.toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className={fieldBox + " text-center py-2"}>
-                    <p className="text-mist-400">Select dates to see pricing</p>
+                    <span className="text-base font-bold text-mist-900">Long-Term Rental Discounts</span>
                   </div>
+                  {discountsOpen
+                    ? <ChevronUp size={16} className="text-mist-400" />
+                    : <ChevronDown size={16} className="text-mist-400" />}
+                </button>
+
+                {discountsOpen && (
+                  <>
+                    {/* Table with blue-tinted bg */}
+                    <div className="bg-blue-50 rounded-xl overflow-hidden border border-blue-100">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr>
+                            <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Duration</th>
+                            <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Discount</th>
+                            <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Mileage</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {discountTiers.map((tier, i) => (
+                            <tr key={i} className="border-t border-blue-100 bg-white/60">
+                              <td className="px-4 py-2.5 text-mist-600 text-sm">{tier.duration}</td>
+                              <td className="px-4 py-2.5 font-semibold text-mist-800 text-sm">{tier.discount}</td>
+                              <td className="px-4 py-2.5 text-mist-500 text-sm">{tier.miles}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="text-xs text-mist-400 mt-2 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-mist-300 inline-block flex-shrink-0" />
+                      Vehicle Swap Option: Available with 30-day notice
+                    </p>
+                  </>
                 )}
               </div>
 
-              {/* Pickup location — field-box styled row outside main card */}
-              <div className="mt-3 border border-mist-200 rounded-xl px-4 py-3 bg-white flex items-center gap-2 text-sm text-mist-500">
-                <MapPin size={14} className="text-mist-400 flex-shrink-0" />
-                <span>Pickup: {car.location}</span>
+              {/* ── Description ── */}
+              {car.description && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowMore(!showMore)}
+                    className="w-full flex items-center justify-between mb-2"
+                  >
+                    <h2 className="text-base font-bold text-mist-900 text-left">
+                      Rent a {car.name} in {car.location}
+                    </h2>
+                    <ChevronDown
+                      size={16}
+                      className={`text-mist-400 flex-shrink-0 transition-transform duration-200 ${showMore ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  <p className={`text-sm text-mist-500 leading-relaxed ${showMore ? "" : "line-clamp-3"}`}>
+                    {car.description}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMore(!showMore)}
+                    className="mt-1 text-sm text-mist-700 font-medium hover:text-mist-900"
+                  >
+                    {showMore ? "Show less ›" : "Show more ›"}
+                  </button>
+                </div>
+              )}
+
+
+              {/* RIGHT COLUMN — Booking Form 2/5 */}
+
+            </div>
+            <div className="lg:w-[430px] flex-shrink-0 lg:self-start">
+              <div className="lg:sticky lg:top-0">
+                {/* Header - Always visible */}
+                <div className="mb-8">
+                  <h1 className="text-3xl font-semibold text-mist-900 mb-2">{car.name}</h1>
+                  {car.shortDescription && (
+                    <p className="text-mist-600 text-base leading-relaxed mb-4">{car.shortDescription}</p>
+                  )}
+                  
+                </div>
+
+                {/* Form Container */}
+                <div className="bg-white border border-mist-300 rounded-lg p-5 space-y-5 shadow-lg">
+                  <div className="flex items-baseline gap-2 mb-6">
+                    <span className="text-3xl font-bold text-mist-900">
+                      ${car.pricePerDay.toLocaleString()}
+                    </span>
+                    <span className="text-sm text-mist-400">USD / day</span>
+                  </div>
+                  {/* Date + Time Rows */}
+                  <div className="space-y-3 border-t border-mist-300 pt-6">
+                    {/* Start date + time */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="relative">
+                        <input
+                          type={startDate ? "date" : "text"}
+                          onFocus={(e) => (e.target.type = "date")}
+                          onBlur={(e) => !startDate && (e.target.type = "text")}
+                          min={today}
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          placeholder="Start date*"
+                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={startTime ? "time" : "text"}
+                          onFocus={(e) => (e.target.type = "time")}
+                          onBlur={(e) => !startTime && (e.target.type = "text")}
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          placeholder="Time*"
+                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                        />
+                      </div>
+                    </div>
+
+                    {/* End date + time */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="relative">
+                        <input
+                          type={endDate ? "date" : "text"}
+                          onFocus={(e) => (e.target.type = "date")}
+                          onBlur={(e) => !endDate && (e.target.type = "text")}
+                          min={startDate || today}
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          placeholder="End date*"
+                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={endTime ? "time" : "text"}
+                          onFocus={(e) => (e.target.type = "time")}
+                          onBlur={(e) => !endTime && (e.target.type = "text")}
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          placeholder="Time*"
+                          className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Need a Driver */}
+                  <div className="space-y-3">
+                    <p className="text-[15px] font-bold text-mist-500">
+                      Need a Driver? 
+                    </p>
+
+                    <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="radio"
+                          checked={needDriver}
+                          onChange={(e) => setNeedDriver(e.target.checked)}
+                          className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                        />
+                        <span className="text-sm text-mist-700">Yes, I will need a driver</span>
+                      </div>
+                      <span className="text-sm font-bold text-mist-900">$45/hr</span>
+                    </label>
+                  </div>
+
+                  {needDriver && (
+                    <div className="space-y-4">
+                      {/* Driver Hours Slider */}
+                      <div className="space-y-2">
+                        <p className="text-xs text-mist-500">Driver Hours per Day</p>
+                        <input
+                          type="range"
+                          min={1}
+                          max={16}
+                          value={driverHours}
+                          onChange={(e) => setDriverHours(Number(e.target.value))}
+                          className="w-full accent-mist-500"
+                        />
+                        <div className="flex justify-between text-[10px] text-mist-400">
+                          <span>0 hr</span>
+                          <span className="font-medium text-mist-600">{driverHours} hr</span>
+                          <span>16 hr</span>
+                        </div>
+                      </div>
+
+                      {/* Driver Availability */}
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-mist-700">Driver Availability:</p>
+
+                        <label className="flex items-center gap-3 border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
+                          <input
+                            type="radio"
+                            name="driverAvail"
+                            checked={driverAvailability === "full"}
+                            onChange={() => setDriverAvailability("full")}
+                            className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                          />
+                          <span className="text-sm text-mist-700">Full Rental</span>
+                        </label>
+
+                        <label className="flex items-center gap-3 border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
+                          <input
+                            type="radio"
+                            name="driverAvail"
+                            checked={driverAvailability === "select"}
+                            onChange={() => setDriverAvailability("select")}
+                            className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                          />
+                          <span className="text-sm text-mist-700">Select Days</span>
+                        </label>
+                      </div>
+
+                      {/* Day Counter */}
+                      {driverAvailability === "select" && (
+                        <div className="flex items-center justify-between border border-mist-300 rounded-md px-3 py-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setDriverDays(Math.max(1, driverDays - 1))}
+                            className="w-8 h-8 rounded-md border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50 transition-colors"
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <span className="text-sm font-medium text-mist-900">{driverDays} days</span>
+                          <button
+                            type="button"
+                            onClick={() => setDriverDays(Math.min(days || 365, driverDays + 1))}
+                            className="w-8 h-8 rounded-md border border-mist-200 flex items-center justify-center text-mist-500 hover:bg-mist-50 transition-colors"
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Next + Pricing */}
+                  {days > 0 ? (
+                    <>
+                      <button
+                        onClick={handleNext}
+                        className="w-full bg-neutral-500 hover:bg-mist-700 transition text-white py-3.5 rounded-md font-semibold text-sm tracking-wide"
+                      >
+                        Next
+                      </button>
+
+                      {/* Price breakdown */}
+                      <div className="space-y-3 pt-4 border-t border-mist-200">
+                        <div className="flex justify-between text-mist-500 text-sm">
+                          <span>Car Total · ${car.pricePerDay} × {days}d</span>
+                          <span className="text-mist-900 font-medium">${subtotal.toLocaleString()}</span>
+                        </div>
+                        {discountPercent > 0 && (
+                          <div className="flex justify-between text-green-600 text-sm">
+                            <span>Discount · {days} days – {discountPercent}%</span>
+                            <span>-${discountAmount.toLocaleString()}</span>
+                          </div>
+                        )}
+                        {driverTotal > 0 && (
+                          <div className="flex justify-between text-mist-500 text-sm">
+                            <span>Driver Total · {driverHours}hr × $45 × {actualDriverDays}d</span>
+                            <span className="text-mist-900 font-medium">${driverTotal.toLocaleString()}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-mist-500 text-sm">
+                          <span>Tax · 8.5%</span>
+                          <span className="text-mist-900 font-medium">${tax.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-mist-500 text-sm">
+                          <span>Security Deposit · Fully refundable</span>
+                          <span className="text-mist-900 font-medium">${securityDeposit.toLocaleString()}</span>
+                        </div>
+                        <hr className="border-mist-200" />
+                        <div className="flex justify-between font-bold text-mist-900 text-base pt-1">
+                          <span>Total Charges</span>
+                          <span>${total.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-4 border border-mist-200 rounded-md">
+                      <p className="text-mist-400 text-sm">Select dates to see pricing</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pickup location */}
+                <div className="mt-4 border border-mist-300 rounded-md px-3 py-2.5 bg-white flex items-center gap-2 text-sm text-mist-500">
+                  <MapPin size={14} className="text-mist-400 flex-shrink-0" />
+                  <span>Pickup: {car.location}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="px-10 sm:px-16 lg:px-20 pt-16 flex items-center justify-between">
-        <h2 className="text-xl sm:text-3xl font-bold text-mist-900">
-          You may also like
-        </h2>
-        <a
-          href="#"
-          className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-mist-100 rounded-md px-4 py-2 hover:bg-mist-50 transition-colors duration-150 whitespace-nowrap shrink-0"
-        >
-          View all
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M7 7h10v10" />
-          </svg>
-        </a>
+        <div className="px-10 sm:px-16 lg:px-20 pt-16 flex items-center justify-between">
+          <h2 className="text-xl sm:text-3xl font-bold text-mist-900">
+            You may also like
+          </h2>
+          <a
+            href="#"
+            className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-mist-100 rounded-md px-4 py-2 hover:bg-mist-50 transition-colors duration-150 whitespace-nowrap shrink-0"
+          >
+            View all
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M7 7h10v10" />
+            </svg>
+          </a>
+        </div>
       </div>
       <Rentals showHeader={false} />
       <WhyChooseUs />
