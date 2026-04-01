@@ -42,15 +42,17 @@ export async function PUT(
       villaData.slug = villaData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
     }
 
-    if (images && images.length > 0) {
+    if (images !== undefined) {
       await prisma.villaImage.deleteMany({ where: { villaId: id } })
-      await prisma.villaImage.createMany({
-        data: (images as string[]).map((url: string, i: number) => ({
-          url,
-          isPrimary: i === 0,
-          villaId: id,
-        })),
-      })
+      if (Array.isArray(images) && images.length > 0) {
+        await prisma.villaImage.createMany({
+          data: (images as string[]).map((url: string, i: number) => ({
+            url,
+            isPrimary: i === 0,
+            villaId: id,
+          })),
+        })
+      }
     }
 
     const villa = await prisma.villa.update({

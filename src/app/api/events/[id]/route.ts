@@ -42,15 +42,17 @@ export async function PUT(
       eventData.slug = eventData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
     }
 
-    if (images && images.length > 0) {
+    if (images !== undefined) {
       await prisma.eventImage.deleteMany({ where: { eventId: id } })
-      await prisma.eventImage.createMany({
-        data: (images as string[]).map((url: string, i: number) => ({
-          url,
-          isPrimary: i === 0,
-          eventId: id,
-        })),
-      })
+      if (Array.isArray(images) && images.length > 0) {
+        await prisma.eventImage.createMany({
+          data: (images as string[]).map((url: string, i: number) => ({
+            url,
+            isPrimary: i === 0,
+            eventId: id,
+          })),
+        })
+      }
     }
 
     const event = await prisma.event.update({

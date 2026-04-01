@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
+import ImageManager, { ExistingImage } from "@/components/admin/ImageManager"
 
 const EVENT_CATEGORIES = [
   "Nightlife",
@@ -45,7 +46,8 @@ function EventForm() {
     isAvailable: true,
     isFeatured: false,
   })
-  const [images, setImages] = useState<FileList | null>(null)
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([])
+  const [newFiles, setNewFiles] = useState<File[]>([])
 
   useEffect(() => {
     const loadData = async () => {
@@ -70,6 +72,7 @@ function EventForm() {
               isAvailable: event.isAvailable ?? true,
               isFeatured: event.isFeatured ?? false,
             })
+            if (event.images) setExistingImages(event.images)
           } else {
             toast.error("Failed to load event data")
           }
@@ -101,21 +104,24 @@ function EventForm() {
     setSubmitting(true)
 
     try {
-      let imageUrls: string[] = []
-      if (images && images.length > 0) {
+      let uploadedUrls: string[] = []
+      if (newFiles.length > 0) {
         const formData = new FormData()
-        Array.from(images).forEach(f => formData.append("files", f))
+        newFiles.forEach(f => formData.append("files", f))
         const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
         if (uploadRes.ok) {
           const data = await uploadRes.json()
-          imageUrls = data.urls
+          uploadedUrls = data.urls
         }
       }
+
+      const keptUrls = existingImages.map(img => img.url)
+      const allImages = [...keptUrls, ...uploadedUrls]
 
       const payload = {
         ...form,
         capacity: parseInt(form.capacity) || 200,
-        images: imageUrls.length > 0 ? imageUrls : undefined,
+        images: isEditing || allImages.length > 0 ? allImages : undefined,
       }
 
       const url = isEditing ? `/api/events/${editId}` : "/api/events"
@@ -228,11 +234,12 @@ function EventForm() {
         </div>
 
         {/* Images */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Images</h2>
-          <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)}
-            className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#dbb241] file:text-black hover:file:bg-[#c9a238]" />
-        </div>
+        <ImageManager
+          existingImages={existingImages}
+          onExistingChange={setExistingImages}
+          newFiles={newFiles}
+          onNewFilesChange={setNewFiles}
+        />
 
         {/* Toggles */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">

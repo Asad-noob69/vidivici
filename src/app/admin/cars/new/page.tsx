@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
+import ImageManager, { ExistingImage } from "@/components/admin/ImageManager"
 
 interface BrandOption {
   id: string
@@ -25,13 +26,14 @@ function AddCarForm() {
   const [brands, setBrands] = useState<BrandOption[]>([])
   const [categories, setCategories] = useState<CategoryOption[]>([])
   const [form, setForm] = useState({
-    name: "", brandId: "", categoryId: "", pricePerDay: "", year: "", seats: "4",
+    name: "", brandId: "", categoryId: "", pricePerDay: "", originalPrice: "", year: "", seats: "4",
     transmission: "Automatic", fuelType: "Gasoline", horsepower: "", topSpeed: "",
     acceleration: "", milesIncluded: "100", extraMileRate: "9", minRentalDays: "1",
     description: "", shortDescription: "", location: "Los Angeles",
     isAvailable: true, isFeatured: false,
   })
-  const [images, setImages] = useState<FileList | null>(null)
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([])
+  const [newFiles, setNewFiles] = useState<File[]>([])
 
   useEffect(() => {
     const loadData = async () => {
@@ -59,6 +61,7 @@ function AddCarForm() {
               brandId: car.brandId || "",
               categoryId: car.categoryId || "",
               pricePerDay: car.pricePerDay?.toString() || "",
+              originalPrice: car.originalPrice?.toString() || "",
               year: car.year?.toString() || "",
               seats: car.seats?.toString() || "4",
               transmission: car.transmission || "Automatic",
@@ -75,6 +78,7 @@ function AddCarForm() {
               isAvailable: car.isAvailable ?? true,
               isFeatured: car.isFeatured ?? false,
             })
+            if (car.images) setExistingImages(car.images)
           } else {
             toast.error("Failed to load car data")
           }
@@ -109,28 +113,33 @@ function AddCarForm() {
     setSubmitting(true)
 
     try {
-      // Upload images first if any
-      let imageUrls: string[] = []
-      if (images && images.length > 0) {
+      // Upload new images if any
+      let uploadedUrls: string[] = []
+      if (newFiles.length > 0) {
         const formData = new FormData()
-        Array.from(images).forEach(f => formData.append("files", f))
+        newFiles.forEach(f => formData.append("files", f))
         const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
         if (uploadRes.ok) {
           const data = await uploadRes.json()
-          imageUrls = data.urls
+          uploadedUrls = data.urls
         }
       }
+
+      // Combine kept existing + newly uploaded
+      const keptUrls = existingImages.map(img => img.url)
+      const allImages = [...keptUrls, ...uploadedUrls]
 
       const payload = {
         ...form,
         pricePerDay: parseFloat(form.pricePerDay),
+        originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
         year: form.year ? parseInt(form.year) : null,
         seats: parseInt(form.seats),
         horsepower: form.horsepower ? parseInt(form.horsepower) : null,
         milesIncluded: parseInt(form.milesIncluded),
         extraMileRate: parseFloat(form.extraMileRate),
         minRentalDays: parseInt(form.minRentalDays),
-        images: imageUrls.length > 0 ? imageUrls : undefined,
+        images: isEditing || allImages.length > 0 ? allImages : undefined,
       }
 
       const url = isEditing ? `/api/cars/${editId}` : "/api/cars"
@@ -199,6 +208,10 @@ function AddCarForm() {
             <div>
               <label className="text-xs text-mist-400 block mb-1">Price Per Day ($) *</label>
               <input type="number" required value={form.pricePerDay} onChange={(e) => setForm({ ...form, pricePerDay: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className="text-xs text-mist-400 block mb-1">Original Price ($) <span className="text-mist-600">— shown as strikethrough</span></label>
+              <input type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} className={inputClass} placeholder="Leave empty if no discount" />
             </div>
             <div>
               <label className="text-xs text-mist-400 block mb-1">Year</label>
@@ -280,11 +293,12 @@ function AddCarForm() {
         </div>
 
         {/* Images */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Images</h2>
-          <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)}
-            className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#dbb241] file:text-black hover:file:bg-[#c9a238]" />
-        </div>
+        <ImageManager
+          existingImages={existingImages}
+          onExistingChange={setExistingImages}
+          newFiles={newFiles}
+          onNewFilesChange={setNewFiles}
+        />
 
         {/* Toggles */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">

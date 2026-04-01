@@ -84,6 +84,7 @@ model Car {
   description      String?    @db.Text
   shortDescription String?
   pricePerDay      Float
+  originalPrice    Float?
   year             Int?
   seats            Int        @default(4)
   transmission     String     @default("Automatic")

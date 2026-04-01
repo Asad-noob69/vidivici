@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, BedDouble, Users, Bath, Maximize2, MapPin, Plane, ChefHat, Shield, CreditCard, Sparkles, Percent, Bed } from "lucide-react"
+import { parseAmenity, AMENITY_ICONS } from "@/lib/amenity-icons"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
@@ -99,7 +100,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
   const tax = subtotal * 0.14
   const total = subtotal + tax + villa.securityDeposit
 
-  const amenitiesList = villa.amenities ? villa.amenities.split(",").map((a) => a.trim()).filter(Boolean) : []
+  const amenitiesList = villa.amenities ? villa.amenities.split(",").map((a) => a.trim()).filter(Boolean).map(parseAmenity) : []
 
   const formatSqft = (sqft: number) => sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
 
@@ -292,12 +293,15 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                     <h2 className="text-xl font-bold text-mist-900 mb-4">What this place offers</h2>
 
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                      {amenitiesList.slice(0, showAllAmenities ? amenitiesList.length : 10).map((amenity, i) => (
-                        <div key={i} className="flex items-center gap-3">
-                          <BedDouble size={20} className="text-mist-500 flex-shrink-0" />
-                          <span className="text-sm text-mist-700">{amenity}</span>
-                        </div>
-                      ))}
+                      {amenitiesList.slice(0, showAllAmenities ? amenitiesList.length : 10).map((amenity, i) => {
+                        const IconComp = AMENITY_ICONS[amenity.iconKey]?.icon || BedDouble
+                        return (
+                          <div key={i} className="flex items-center gap-3">
+                            <IconComp size={20} className="text-mist-500 flex-shrink-0" />
+                            <span className="text-sm text-mist-700">{amenity.name}</span>
+                          </div>
+                        )
+                      })}
                     </div>
 
                     {amenitiesList.length > 10 && !showAllAmenities && (

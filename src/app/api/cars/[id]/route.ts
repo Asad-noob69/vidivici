@@ -47,16 +47,18 @@ export async function PUT(
       carData.slug = carData.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
     }
 
-    // If new images provided, replace all existing images
-    if (images && images.length > 0) {
+    // Reconcile images if provided (array of URL strings, may be empty)
+    if (images !== undefined) {
       await prisma.carImage.deleteMany({ where: { carId: id } })
-      await prisma.carImage.createMany({
-        data: (images as string[]).map((url: string, i: number) => ({
-          url,
-          isPrimary: i === 0,
-          carId: id,
-        })),
-      })
+      if (Array.isArray(images) && images.length > 0) {
+        await prisma.carImage.createMany({
+          data: (images as string[]).map((url: string, i: number) => ({
+            url,
+            isPrimary: i === 0,
+            carId: id,
+          })),
+        })
+      }
     }
 
     const car = await prisma.car.update({

@@ -3,6 +3,14 @@
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
+import ImageManager, { ExistingImage } from "@/components/admin/ImageManager"
+import { AMENITY_ICONS, ICON_KEYS, DEFAULT_ICON_KEY, parseAmenity, serializeAmenities } from "@/lib/amenity-icons"
+import { Plus, Trash2 } from "lucide-react"
+
+interface AmenityRow {
+  name: string
+  iconKey: string
+}
 
 function VillaForm() {
   const router = useRouter()
@@ -23,13 +31,14 @@ function VillaForm() {
     pricePerNight: "",
     cleaningFee: "0",
     securityDeposit: "0",
-    amenities: "",
     description: "",
     shortDescription: "",
     isAvailable: true,
     isFeatured: false,
   })
-  const [images, setImages] = useState<FileList | null>(null)
+  const [amenityRows, setAmenityRows] = useState<AmenityRow[]>([{ name: "", iconKey: DEFAULT_ICON_KEY }])
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([])
+  const [newFiles, setNewFiles] = useState<File[]>([])
 
   useEffect(() => {
     const loadData = async () => {
@@ -49,12 +58,17 @@ function VillaForm() {
               pricePerNight: villa.pricePerNight?.toString() || "",
               cleaningFee: villa.cleaningFee?.toString() || "0",
               securityDeposit: villa.securityDeposit?.toString() || "0",
-              amenities: villa.amenities || "",
               description: villa.description || "",
               shortDescription: villa.shortDescription || "",
               isAvailable: villa.isAvailable ?? true,
               isFeatured: villa.isFeatured ?? false,
             })
+            // Parse amenities into rows
+            if (villa.amenities) {
+              const parsed = villa.amenities.split(",").map((a: string) => a.trim()).filter(Boolean).map(parseAmenity)
+              if (parsed.length > 0) setAmenityRows(parsed)
+            }
+            if (villa.images) setExistingImages(villa.images)
           } else {
             toast.error("Failed to load villa data")
           }
@@ -87,16 +101,19 @@ function VillaForm() {
     setSubmitting(true)
 
     try {
-      let imageUrls: string[] = []
-      if (images && images.length > 0) {
+      let uploadedUrls: string[] = []
+      if (newFiles.length > 0) {
         const formData = new FormData()
-        Array.from(images).forEach(f => formData.append("files", f))
+        newFiles.forEach(f => formData.append("files", f))
         const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
         if (uploadRes.ok) {
           const data = await uploadRes.json()
-          imageUrls = data.urls
+          uploadedUrls = data.urls
         }
       }
+
+      const keptUrls = existingImages.map(img => img.url)
+      const allImages = [...keptUrls, ...uploadedUrls]
 
       const payload = {
         ...form,
@@ -107,7 +124,8 @@ function VillaForm() {
         pricePerNight: parseFloat(form.pricePerNight),
         cleaningFee: parseFloat(form.cleaningFee),
         securityDeposit: parseFloat(form.securityDeposit),
-        images: imageUrls.length > 0 ? imageUrls : undefined,
+        amenities: serializeAmenities(amenityRows),
+        images: isEditing || allImages.length > 0 ? allImages : undefined,
       }
 
       const url = isEditing ? `/api/villas/${editId}` : "/api/villas"
@@ -132,6 +150,14 @@ function VillaForm() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const addAmenity = () => setAmenityRows([...amenityRows, { name: "", iconKey: DEFAULT_ICON_KEY }])
+  const removeAmenity = (i: number) => setAmenityRows(amenityRows.filter((_, idx) => idx !== i))
+  const updateAmenity = (i: number, field: keyof AmenityRow, value: string) => {
+    const updated = [...amenityRows]
+    updated[i] = { ...updated[i], [field]: value }
+    setAmenityRows(updated)
   }
 
   const inputClass = "w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none"
@@ -223,19 +249,55 @@ function VillaForm() {
               <label className="text-xs text-mist-400 block mb-1">Full Description</label>
               <textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`${inputClass} resize-none`} />
             </div>
-            <div>
-              <label className="text-xs text-mist-400 block mb-1">Amenities (comma-separated)</label>
-              <textarea rows={3} value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} className={`${inputClass} resize-none`} placeholder="Pool, Hot Tub, Home Theater, Wine Cellar, Gym" />
-            </div>
           </div>
         </div>
 
-        {/* Images */}
+        {/* Amenities */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Images</h2>
-          <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)}
-            className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#dbb241] file:text-black hover:file:bg-[#c9a238]" />
+          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Amenities</h2>
+          <div className="space-y-3">
+            {amenityRows.map((row, i) => {
+              const IconComp = AMENITY_ICONS[row.iconKey]?.icon
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-10 h-10 flex items-center justify-center bg-[#111] border border-[#2a2a2a] rounded">
+                    {IconComp && <IconComp size={18} className="text-[#dbb241]" />}
+                  </div>
+                  <input
+                    type="text"
+                    value={row.name}
+                    onChange={(e) => updateAmenity(i, "name", e.target.value)}
+                    placeholder="e.g., Infinity Pool"
+                    className="flex-1 bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-2.5 rounded focus:border-[#dbb241] focus:outline-none"
+                  />
+                  <select
+                    value={row.iconKey}
+                    onChange={(e) => updateAmenity(i, "iconKey", e.target.value)}
+                    className="bg-[#111] border border-[#2a2a2a] text-white text-sm px-3 py-2.5 rounded focus:border-[#dbb241] focus:outline-none w-44"
+                  >
+                    {ICON_KEYS.map((key) => (
+                      <option key={key} value={key}>{AMENITY_ICONS[key].label}</option>
+                    ))}
+                  </select>
+                  <button type="button" onClick={() => removeAmenity(i)} className="text-red-500 hover:text-red-400 p-1">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          <button type="button" onClick={addAmenity} className="mt-3 flex items-center gap-2 text-sm text-[#dbb241] hover:text-[#c9a238]">
+            <Plus size={16} /> Add Amenity
+          </button>
         </div>
+
+        {/* Images */}
+        <ImageManager
+          existingImages={existingImages}
+          onExistingChange={setExistingImages}
+          newFiles={newFiles}
+          onNewFilesChange={setNewFiles}
+        />
 
         {/* Toggles */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
