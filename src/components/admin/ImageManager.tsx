@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 
 export interface ExistingImage {
@@ -19,7 +19,6 @@ interface Props {
 export default function ImageManager({ existingImages, onExistingChange, newFiles, onNewFilesChange }: Props) {
   const [previews, setPreviews] = useState<string[]>([])
 
-  // Generate object URLs for new files
   useEffect(() => {
     const urls = newFiles.map((f) => URL.createObjectURL(f))
     setPreviews(urls)
@@ -45,16 +44,16 @@ export default function ImageManager({ existingImages, onExistingChange, newFile
   const hasImages = existingImages.length > 0 || newFiles.length > 0
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Images</h2>
+    <div className="bg-white border border-mist-200 rounded-xl p-6">
+      <h2 className="text-lg font-semibold text-mist-900 mb-4">Images</h2>
 
       {hasImages && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
           {existingImages.map((img) => (
-            <div key={img.id} className="relative group aspect-square rounded-lg overflow-hidden border border-[#2a2a2a]">
+            <div key={img.id} className="relative group aspect-square rounded-lg overflow-hidden border border-mist-200">
               <img src={img.url} alt="" className="w-full h-full object-cover" />
               {img.isPrimary && (
-                <span className="absolute top-1 left-1 bg-[#dbb241] text-black text-[10px] font-bold px-1.5 py-0.5 rounded">
+                <span className="absolute top-1 left-1 bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                   PRIMARY
                 </span>
               )}
@@ -69,7 +68,7 @@ export default function ImageManager({ existingImages, onExistingChange, newFile
           ))}
 
           {previews.map((url, i) => (
-            <div key={`new-${i}`} className="relative group aspect-square rounded-lg overflow-hidden border border-[#dbb241]/30">
+            <div key={`new-${i}`} className="relative group aspect-square rounded-lg overflow-hidden border border-green-200">
               <img src={url} alt="" className="w-full h-full object-cover" />
               <span className="absolute top-1 left-1 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                 NEW
@@ -91,7 +90,7 @@ export default function ImageManager({ existingImages, onExistingChange, newFile
         multiple
         accept="image/*"
         onChange={handleFileSelect}
-        className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#dbb241] file:text-black hover:file:bg-[#c9a238]"
+        className="text-sm text-mist-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-mist-800"
       />
     </div>
   )

@@ -117,22 +117,22 @@ function NewBlogPostForm() {
         <div>
           <label className="text-xs text-mist-400 block mb-1">Title</label>
           <input type="text" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: generateSlug(e.target.value) })}
-            className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none" />
+            className="w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
         </div>
         <div>
           <label className="text-xs text-mist-400 block mb-1">Slug</label>
           <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none" />
+            className="w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none" />
         </div>
         <div>
           <label className="text-xs text-mist-400 block mb-1">Excerpt</label>
           <textarea rows={2} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-            className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none resize-none" />
+            className="w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none resize-none" />
         </div>
         <div>
           <label className="text-xs text-mist-400 block mb-1">Category</label>
           <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none">
+            className="w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none">
             <option>Exotic Cars</option>
             <option>Luxury Villas</option>
             <option>Events</option>
@@ -143,24 +143,24 @@ function NewBlogPostForm() {
         <div>
           <label className="text-xs text-mist-400 block mb-1">Content</label>
           <textarea rows={15} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none resize-none" />
+            className="w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none resize-none" />
         </div>
         <div>
           <label className="text-xs text-mist-400 block mb-1">Cover Image</label>
           {form.coverImage && (
             <p className="text-xs text-mist-500 mb-1">Current: {form.coverImage}</p>
           )}
-          <input type="file" accept="image/*" ref={fileInputRef} className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#dbb241] file:text-black" />
+          <input type="file" accept="image/*" ref={fileInputRef} className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-[#dbb241]" />
+          <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-black" />
           <span className="text-sm text-mist-300">Publish immediately</span>
         </label>
         <div className="flex gap-3">
-          <button type="submit" disabled={submitting} className="bg-[#dbb241] text-black px-8 py-3 rounded font-semibold hover:bg-[#c9a238] transition-colors disabled:opacity-50">
+          <button type="submit" disabled={submitting} className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-mist-800 transition-colors disabled:opacity-50">
             {submitting ? "Saving..." : "Save Post"}
           </button>
-          <button type="button" onClick={() => router.back()} className="border border-[#2a2a2a] text-mist-300 px-8 py-3 rounded hover:border-[#dbb241] transition-colors">Cancel</button>
+          <button type="button" onClick={() => router.back()} className="border border-mist-200 text-mist-600 px-8 py-3 rounded hover:border-black transition-colors">Cancel</button>
         </div>
       </form>
     </div>

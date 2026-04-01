@@ -148,7 +148,7 @@ function EventForm() {
     }
   }
 
-  const inputClass = "w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none"
+  const inputClass = "w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none"
 
   if (loadingData) {
     return (
@@ -166,8 +166,8 @@ function EventForm() {
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
         {/* Basic Info */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Basic Information</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Basic Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="text-xs text-mist-400 block mb-1">Event Name *</label>
@@ -205,8 +205,8 @@ function EventForm() {
         </div>
 
         {/* Details */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Event Details</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Event Details</h2>
           <div className="space-y-4">
             <div>
               <label className="text-xs text-mist-400 block mb-1">Short Description</label>
@@ -242,14 +242,14 @@ function EventForm() {
         />
 
         {/* Toggles */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
           <div className="flex gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} className="accent-[#dbb241]" />
+              <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} className="accent-black" />
               <span className="text-sm text-mist-300">Available</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} className="accent-[#dbb241]" />
+              <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} className="accent-black" />
               <span className="text-sm text-mist-300">Featured Event</span>
             </label>
           </div>
@@ -257,11 +257,11 @@ function EventForm() {
 
         <div className="flex gap-3">
           <button type="submit" disabled={submitting}
-            className="bg-[#dbb241] text-black px-8 py-3 rounded font-semibold hover:bg-[#c9a238] transition-colors disabled:opacity-50">
+            className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-mist-800 transition-colors disabled:opacity-50">
             {submitting ? "Saving..." : isEditing ? "Update Event" : "Save Event"}
           </button>
           <button type="button" onClick={() => router.back()}
-            className="border border-[#2a2a2a] text-mist-300 px-8 py-3 rounded hover:border-[#dbb241] transition-colors">
+            className="border border-mist-200 text-mist-600 px-8 py-3 rounded hover:border-black transition-colors">
             Cancel
           </button>
         </div>

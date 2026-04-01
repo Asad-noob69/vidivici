@@ -160,7 +160,7 @@ function VillaForm() {
     setAmenityRows(updated)
   }
 
-  const inputClass = "w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded focus:border-[#dbb241] focus:outline-none"
+  const inputClass = "w-full bg-white border border-mist-200 text-mist-900 text-sm px-4 py-3 rounded focus:border-black focus:outline-none"
 
   if (loadingData) {
     return (
@@ -178,8 +178,8 @@ function VillaForm() {
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
         {/* Basic Info */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Basic Information</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Basic Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="text-xs text-mist-400 block mb-1">Villa Name *</label>
@@ -215,8 +215,8 @@ function VillaForm() {
         </div>
 
         {/* Specs */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Specifications</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Specifications</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="text-xs text-mist-400 block mb-1">Bedrooms</label>
@@ -238,8 +238,8 @@ function VillaForm() {
         </div>
 
         {/* Description */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Description</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Description</h2>
           <div className="space-y-4">
             <div>
               <label className="text-xs text-mist-400 block mb-1">Short Description</label>
@@ -253,27 +253,27 @@ function VillaForm() {
         </div>
 
         {/* Amenities */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#dbb241] mb-4">Amenities</h2>
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-mist-900 mb-4">Amenities</h2>
           <div className="space-y-3">
             {amenityRows.map((row, i) => {
               const IconComp = AMENITY_ICONS[row.iconKey]?.icon
               return (
                 <div key={i} className="flex items-center gap-3">
-                  <div className="w-10 h-10 flex items-center justify-center bg-[#111] border border-[#2a2a2a] rounded">
-                    {IconComp && <IconComp size={18} className="text-[#dbb241]" />}
+                  <div className="w-10 h-10 flex items-center justify-center bg-mist-50 border border-mist-200 rounded">
+                    {IconComp && <IconComp size={18} className="text-mist-900" />}
                   </div>
                   <input
                     type="text"
                     value={row.name}
                     onChange={(e) => updateAmenity(i, "name", e.target.value)}
                     placeholder="e.g., Infinity Pool"
-                    className="flex-1 bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-2.5 rounded focus:border-[#dbb241] focus:outline-none"
+                    className="flex-1 bg-white border border-mist-200 text-mist-900 text-sm px-4 py-2.5 rounded focus:border-black focus:outline-none"
                   />
                   <select
                     value={row.iconKey}
                     onChange={(e) => updateAmenity(i, "iconKey", e.target.value)}
-                    className="bg-[#111] border border-[#2a2a2a] text-white text-sm px-3 py-2.5 rounded focus:border-[#dbb241] focus:outline-none w-44"
+                    className="bg-white border border-mist-200 text-mist-900 text-sm px-3 py-2.5 rounded focus:border-black focus:outline-none w-44"
                   >
                     {ICON_KEYS.map((key) => (
                       <option key={key} value={key}>{AMENITY_ICONS[key].label}</option>
@@ -286,7 +286,7 @@ function VillaForm() {
               )
             })}
           </div>
-          <button type="button" onClick={addAmenity} className="mt-3 flex items-center gap-2 text-sm text-[#dbb241] hover:text-[#c9a238]">
+          <button type="button" onClick={addAmenity} className="mt-3 flex items-center gap-2 text-sm text-mist-900 hover:text-mist-600">
             <Plus size={16} /> Add Amenity
           </button>
         </div>
@@ -300,14 +300,14 @@ function VillaForm() {
         />
 
         {/* Toggles */}
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+        <div className="bg-white border border-mist-200 rounded-xl p-6">
           <div className="flex gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} className="accent-[#dbb241]" />
+              <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} className="accent-black" />
               <span className="text-sm text-mist-300">Available for Rent</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} className="accent-[#dbb241]" />
+              <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} className="accent-black" />
               <span className="text-sm text-mist-300">Featured Villa</span>
             </label>
           </div>
@@ -315,11 +315,11 @@ function VillaForm() {
 
         <div className="flex gap-3">
           <button type="submit" disabled={submitting}
-            className="bg-[#dbb241] text-black px-8 py-3 rounded font-semibold hover:bg-[#c9a238] transition-colors disabled:opacity-50">
+            className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-mist-800 transition-colors disabled:opacity-50">
             {submitting ? "Saving..." : isEditing ? "Update Villa" : "Save Villa"}
           </button>
           <button type="button" onClick={() => router.back()}
-            className="border border-[#2a2a2a] text-mist-300 px-8 py-3 rounded hover:border-[#dbb241] transition-colors">
+            className="border border-mist-200 text-mist-600 px-8 py-3 rounded hover:border-black transition-colors">
             Cancel
           </button>
         </div>
