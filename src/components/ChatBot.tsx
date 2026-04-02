@@ -1,22 +1,31 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { MessageCircle, X, Send } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { MessageCircle, X, Send, History } from "lucide-react"
 
 interface Message {
   role: "user" | "assistant" | "admin"
   content: string
 }
 
+const GREETING: Message = {
+  role: "assistant",
+  content: "Hey there! I'm **Mark**, your personal VIDI VICI concierge. Looking for a luxury car, villa, or exclusive event? I can help you find and book the perfect experience. What are you looking for?",
+}
+
 export default function ChatBot() {
+  const { data: session } = useSession()
+  const userId = (session?.user as any)?.id ?? null
+
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hey there! I'm **Mark**, your personal VIDI VICI concierge. Looking for a luxury car, villa, or exclusive event? I can help you find and book the perfect experience. What are you looking for?" },
-  ])
+  const [messages, setMessages] = useState<Message[]>([GREETING])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [paused, setPaused] = useState(false)
+  const [historyLoaded, setHistoryLoaded] = useState(false)
   const [visitorId] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("vv_visitor_id")
@@ -33,6 +42,38 @@ export default function ChatBot() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  // Load chat history for logged-in users
+  useEffect(() => {
+    if (!userId || historyLoaded) return
+    setHistoryLoading(true)
+    fetch("/api/chat/sessions/user")
+      .then((r) => r.ok ? r.json() : { session: null })
+      .then(({ session: chatSession }) => {
+        if (chatSession && chatSession.messages?.length > 0) {
+          const dbMessages: Message[] = chatSession.messages.map((m: any) => ({
+            role: m.role as "user" | "assistant" | "admin",
+            content: m.content,
+          }))
+          setSessionId(chatSession.id)
+          setPaused(chatSession.isPaused)
+          setMessages([GREETING, ...dbMessages])
+        }
+        setHistoryLoaded(true)
+      })
+      .catch(() => { setHistoryLoaded(true) })
+      .finally(() => setHistoryLoading(false))
+  }, [userId, historyLoaded])
+
+  // Reset history state when user logs out
+  useEffect(() => {
+    if (!userId) {
+      setHistoryLoaded(false)
+      setSessionId(null)
+      setMessages([GREETING])
+      setPaused(false)
+    }
+  }, [userId])
 
   // Poll for admin messages when paused
   const pollForAdmin = useCallback(async () => {
@@ -83,6 +124,7 @@ export default function ChatBot() {
           messages: newMessages.slice(1).map((m) => ({ role: m.role, content: m.content })),
           sessionId,
           visitorId,
+          userId,
         }),
       })
 
@@ -162,6 +204,22 @@ export default function ChatBot() {
           {paused && (
             <div className="bg-blue-50 border-b border-blue-100 px-4 py-2 text-xs text-blue-700 flex-shrink-0">
               A team member has joined this conversation.
+            </div>
+          )}
+
+          {/* History loading indicator */}
+          {historyLoading && (
+            <div className="bg-mist-50 border-b border-mist-100 px-4 py-2 text-xs text-mist-400 flex-shrink-0 flex items-center gap-2">
+              <div className="w-3 h-3 border border-mist-300 border-t-mist-600 rounded-full animate-spin" />
+              Loading your conversation history…
+            </div>
+          )}
+
+          {/* Logged-in history banner (shown once after history loads) */}
+          {userId && historyLoaded && messages.length > 1 && !historyLoading && (
+            <div className="bg-amber-50 border-b border-amber-100 px-4 py-2 text-xs text-amber-700 flex-shrink-0 flex items-center gap-2">
+              <History size={12} />
+              Your previous conversation has been restored.
             </div>
           )}
 

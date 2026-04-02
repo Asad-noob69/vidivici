@@ -385,16 +385,33 @@ async function executeTool(name: string, args: any) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, sessionId, visitorId } = await request.json()
+    const { messages, sessionId, visitorId, userId } = await request.json()
 
     // Get or create session
     let session: any = null
     if (sessionId) {
       session = await prisma.chatSession.findUnique({ where: { id: sessionId } })
     }
+    // For logged-in users without a sessionId, try to find their most recent session
+    if (!session && userId) {
+      session = await prisma.chatSession.findFirst({
+        where: { userId },
+        orderBy: { updatedAt: 'desc' },
+      })
+    }
     if (!session) {
       session = await prisma.chatSession.create({
-        data: { visitorId: visitorId || `visitor-${Date.now()}` },
+        data: {
+          visitorId: visitorId || `visitor-${Date.now()}`,
+          userId: userId || null,
+        },
+      })
+    }
+    // If session exists but has no userId yet and user is now logged in, link it
+    if (session && userId && !session.userId) {
+      session = await prisma.chatSession.update({
+        where: { id: session.id },
+        data: { userId },
       })
     }
 
