@@ -522,7 +522,7 @@ export default function BallroomPage() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white pt-24 lg:pt-28 2xl:pt-36">
       {/* Breadcrumb Section */}
       <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-8 2xl:py-12">
         <div className="flex items-center justify-between">

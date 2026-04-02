@@ -42,7 +42,7 @@ export default function WhyChooseUs({ bg = "#f0f0ee" }: { bg?: string }) {
         src="/Vector 7.png"
         alt=""
         aria-hidden="true"
-        className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180 opacity-80"
+        className="hidden md:block absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180 opacity-80"
       />
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-32 items-start 2xl:max-w-[2200px] 2xl:mx-auto">

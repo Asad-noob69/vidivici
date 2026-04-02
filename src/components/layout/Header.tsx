@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Menu, X } from "lucide-react";
 
 const ChevronIcon = ({ rotated }) => (
   <svg
@@ -91,6 +92,8 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
   const headerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const forceLightByPath = pathname === "/events/ballroom";
+
  
   const showBg = scrolled;
 
@@ -101,7 +104,13 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
     setSearchQuery("");
     setSearchOpen(false);
     setMobileOpen(false);
+    setMobileExpanded(null);
   };
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setMobileExpanded(null);
+  }, [pathname]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -114,12 +123,12 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
   }, []);
 
   useEffect(() => {
-    if (forceLight) return;
+    if (forceLight || forceLightByPath) return;
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [forceLight]);
+  }, [forceLight, forceLightByPath]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -128,13 +137,18 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
     };
   }, [mobileOpen]);
 
-  const isLightMode = forceLight || scrolled;
+  const isLightMode = forceLight || forceLightByPath || scrolled;
+  const mobileLightTheme = forceLight || forceLightByPath;
   return (
     <div ref={headerRef}>
       {/* HEADER - Increased height and padding for 2xl */}
       <header
         className={`fixed top-0 z-50 w-full sm:px-16 lg:px-20 px-6 2xl:px-32 transition-all duration-300 
-        ${(forceLight || scrolled)
+        ${mobileOpen
+          ? (mobileLightTheme
+            ? "bg-mist-50/95 backdrop-blur-md border-b border-mist-200 py-0 shadow-sm"
+            : "bg-[#0a0d12] border-b border-white/[0.08] py-0")
+          : (forceLight || forceLightByPath || scrolled)
             ? "bg-mist-50/95 backdrop-blur-md border-b border-mist-200 py-0 shadow-sm"
             : "bg-transparent py-2 2xl:py-4"
           }`}
@@ -161,7 +175,7 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
                 >
                   {item.label}
                   {(item.sub.length > 0 || item.carsMenu) && (
-                    <span className={isLightMode ? "text-mist-400" : "text-white/50"}>
+                    <span className={isLightMode ? "text-mist-500" : "text-white/80"}>
                       <ChevronIcon rotated={openDropdown === item.label} />
                     </span>
                   )}
@@ -276,31 +290,45 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
           </div>
 
           {/* MOBILE HAMBURGER - Color Toggle */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="sm:hidden flex flex-col gap-[5px] w-9 h-9 items-center justify-center">
-            <span className={`block w-[22px] h-[1.5px] transition-colors ${isLightMode ? 'bg-mist-900' : 'bg-white'}`} style={{ transform: mobileOpen ? "rotate(45deg) translate(0,6.5px)" : "none" }} />
-            <span className={`block w-[22px] h-[1.5px] transition-colors ${isLightMode ? 'bg-mist-900' : 'bg-white'}`} style={{ opacity: mobileOpen ? 0 : 1 }} />
-            <span className={`block w-[22px] h-[1.5px] transition-colors ${isLightMode ? 'bg-mist-900' : 'bg-white'}`} style={{ transform: mobileOpen ? "rotate(-45deg) translate(0,-6.5px)" : "none" }} />
+          <button
+            onClick={() => setMobileOpen((prev) => !prev)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            className="sm:hidden flex h-11 w-11 items-center justify-center rounded-md"
+          >
+            <span className="relative flex h-6 w-6 items-center justify-center">
+              <Menu
+                size={22}
+                strokeWidth={1.8}
+                className={`absolute transition-all duration-200 ${isLightMode ? "text-mist-900" : "text-white"} ${mobileOpen ? "scale-75 opacity-0" : "scale-100 opacity-100"}`}
+              />
+              <X
+                size={22}
+                strokeWidth={1.8}
+                className={`absolute transition-all duration-200 ${isLightMode ? "text-mist-900" : "text-white"} ${mobileOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"}`}
+              />
+            </span>
           </button>
         </div>
       </header>
 
       {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="sm:hidden fixed top-16 left-0 right-0 bg-[#0a0d12] border-b border-white/[0.08] z-[45] pb-7">
+        <div className={`sm:hidden fixed inset-0 z-[45] pt-16 pb-7 overflow-y-auto ${mobileLightTheme ? "bg-white" : "bg-[#0a0d12]"}`}>
 
           {/* MOBILE SEARCH */}
           <form
             onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
-            className="mx-6 mt-4 mb-2 flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-lg overflow-hidden"
+            className={`mx-6 mt-4 mb-4 flex items-center gap-1.5 rounded-lg overflow-hidden ${mobileLightTheme ? "bg-mist-50 border border-mist-200" : "bg-white/10 border border-white/20"}`}
           >
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search cars..."
-              className="flex-1 bg-transparent px-3 py-2.5 text-[14px] text-white placeholder-white/40 outline-none"
+              className={`flex-1 bg-transparent px-3 py-2.5 text-[14px] outline-none ${mobileLightTheme ? "text-mist-800 placeholder-mist-400" : "text-white placeholder-white/40"}`}
             />
-            <button type="submit" className="pr-3 text-white/60 hover:text-white">
+            <button type="submit" className={`pr-3 ${mobileLightTheme ? "text-mist-500 hover:text-mist-900" : "text-white/60 hover:text-white"}`}>
               <SearchIcon />
             </button>
           </form>
@@ -312,7 +340,7 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
                 <Link
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-6 py-3 text-[15px] text-white/80 hover:text-white"
+                  className={`block px-6 py-3 text-[15px] ${mobileLightTheme ? "text-mist-800 hover:text-mist-900" : "text-white/80 hover:text-white"}`}
                 >
                   {item.label}
                 </Link>
@@ -322,11 +350,14 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
                     <Link
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="text-[15px] text-white/80 hover:text-white"
+                      className={`text-[15px] ${mobileLightTheme ? "text-mist-800 hover:text-mist-900" : "text-white/80 hover:text-white"}`}
                     >
                       {item.label}
                     </Link>
-                    <button onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}>
+                    <button
+                      onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
+                      className={mobileLightTheme ? "text-mist-500 hover:text-mist-900" : "text-white/80 hover:text-white"}
+                    >
                       <ChevronIcon rotated={mobileExpanded === item.label} />
                     </button>
                   </div>
@@ -335,13 +366,13 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
                     <div className="pl-9">
                       {item.carsMenu ? (
                         <>
-                          <p className="py-1.5 text-[10px] font-semibold text-white/30 uppercase tracking-widest">Makes</p>
+                          <p className={`py-1.5 text-[10px] font-semibold uppercase tracking-widest ${mobileLightTheme ? "text-mist-400" : "text-white/30"}`}>Makes</p>
                           {[...CARS_MAKES_COL_1, ...CARS_MAKES_COL_2].map((make) => (
-                            <Link key={make} href={`/cars?make=${encodeURIComponent(make)}`} onClick={() => setMobileOpen(false)} className="block py-2 text-white/50 hover:text-white text-[14px]">{make}</Link>
+                            <Link key={make} href={`/cars?make=${encodeURIComponent(make)}`} onClick={() => setMobileOpen(false)} className={`block py-2 text-[14px] ${mobileLightTheme ? "text-mist-500 hover:text-mist-900" : "text-white/50 hover:text-white"}`}>{make}</Link>
                           ))}
-                          <p className="py-1.5 mt-2 text-[10px] font-semibold text-white/30 uppercase tracking-widest">Categories</p>
+                          <p className={`py-1.5 mt-2 text-[10px] font-semibold uppercase tracking-widest ${mobileLightTheme ? "text-mist-400" : "text-white/30"}`}>Categories</p>
                           {CARS_CATEGORIES.map((cat) => (
-                            <Link key={cat} href={`/cars?category=${encodeURIComponent(cat)}`} onClick={() => setMobileOpen(false)} className="block py-2 text-white/50 hover:text-white text-[14px]">{cat}</Link>
+                            <Link key={cat} href={`/cars?category=${encodeURIComponent(cat)}`} onClick={() => setMobileOpen(false)} className={`block py-2 text-[14px] ${mobileLightTheme ? "text-mist-500 hover:text-mist-900" : "text-white/50 hover:text-white"}`}>{cat}</Link>
                           ))}
                         </>
                       ) : item.sub.map((s) => (
@@ -349,7 +380,7 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
                           key={s.label}
                           href={s.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block py-2 text-white/50 hover:text-white text-[14px]"
+                          className={`block py-2 text-[14px] ${mobileLightTheme ? "text-mist-500 hover:text-mist-900" : "text-white/50 hover:text-white"}`}
                         >
                           {s.label}
                         </Link>
@@ -360,6 +391,31 @@ export default function Header({ forceLight = false }: { forceLight?: boolean } 
               )}
             </div>
           ))}
+
+          <div className={`mx-6 mt-5 grid grid-cols-1 gap-2.5 border-t pt-4 ${mobileLightTheme ? "border-mist-200" : "border-white/10"}`}>
+            <Link
+              href={session?.user ? "/account" : "/login"}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-[14px] ${mobileLightTheme ? "border-mist-200 text-mist-800 hover:bg-mist-50" : "border-white/20 text-white hover:bg-white/5"}`}
+            >
+              <UserIcon />
+              <span>Account</span>
+            </Link>
+            <Link
+              href="/partner"
+              onClick={() => setMobileOpen(false)}
+              className={`rounded-lg border px-4 py-2.5 text-center text-[14px] ${mobileLightTheme ? "border-mist-200 text-mist-700 hover:bg-mist-50" : "border-white/20 text-white/90 hover:bg-white/5"}`}
+            >
+              Become a Partner
+            </Link>
+            <Link
+              href="/booking"
+              onClick={() => setMobileOpen(false)}
+              className={`rounded-lg px-4 py-2.5 text-center text-[14px] ${mobileLightTheme ? "bg-mist-900 text-white hover:bg-black" : "bg-white text-mist-900 hover:bg-white/90"}`}
+            >
+              Reserve Now
+            </Link>
+          </div>
         </div>
       )}
     </div>

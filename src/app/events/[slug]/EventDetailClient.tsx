@@ -68,7 +68,8 @@ const VENUE_OPTIONS = [
 
 export function VenueBookingForm() {
   const [form, setForm] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     clubVenue: "",
@@ -93,7 +94,7 @@ export function VenueBookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.fullName || !form.email || !form.bookingDate || !form.clubVenue) return;
+    if (!form.firstName || !form.email || !form.bookingDate || !form.clubVenue) return;
     setSubmitting(true);
 
     try {
@@ -103,12 +104,14 @@ export function VenueBookingForm() {
         body: JSON.stringify({
           source: "venue-booking",
           category: "Event",
-          name: form.fullName,
+          name: `${form.firstName} ${form.lastName}`.trim(),
           email: form.email,
           phone: form.phone,
           subject: `Venue Booking - ${form.clubVenue}`,
           message: form.specialRequests,
           data: {
+            firstName: form.firstName,
+            lastName: form.lastName,
             clubVenue: form.clubVenue,
             bookingDate: form.bookingDate,
             guestsTotal: form.guestsTotal,
@@ -132,10 +135,10 @@ export function VenueBookingForm() {
   return (
     <section className="w-full bg-white py-12 2xl:py-24 sm:px-16 lg:px-20 2xl:px-32 px-6 " id="booking-form">
      
-      <div className="border border-mist-200 rounded-3xl 2xl:rounded-[40px] overflow-hidden gap-8 2xl:gap-16 sm:p-8 2xl:sm:p-16 px-4 py-6 2xl:px-8 2xl:py-12 flex flex-col md:flex-row shadow-sm">
+      <div className="border border-mist-200 rounded-3xl overflow-hidden gap-8 2xl:gap-16 sm:p-8 2xl:sm:p-16 px-4 py-6 2xl:px-8 2xl:py-12 flex flex-col md:flex-row shadow-sm">
 
         {/* Left Panel - Info */}
-        <div className="bg-mist-100 px-4 sm:px-8 2xl:sm:px-12 py-8 2xl:py-12 md:w-1/3 flex-shrink-0 flex flex-col gap-8 2xl:gap-12 relative overflow-hidden rounded-2xl 2xl:rounded-3xl">
+        <div className="bg-mist-100 px-4 sm:px-8 2xl:sm:px-12 py-8 2xl:py-12 md:w-1/3 flex-shrink-0 flex flex-col gap-8 2xl:gap-12 relative overflow-hidden rounded-3xl">
            <img
               src="/Vector 7.png"
               alt=""
@@ -182,12 +185,12 @@ export function VenueBookingForm() {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-6 2xl:gap-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <Field label="Full Name">
+                  <Field label="First Name">
                     <input
                       type="text"
-                      placeholder="Enter your full name"
-                      value={form.fullName}
-                      onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                      placeholder="Enter your first name"
+                      value={form.firstName}
+                      onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                       className={inputClass}
                       required
                     />
@@ -201,6 +204,33 @@ export function VenueBookingForm() {
                       className={inputClass}
                       required
                     />
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Field label="Last Name">
+                    <input
+                      type="text"
+                      placeholder="Enter your last name"
+                      value={form.lastName}
+                      onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                      className={inputClass}
+                    />
+                  </Field>
+                  <Field label="Phone Number">
+                    <div className="flex items-center border border-mist-300 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
+                      <span className="px-4 py-3 2xl:px-8 2xl:py-6 text-sm 2xl:text-3xl border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
+                        🇺🇸
+                      </span>
+                      <input
+                        type="tel"
+                        inputMode="tel"
+                        placeholder="Enter your phone number"
+                        value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                        className="flex-1 px-4 py-3 2xl:px-8 2xl:py-6 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 outline-none bg-white"
+                      />
+                    </div>
                   </Field>
                 </div>
 
@@ -236,7 +266,7 @@ export function VenueBookingForm() {
                   <Field label="Guests (Total)">
                     <input
                       type="text"
-                      placeholder="e.g. 50 guests"
+                      placeholder="e.g. 6 guests - 4M / 2F"
                       value={form.guestsTotal}
                       onChange={(e) => setForm({ ...form, guestsTotal: e.target.value })}
                       className={inputClass}
@@ -258,17 +288,25 @@ export function VenueBookingForm() {
                 </div>
 
                 <Field label="Add-Ons">
-                  <div className="flex flex-wrap gap-3 mt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                     {ADD_ONS.map((addon) => (
                       <button
                         key={addon}
                         type="button"
                         onClick={() => toggleAddOn(addon)}
-                        className={`px-4 2xl:px-6 py-2 2xl:py-3 rounded-full text-xs 2xl:text-base font-semibold border transition-all ${form.addOns.includes(addon)
-                            ? "bg-mist-900 text-white border-mist-900"
-                            : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
+                        className={`w-full px-4 2xl:px-6 py-3 2xl:py-5 rounded-2xl text-sm 2xl:text-xl font-medium border transition-all flex items-center gap-4 ${form.addOns.includes(addon)
+                            ? "bg-white text-mist-900 border-mist-300"
+                            : "bg-white text-mist-700 border-mist-200 hover:border-mist-300"
                           }`}
                       >
+                        <span
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${form.addOns.includes(addon)
+                              ? "border-blue-500"
+                              : "border-mist-400"
+                            }`}
+                        >
+                          {form.addOns.includes(addon) && <span className="w-3 h-3 rounded-full bg-blue-500" />}
+                        </span>
                         {addon}
                       </button>
                     ))}
@@ -288,7 +326,7 @@ export function VenueBookingForm() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-mist-900 text-white font-medium py-4 2xl:py-6 rounded-xl 2xl:rounded-2xl hover:bg-mist-800 transition-colors disabled:opacity-50 mt-2 text-base 2xl:text-2xl"
+                  className="w-full bg-mist-900 text-white font-medium py-4 2xl:py-6 rounded-3xl hover:bg-mist-800 transition-colors disabled:opacity-50 mt-2 text-base 2xl:text-2xl"
                 >
                   {submitting ? "Processing..." : "Submit Booking Request"}
                 </button>
@@ -390,31 +428,43 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
   }
 
   return (
-    <div className="bg-white">
-      {/* Breadcrumb */}
-      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-12 2xl:py-16">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-base 2xl:text-xl text-mist-500">
+    <div className="bg-white pt-24 lg:pt-28 2xl:pt-36">
+      {/* Breadcrumb (Desktop) */}
+      <div className="hidden lg:block px-6 sm:px-16 lg:px-28 2xl:px-32 pb-6 2xl:pb-10">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base 2xl:text-xl text-mist-500">
             <Link href="/" className="hover:text-mist-700">Los Angeles</Link>
             <span>&gt;</span>
             <Link href="/events" className="hover:text-mist-700">Events</Link>
             <span>&gt;</span>
             <span className="text-mist-700 font-medium">{event.name}</span>
           </div>
-          <div className="flex items-center gap-5">
-            <button className="flex items-center gap-1.5 text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
+          <div className="flex flex-nowrap items-center gap-4 sm:gap-5">
+            <button className="flex items-center gap-1.5 whitespace-nowrap text-sm sm:text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
               <Share2 size={16} /> Share
             </button>
-            <button className="flex items-center gap-1.5 text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
+            <button className="flex items-center gap-1.5 whitespace-nowrap text-sm sm:text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
               <Heart size={16} /> Save
             </button>
           </div>
         </div>
       </div>
 
+      {/* Top Actions (Mobile) */}
+      <div className="lg:hidden px-6 sm:px-16 pb-4">
+        <div className="flex items-center justify-end gap-3">
+          <button className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
+            <Share2 size={15} /> Share
+          </button>
+          <button className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
+            <Heart size={15} /> Save
+          </button>
+        </div>
+      </div>
+
       {/* Hero Image with Event Title */}
-      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 mb-14 2xl:mb-24">
-        <div className="relative rounded-[2rem] 2xl:rounded-[48px] overflow-hidden h-[450px] lg:h-[550px] 2xl:h-[760px]">
+      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 mb-8 2xl:mb-24">
+        <div className="relative rounded-3xl overflow-hidden h-[450px] lg:h-[550px] 2xl:h-[760px]">
           <img
             src={images[currentImage].url}
             alt={images[currentImage].alt || event.name}
@@ -435,7 +485,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             )}
             
             <button 
-               className="bg-white text-black px-10 2xl:px-14 py-3.5 2xl:py-6 rounded-xl 2xl:rounded-2xl text-sm 2xl:text-2xl font-bold hover:bg-gray-100 transition-all shadow-lg"
+               className="bg-white text-black px-10 2xl:px-14 py-3.5 2xl:py-6 rounded-3xl text-sm 2xl:text-2xl font-bold hover:bg-gray-100 transition-all shadow-lg"
                onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
             >
               Reserve Now
@@ -462,6 +512,19 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         </div>
       </div>
 
+      {/* Breadcrumb (Mobile) */}
+      <div className="lg:hidden px-6 sm:px-16 lg:px-28 2xl:px-32 2xl:pb-16">
+        <div className="flex items-center">
+          <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base 2xl:text-xl text-mist-500">
+            <Link href="/" className="hover:text-mist-700">Los Angeles</Link>
+            <span>&gt;</span>
+            <Link href="/events" className="hover:text-mist-700">Events</Link>
+            <span>&gt;</span>
+            <span className="text-mist-700 font-medium">{event.name}</span>
+          </div>
+        </div>
+      </div>
+
     {/* Why Choose Section */}
 {highlightsList.length > 0 && (
   <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 text-center">
@@ -483,7 +546,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         return (
           <div
             key={i}
-            className="bg-[#f5f5f5] p-8 2xl:p-12 rounded-2xl 2xl:rounded-3xl text-left flex flex-col h-full"
+            className="bg-[#f5f5f5] p-8 2xl:p-12 rounded-3xl text-left flex flex-col h-full"
           >
             {/* Icon Container */}
             <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-6">
@@ -518,7 +581,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         <img
           src={images[0]?.url || "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1000"}
           alt={event.name}
-          className="w-full h-full object-cover rounded-[2rem]"
+          className="w-full h-full object-cover rounded-3xl"
         />
       </div>
 
@@ -528,14 +591,14 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           <img
             src={images[1]?.url || "https://images.unsplash.com/photo-1470337458703-46ad1756a187?q=80&w=600"}
             alt="Interior Details"
-            className="w-full h-full object-cover rounded-[2rem]"
+            className="w-full h-full object-cover rounded-3xl"
           />
         </div>
         <div className="h-2/5">
           <img
             src={images[2]?.url || "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600"}
             alt="Atmosphere"
-            className="w-full h-full object-cover rounded-[2rem]"
+            className="w-full h-full object-cover rounded-3xl"
           />
         </div>
       </div>
@@ -558,7 +621,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
       </div>
 
       {event.dressCode && (
-        <div className="mb-8 p-6 2xl:p-10 bg-[#f5f5f5] rounded-2xl 2xl:rounded-3xl border border-gray-100">
+        <div className="mb-8 p-6 2xl:p-10 bg-[#f5f5f5] rounded-3xl border border-gray-100">
           <h4 className="text-sm 2xl:text-xl font-bold text-[#1a1a1a] uppercase tracking-wider mb-2">Dress Code</h4>
           <p className="text-sm 2xl:text-2xl text-gray-600">{event.dressCode}</p>
         </div>
@@ -566,7 +629,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       <button 
         onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
-        className="bg-[#1a1a1a] text-white px-10 2xl:px-14 py-4 2xl:py-6 rounded-xl 2xl:rounded-2xl font-bold 2xl:text-2xl hover:bg-black transition-colors shadow-lg"
+        className="bg-[#1a1a1a] text-white px-10 2xl:px-14 py-4 2xl:py-6 rounded-3xl font-bold 2xl:text-2xl hover:bg-black transition-colors shadow-lg"
       >
         Reserve Now
       </button>
@@ -579,14 +642,14 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 max-w-[1840px] mx-auto">
           {/* Column 1 */}
           <div className="flex flex-col gap-6">
-            <div className="h-[350px]">
+            <div className="h-[220px] sm:h-[300px] lg:h-[350px]">
               <img
                 src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=800"
                 alt="Delilah Atmosphere"
-                className="w-full h-full object-cover rounded-[2rem]"
+                className="w-full h-full object-cover rounded-3xl"
               />
             </div>
-            <div className="bg-[#f5f5f5] p-10 2xl:p-14 rounded-[2rem] 2xl:rounded-[2.5rem] flex-grow">
+            <div className="bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow">
               <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">Dress for the Occasion</h3>
               <p className="text-gray-500 text-sm 2xl:text-xl leading-relaxed">
                 Delilah's attire is upscale casual chic. Collared shirts are recommended.
@@ -598,7 +661,14 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
           {/* Column 2 */}
           <div className="flex flex-col gap-6">
-            <div className="bg-[#f5f5f5] p-10 2xl:p-14 rounded-[2rem] 2xl:rounded-[2.5rem]">
+            <div className="h-[220px] sm:h-[300px] lg:h-[400px]">
+              <img
+                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
+                alt="Delilah Bar"
+                className="w-full h-full object-cover rounded-3xl"
+              />
+            </div>
+            <div className="bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl">
               <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">Culinary Excellence</h3>
               <p className="text-gray-500 text-sm 2xl:text-xl leading-relaxed">
                 Indulge in upscale American cuisine crafted to perfection. Signature dishes
@@ -607,25 +677,18 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
                 your Delilah experience.
               </p>
             </div>
-            <div className="h-[400px]">
-              <img
-                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
-                alt="Delilah Bar"
-                className="w-full h-full object-cover rounded-[2rem]"
-              />
-            </div>
           </div>
 
           {/* Column 3 */}
           <div className="flex flex-col gap-6">
-            <div className="h-[350px]">
+            <div className="h-[220px] sm:h-[300px] lg:h-[350px]">
               <img
                 src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
                 alt="Live Entertainment"
-                className="w-full h-full object-cover rounded-[2rem]"
+                className="w-full h-full object-cover rounded-3xl"
               />
             </div>
-            <div className="bg-[#f5f5f5] p-10 2xl:p-14 rounded-[2rem] 2xl:rounded-[2.5rem] flex-grow">
+            <div className="bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow">
               <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">Live Entertainment & Performances</h3>
               <p className="text-gray-500 text-sm 2xl:text-xl leading-relaxed">
                 Enjoy live performers, DJs, and surprise acts throughout the evening.
@@ -655,11 +718,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 2xl:gap-y-8 gap-x-6 2xl:gap-x-10">
 
             {/* Mixologist */}
-            <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-2xl 2xl:rounded-[40px] p-4 2xl:p-8">
+            <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-3xl p-4 2xl:p-8">
               <img
                 src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300&q=80"
                 alt="Mixologist"
-                className="w-48 2xl:w-72 h-48 2xl:h-72 object-cover rounded-lg 2xl:rounded-2xl flex-shrink-0"
+                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-72 2xl:h-72 object-cover rounded-3xl flex-shrink-0"
               />
               <div className="pt-1">
                 <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services or Party Bus</h3>
@@ -670,11 +733,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             </div>
 
             {/* Valet Parking */}
-            <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-2xl 2xl:rounded-[40px] p-4 2xl:p-8">
+            <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-3xl p-4 2xl:p-8">
               <img
                 src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=300&q=80"
                 alt="Valet Parking"
-                className="w-48 2xl:w-72 h-48 2xl:h-72 object-cover rounded-lg 2xl:rounded-2xl flex-shrink-0"
+                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-72 2xl:h-72 object-cover rounded-3xl flex-shrink-0"
               />
               <div className="pt-1">
                 <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Security & Bodyguards</h3>
@@ -691,7 +754,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       <section className="py-16 2xl:py-24 px-6 sm:px-16 lg:px-20 2xl:px-32 bg-white">
         <div className="">
-          <div className="relative bg-mist-100 rounded-3xl 2xl:rounded-[40px] px-8 2xl:px-16 py-16 2xl:py-24 text-center overflow-hidden">
+          <div className="relative bg-mist-100 rounded-3xl px-8 2xl:px-16 py-16 2xl:py-24 text-center overflow-hidden">
             <img
               src="/Vector 7.png"
               alt=""
@@ -715,7 +778,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             <p className="text-sm 2xl:text-2xl text-mist-600 max-w-sm 2xl:max-w-3xl mx-auto leading-relaxed mb-8 2xl:mb-12">
               Secure your table, VIP services, or private experience today and make your evening truly extraordinary.
             </p>
-            <button className="bg-mist-900 text-white text-sm 2xl:text-2xl font-semibold px-7 2xl:px-12 py-3.5 2xl:py-5 rounded-xl 2xl:rounded-2xl hover:bg-mist-700 transition-colors">
+            <button className="bg-mist-900 text-white text-sm 2xl:text-2xl font-semibold px-7 2xl:px-12 py-3.5 2xl:py-5 rounded-3xl hover:bg-mist-700 transition-colors">
               Reserve Now
             </button>
 
@@ -735,41 +798,41 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 h-[600px] lg:h-[700px] 2xl:h-[860px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 h-auto md:h-[700px] 2xl:h-[860px]">
 
           {/* Left Column: Full Height */}
-          <div className="h-full">
+          <div className="h-[260px] sm:h-[320px] md:h-full">
             <img
               src="https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=800"
               alt="Bar interior"
-              className="w-full h-full object-cover rounded-[2rem]"
+              className="w-full h-full object-cover rounded-3xl"
             />
           </div>
 
           {/* Middle Column: Two Stacked Images */}
-          <div className="flex flex-col gap-6 h-full">
-            <div className="h-1/2">
+          <div className="flex flex-col gap-6 h-auto md:h-full">
+            <div className="h-[260px] sm:h-[320px] md:h-1/2">
               <img
                 src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
                 alt="Lounge seating"
-                className="w-full h-full object-cover rounded-[2rem]"
+                className="w-full h-full object-cover rounded-3xl"
               />
             </div>
-            <div className="h-1/2">
+            <div className="h-[260px] sm:h-[320px] md:h-1/2">
               <img
                 src="https://images.unsplash.com/photo-1485872299829-c673f5194813?q=80&w=800"
                 alt="Elegant lighting"
-                className="w-full h-full object-cover rounded-[2rem]"
+                className="w-full h-full object-cover rounded-3xl"
               />
             </div>
           </div>
 
           {/* Right Column: Full Height */}
-          <div className="h-full">
+          <div className="h-[260px] sm:h-[320px] md:h-full">
             <img
               src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
               alt="Atmospheric dining"
-              className="w-full h-full object-cover rounded-[2rem]"
+              className="w-full h-full object-cover rounded-3xl"
             />
           </div>
 
