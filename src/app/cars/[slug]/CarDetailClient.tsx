@@ -484,6 +484,17 @@ const discountTiers = [
 
 function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time") {
   if (input.type !== "text") return
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+
+  const lockedWidth = Math.ceil(input.getBoundingClientRect().width)
+  if (isIOS && lockedWidth > 0) {
+    // Prevent iOS Safari from resizing date/time controls while switching input type.
+    input.style.width = `${lockedWidth}px`
+    input.style.minWidth = `${lockedWidth}px`
+    input.style.maxWidth = `${lockedWidth}px`
+    input.style.fontSize = "16px"
+  }
   input.type = kind
   requestAnimationFrame(() => {
     input.focus()
@@ -493,6 +504,14 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
       } catch {
         // Safari can block showPicker; focus fallback still works.
       }
+    }
+    if (isIOS) {
+      requestAnimationFrame(() => {
+        input.style.width = "100%"
+        input.style.minWidth = "0"
+        input.style.maxWidth = "100%"
+        input.style.fontSize = "16px"
+      })
     }
   })
 }
