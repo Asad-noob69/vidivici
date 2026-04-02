@@ -818,7 +818,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                           value={startDate}
                           onChange={(e) => setStartDate(e.target.value)}
                           placeholder="Start date*"
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                         />
                       </div>
                       <div className="relative">
@@ -830,7 +830,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                           value={startTime}
                           onChange={(e) => setStartTime(e.target.value)}
                           placeholder="Time*"
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                         />
                       </div>
                     </div>
@@ -847,7 +847,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                           value={endDate}
                           onChange={(e) => setEndDate(e.target.value)}
                           placeholder="End date*"
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                         />
                       </div>
                       <div className="relative">
@@ -859,7 +859,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
                           placeholder="Time*"
-                          className="w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                          className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                         />
                       </div>
                     </div>
@@ -1102,7 +1102,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       placeholder="Start date*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                     />
                   </div>
                   <div className="relative">
@@ -1114,7 +1114,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
                       placeholder="Time*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                     />
                   </div>
                 </div>
@@ -1130,7 +1130,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       placeholder="End date*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                     />
                   </div>
                   <div className="relative">
@@ -1142,7 +1142,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
                       placeholder="Time*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className="ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
                     />
                   </div>
                 </div>
