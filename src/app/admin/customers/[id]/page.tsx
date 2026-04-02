@@ -53,11 +53,28 @@ interface CustomerDetail {
   state: string | null
   zipCode: string | null
   driverLicense: string | null
+  driverLicenseStatus: string
   insurance: string | null
+  insuranceStatus: string
   createdAt: string
   bookings: CarBooking[]
   villaBookings: VillaBooking[]
   _count: { wishlist: number }
+}
+
+interface DocEntry { url: string | null; number: string | null; expiry: string | null }
+
+function parseDoc(raw: string | null): DocEntry | null {
+  if (!raw) return null
+  try { return JSON.parse(raw) as DocEntry }
+  catch { return { url: raw, number: null, expiry: null } }
+}
+
+const DOC_STATUS_COLORS: Record<string, string> = {
+  VERIFIED: "bg-green-100 text-green-700",
+  PENDING:  "bg-yellow-100 text-yellow-700",
+  REJECTED: "bg-red-100 text-red-600",
+  NONE:     "bg-mist-100 text-mist-500",
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -99,14 +116,28 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
   const [customer, setCustomer] = useState<CustomerDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"cars" | "villas">("cars")
+  const [verifying, setVerifying] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadCustomer = () => {
     fetch(`/api/admin/customers/${id}`)
       .then((r) => r.ok ? r.json() : null)
       .then(setCustomer)
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [id])
+  }
+
+  useEffect(() => { loadCustomer() }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const verifyDoc = async (docType: string, status: string) => {
+    setVerifying(docType + status)
+    await fetch(`/api/admin/customers/${id}/verify-document`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docType, status }),
+    })
+    setVerifying(null)
+    loadCustomer()
+  }
 
   if (loading) {
     return (
@@ -128,8 +159,10 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
   }
 
   const initials = (customer.name || customer.email).charAt(0).toUpperCase()
-  const hasLicense = !!customer.driverLicense
-  const hasInsurance = !!customer.insurance
+  const dl  = parseDoc(customer.driverLicense)
+  const ins = parseDoc(customer.insurance)
+  const hasLicense  = !!dl
+  const hasInsurance = !!ins
 
   return (
     <div className="space-y-6">
@@ -165,11 +198,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                 <span className="bg-red-50 text-red-500 px-2.5 py-1 rounded-full font-medium">
                   {customer._count.wishlist} wishlist
                 </span>
-                <span className={`px-2.5 py-1 rounded-full font-medium ${hasLicense ? "bg-green-50 text-green-600" : "bg-mist-100 text-mist-400"}`}>
-                  DL {hasLicense ? "✓ submitted" : "not submitted"}
+                <span className={`px-2.5 py-1 rounded-full font-medium text-xs ${DOC_STATUS_COLORS[customer.driverLicenseStatus] ?? DOC_STATUS_COLORS.NONE}`}>
+                  DL: {customer.driverLicenseStatus === "NONE" ? "not submitted" : customer.driverLicenseStatus.toLowerCase()}
                 </span>
-                <span className={`px-2.5 py-1 rounded-full font-medium ${hasInsurance ? "bg-green-50 text-green-600" : "bg-mist-100 text-mist-400"}`}>
-                  Insurance {hasInsurance ? "✓ submitted" : "not submitted"}
+                <span className={`px-2.5 py-1 rounded-full font-medium text-xs ${DOC_STATUS_COLORS[customer.insuranceStatus] ?? DOC_STATUS_COLORS.NONE}`}>
+                  Insurance: {customer.insuranceStatus === "NONE" ? "not submitted" : customer.insuranceStatus.toLowerCase()}
                 </span>
               </div>
             </div>
@@ -204,21 +237,100 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         <h2 className="text-sm font-semibold text-mist-900 mb-4 flex items-center gap-2">
           <FileText size={15} /> Documents
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className={`rounded-xl border p-4 ${hasLicense ? "border-green-200 bg-green-50" : "border-mist-200 bg-mist-50"}`}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-mist-500 mb-1">Driver&apos;s License</p>
-            {hasLicense ? (
-              <p className="text-sm text-green-700 font-medium break-all">{customer.driverLicense}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Driver's License */}
+          <div className="border border-mist-200 rounded-2xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-mist-100 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-mist-600">Driver&apos;s License</p>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${DOC_STATUS_COLORS[customer.driverLicenseStatus] ?? DOC_STATUS_COLORS.NONE}`}>
+                {customer.driverLicenseStatus === "NONE" ? "Not submitted" : customer.driverLicenseStatus}
+              </span>
+            </div>
+            {dl ? (
+              <>
+                <div className="bg-mist-50 flex items-center justify-center" style={{ minHeight: 180 }}>
+                  {dl.url ? (
+                    dl.url.toLowerCase().endsWith(".pdf") ? (
+                      <a href={dl.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline p-4">View PDF</a>
+                    ) : (
+                      <a href={dl.url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={dl.url} alt="Driver License" className="max-h-44 max-w-full object-contain" />
+                      </a>
+                    )
+                  ) : (
+                    <p className="text-xs text-mist-400 p-4">No image uploaded</p>
+                  )}
+                </div>
+                {dl.number && <p className="text-xs text-mist-500 px-4 pt-2">Number: <span className="font-medium text-mist-900">{dl.number}</span></p>}
+                {dl.expiry  && <p className="text-xs text-mist-500 px-4 pb-2">Expiry: <span className="font-medium text-mist-900">{dl.expiry}</span></p>}
+                <div className="flex gap-2 p-4 pt-3">
+                  <button
+                    onClick={() => verifyDoc("DRIVING_LICENSE", "VERIFIED")}
+                    disabled={verifying !== null || customer.driverLicenseStatus === "VERIFIED"}
+                    className="flex-1 py-2 rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold transition"
+                  >
+                    {verifying === "DRIVING_LICENSEVERIFIED" ? "Saving…" : "Verify"}
+                  </button>
+                  <button
+                    onClick={() => verifyDoc("DRIVING_LICENSE", "REJECTED")}
+                    disabled={verifying !== null || customer.driverLicenseStatus === "REJECTED"}
+                    className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-semibold transition"
+                  >
+                    {verifying === "DRIVING_LICENSEREJECTED" ? "Saving…" : "Reject"}
+                  </button>
+                </div>
+              </>
             ) : (
-              <p className="text-sm text-mist-400">Not submitted</p>
+              <p className="text-sm text-mist-400 p-4">Not submitted yet.</p>
             )}
           </div>
-          <div className={`rounded-xl border p-4 ${hasInsurance ? "border-green-200 bg-green-50" : "border-mist-200 bg-mist-50"}`}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-mist-500 mb-1">Insurance</p>
-            {hasInsurance ? (
-              <p className="text-sm text-green-700 font-medium break-all">{customer.insurance}</p>
+
+          {/* Insurance */}
+          <div className="border border-mist-200 rounded-2xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-mist-100 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-mist-600">Insurance Policy</p>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${DOC_STATUS_COLORS[customer.insuranceStatus] ?? DOC_STATUS_COLORS.NONE}`}>
+                {customer.insuranceStatus === "NONE" ? "Not submitted" : customer.insuranceStatus}
+              </span>
+            </div>
+            {ins ? (
+              <>
+                <div className="bg-mist-50 flex items-center justify-center" style={{ minHeight: 180 }}>
+                  {ins.url ? (
+                    ins.url.toLowerCase().endsWith(".pdf") ? (
+                      <a href={ins.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline p-4">View PDF</a>
+                    ) : (
+                      <a href={ins.url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={ins.url} alt="Insurance" className="max-h-44 max-w-full object-contain" />
+                      </a>
+                    )
+                  ) : (
+                    <p className="text-xs text-mist-400 p-4">No image uploaded</p>
+                  )}
+                </div>
+                {ins.number && <p className="text-xs text-mist-500 px-4 pt-2">Policy #: <span className="font-medium text-mist-900">{ins.number}</span></p>}
+                {ins.expiry  && <p className="text-xs text-mist-500 px-4 pb-2">Expiry: <span className="font-medium text-mist-900">{ins.expiry}</span></p>}
+                <div className="flex gap-2 p-4 pt-3">
+                  <button
+                    onClick={() => verifyDoc("INSURANCE_POLICY", "VERIFIED")}
+                    disabled={verifying !== null || customer.insuranceStatus === "VERIFIED"}
+                    className="flex-1 py-2 rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold transition"
+                  >
+                    {verifying === "INSURANCE_POLICYVERIFIED" ? "Saving…" : "Verify"}
+                  </button>
+                  <button
+                    onClick={() => verifyDoc("INSURANCE_POLICY", "REJECTED")}
+                    disabled={verifying !== null || customer.insuranceStatus === "REJECTED"}
+                    className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-semibold transition"
+                  >
+                    {verifying === "INSURANCE_POLICYREJECTED" ? "Saving…" : "Reject"}
+                  </button>
+                </div>
+              </>
             ) : (
-              <p className="text-sm text-mist-400">Not submitted</p>
+              <p className="text-sm text-mist-400 p-4">Not submitted yet.</p>
             )}
           </div>
         </div>

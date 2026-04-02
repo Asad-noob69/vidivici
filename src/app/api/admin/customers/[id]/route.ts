@@ -21,7 +21,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         state: true,
         zipCode: true,
         driverLicense: true,
+        driverLicenseStatus: true,
         insurance: true,
+        insuranceStatus: true,
         createdAt: true,
         bookings: {
           orderBy: { createdAt: 'desc' },

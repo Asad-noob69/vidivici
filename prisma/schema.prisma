@@ -24,8 +24,10 @@ model User {
   city          String?
   state         String?
   zipCode       String?
-  driverLicense String?
-  insurance     String?
+  driverLicense       String?
+  driverLicenseStatus String  @default("NONE")
+  insurance           String?
+  insuranceStatus     String  @default("NONE")
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   bookings      Booking[]
