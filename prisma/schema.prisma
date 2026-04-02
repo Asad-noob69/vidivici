@@ -33,6 +33,7 @@ model User {
   bookings      Booking[]
   wishlist      Wishlist[]
   villaBookings VillaBooking[]
+  chatSessions  ChatSession[]
 }
 
 enum Role {
@@ -237,6 +238,8 @@ model ChatSession {
   id          String        @id @default(cuid())
   visitorId   String
   visitorName String?
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   isPaused    Boolean       @default(false)
   lastMessage String?
   createdAt   DateTime      @default(now())
