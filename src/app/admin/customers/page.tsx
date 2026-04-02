@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Search, Users } from "lucide-react"
 
 interface Customer {
@@ -9,11 +10,16 @@ interface Customer {
   email: string
   phone: string | null
   image: string | null
+  country: string | null
+  city: string | null
+  driverLicense: string | null
+  insurance: string | null
   createdAt: string
-  _count: { bookings: number; wishlist: number }
+  _count: { bookings: number; villaBookings: number; wishlist: number }
 }
 
 export default function CustomersPage() {
+  const router = useRouter()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -75,18 +81,23 @@ export default function CustomersPage() {
                 <th className="text-left px-5 py-3">Customer</th>
                 <th className="text-left px-5 py-3 hidden sm:table-cell">Email</th>
                 <th className="text-left px-5 py-3 hidden md:table-cell">Phone</th>
+                <th className="text-left px-5 py-3 hidden lg:table-cell">Location</th>
                 <th className="text-center px-5 py-3">Bookings</th>
-                <th className="text-center px-5 py-3 hidden sm:table-cell">Wishlist</th>
+                <th className="text-center px-5 py-3 hidden sm:table-cell">Docs</th>
                 <th className="text-left px-5 py-3 hidden lg:table-cell">Joined</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((c, i) => {
                 const initials = (c.name || c.email).charAt(0).toUpperCase()
+                const totalBookings = c._count.bookings + c._count.villaBookings
+                const hasLicense = !!c.driverLicense
+                const hasInsurance = !!c.insurance
                 return (
                   <tr
                     key={c.id}
-                    className={`border-b border-mist-100 hover:bg-mist-50 transition ${i === filtered.length - 1 ? "border-b-0" : ""}`}
+                    onClick={() => router.push(`/admin/customers/${c.id}`)}
+                    className={`border-b border-mist-100 hover:bg-mist-50 transition cursor-pointer ${i === filtered.length - 1 ? "border-b-0" : ""}`}
                   >
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
@@ -104,15 +115,23 @@ export default function CustomersPage() {
                     </td>
                     <td className="px-5 py-3.5 text-mist-600 hidden sm:table-cell">{c.email}</td>
                     <td className="px-5 py-3.5 text-mist-600 hidden md:table-cell">{c.phone || "—"}</td>
+                    <td className="px-5 py-3.5 text-mist-600 hidden lg:table-cell text-xs">
+                      {[c.city, c.country].filter(Boolean).join(", ") || "—"}
+                    </td>
                     <td className="px-5 py-3.5 text-center">
                       <span className="inline-block bg-blue-50 text-blue-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                        {c._count.bookings}
+                        {totalBookings}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-center hidden sm:table-cell">
-                      <span className="inline-block bg-red-50 text-red-500 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                        {c._count.wishlist}
-                      </span>
+                      <div className="flex items-center justify-center gap-1">
+                        <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${hasLicense ? "bg-green-50 text-green-600" : "bg-mist-100 text-mist-400"}`}>
+                          {hasLicense ? "DL ✓" : "DL —"}
+                        </span>
+                        <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${hasInsurance ? "bg-green-50 text-green-600" : "bg-mist-100 text-mist-400"}`}>
+                          {hasInsurance ? "INS ✓" : "INS —"}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-5 py-3.5 text-mist-400 hidden lg:table-cell text-xs">
                       {new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
