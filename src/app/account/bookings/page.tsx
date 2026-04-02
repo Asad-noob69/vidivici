@@ -13,6 +13,8 @@ interface BookingData {
   pickupLocation: string
   totalPrice: number
   status: string
+  paymentStatus: string
+  contractStatus?: string
   car: {
     name: string
     slug: string
@@ -180,6 +182,26 @@ export default function MyBookingsPage() {
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusColor(booking.status)}`}>
                           {statusLabel(booking.status)}
                         </span>
+                        {booking.paymentStatus === "AUTHORIZED" && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                            Payment Authorized
+                          </span>
+                        )}
+                        {booking.paymentStatus === "PAID" && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">
+                            Paid
+                          </span>
+                        )}
+                        {booking.contractStatus === "SENT" && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">
+                            Contract Sent - Check Email
+                          </span>
+                        )}
+                        {booking.contractStatus === "SIGNED" && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">
+                            Contract Signed
+                          </span>
+                        )}
                         <p className="text-2xl font-bold text-mist-900 leading-tight">
                           ${booking.totalPrice.toLocaleString()}
                           <span className="text-sm font-normal text-mist-400"> /day</span>

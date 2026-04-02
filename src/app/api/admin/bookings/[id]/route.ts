@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { voidPayPalAuthorization } from '@/lib/paypal'
 
 export async function GET(
   request: NextRequest,
@@ -63,14 +64,42 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { bookingType, status, paymentStatus, documentStatus, adminNotes, notes } = body
+    const { bookingType, status, paymentStatus, documentStatus, contractStatus, adminNotes, notes } = body
 
     const updateData: any = {}
     if (status) updateData.status = status
     if (paymentStatus) updateData.paymentStatus = paymentStatus
     if (documentStatus) updateData.documentStatus = documentStatus
+    if (contractStatus) updateData.contractStatus = contractStatus
     if (adminNotes !== undefined) updateData.adminNotes = adminNotes
     if (notes !== undefined) updateData.notes = notes
+
+    // Void PayPal authorization when cancelling
+    if (status === 'CANCELLED') {
+      try {
+        let authId: string | null = null
+        let currentPaymentStatus: string | null = null
+        if (bookingType === 'car') {
+          const b = await prisma.booking.findUnique({ where: { id }, select: { paypalAuthorizationId: true, paymentStatus: true } })
+          authId = b?.paypalAuthorizationId || null
+          currentPaymentStatus = b?.paymentStatus || null
+        } else if (bookingType === 'villa') {
+          const b = await prisma.villaBooking.findUnique({ where: { id }, select: { paypalAuthorizationId: true, paymentStatus: true } })
+          authId = b?.paypalAuthorizationId || null
+          currentPaymentStatus = b?.paymentStatus || null
+        } else if (bookingType === 'event') {
+          const b = await prisma.eventBooking.findUnique({ where: { id }, select: { paypalAuthorizationId: true, paymentStatus: true } })
+          authId = b?.paypalAuthorizationId || null
+          currentPaymentStatus = b?.paymentStatus || null
+        }
+        if (authId && currentPaymentStatus === 'AUTHORIZED') {
+          await voidPayPalAuthorization(authId)
+          updateData.paymentStatus = 'UNPAID'
+        }
+      } catch (voidErr) {
+        console.error('Failed to void PayPal authorization:', voidErr)
+      }
+    }
 
     if (bookingType === 'villa') {
       const booking = await prisma.villaBooking.update({
@@ -86,6 +115,7 @@ export async function PUT(
       if (status) eventUpdate.status = status
       if (paymentStatus) eventUpdate.paymentStatus = paymentStatus
       if (documentStatus) eventUpdate.documentStatus = documentStatus
+      if (contractStatus) eventUpdate.contractStatus = contractStatus
       if (adminNotes !== undefined) eventUpdate.adminNotes = adminNotes
       if (notes !== undefined) eventUpdate.specialRequests = notes
       const booking = await prisma.eventBooking.update({

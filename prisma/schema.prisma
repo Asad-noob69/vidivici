@@ -145,12 +145,16 @@ model Booking {
   status          BookingStatus @default(PENDING)
   paymentStatus   PaymentStatus @default(UNPAID)
   documentStatus  String        @default("PENDING")
-  paymentIntentId String?
-  notes           String?       @db.Text
-  adminNotes      String?       @db.Text
-  documents       String?       @db.Text
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  paymentIntentId       String?
+  paypalOrderId         String?
+  paypalAuthorizationId String?
+  contractStatus        String        @default("NONE")
+  contractSentAt        DateTime?
+  notes                 String?       @db.Text
+  adminNotes            String?       @db.Text
+  documents             String?       @db.Text
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 }
 
 enum BookingStatus {
@@ -163,6 +167,7 @@ enum BookingStatus {
 
 enum PaymentStatus {
   UNPAID
+  AUTHORIZED
   PAID
   REFUNDED
   FAILED
@@ -263,15 +268,19 @@ model VillaBooking {
   checkIn         DateTime
   checkOut        DateTime
   guests          Int           @default(1)
-  totalPrice      Float
-  status          BookingStatus @default(PENDING)
-  paymentStatus   PaymentStatus @default(UNPAID)
-  documentStatus  String        @default("PENDING")
-  notes           String?       @db.Text
-  adminNotes      String?       @db.Text
-  documents       String?       @db.Text
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  totalPrice            Float
+  status                BookingStatus @default(PENDING)
+  paymentStatus         PaymentStatus @default(UNPAID)
+  documentStatus        String        @default("PENDING")
+  paypalOrderId         String?
+  paypalAuthorizationId String?
+  contractStatus        String        @default("NONE")
+  contractSentAt        DateTime?
+  notes                 String?       @db.Text
+  adminNotes            String?       @db.Text
+  documents             String?       @db.Text
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 }
 
 model WeddingInquiry {
@@ -337,12 +346,16 @@ model EventBooking {
   budget          String?
   addOns          String?
   specialRequests String?  @db.Text
-  totalPrice      Float    @default(0)
-  status          String   @default("PENDING")
-  paymentStatus   String   @default("UNPAID")
-  documentStatus  String   @default("PENDING")
-  adminNotes      String?  @db.Text
-  documents       String?  @db.Text
-  isRead          Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  totalPrice            Float    @default(0)
+  status                String   @default("PENDING")
+  paymentStatus         String   @default("UNPAID")
+  documentStatus        String   @default("PENDING")
+  paypalOrderId         String?
+  paypalAuthorizationId String?
+  contractStatus        String   @default("NONE")
+  contractSentAt        DateTime?
+  adminNotes            String?  @db.Text
+  documents             String?  @db.Text
+  isRead                Boolean  @default(false)
+  createdAt             DateTime @default(now())
 }

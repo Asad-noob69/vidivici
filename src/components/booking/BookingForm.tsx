@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CheckCircle } from "lucide-react"
+import PayPalBookingButton from "./PayPalBookingButton"
 
 interface BookingFormProps {
   car: {
@@ -27,7 +28,6 @@ export default function BookingForm({ car }: BookingFormProps) {
   const [phone, setPhone] = useState("")
   const [notes, setNotes] = useState("")
   const [agreed, setAgreed] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
@@ -43,54 +43,21 @@ export default function BookingForm({ car }: BookingFormProps) {
   const discountAmount = subtotal * discount
   const total = subtotal - discountAmount
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!agreed) { setError("Please agree to the terms"); return }
-    if (days < car.minRentalDays) { setError(`Minimum rental is ${car.minRentalDays} day(s)`); return }
-
-    setSubmitting(true)
-    setError("")
-
-    try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          carId: car.id,
-          startDate,
-          endDate,
-          pickupLocation,
-          dropoffLocation: sameDropoff ? pickupLocation : dropoffLocation,
-          notes,
-        }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || "Booking failed")
-      }
-
-      setSuccess(true)
-    } catch (err: any) {
-      setError(err.message || "Something went wrong")
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  const formValid = agreed && days >= car.minRentalDays && startDate && endDate && pickupLocation
 
   if (success) {
     return (
       <div className="bg-[#1a1a1a] border border-green-600/30 rounded-xl p-8 text-center">
         <CheckCircle size={40} className="text-green-500 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-white mb-2">Reservation Submitted!</h3>
-        <p className="text-mist-400 text-sm mb-4">We&apos;ll confirm your booking shortly via email.</p>
+        <p className="text-mist-400 text-sm mb-4">Your payment has been authorized. We&apos;ll confirm your booking shortly.</p>
         <p className="text-sm text-mist-500">{car.name} &bull; {days} day(s) &bull; ${total.toLocaleString()}</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 space-y-4">
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 space-y-4">
       <h3 className="text-lg font-semibold text-[#dbb241] mb-2">Reserve This Vehicle</h3>
 
       {error && <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded">{error}</p>}
@@ -177,13 +144,21 @@ export default function BookingForm({ car }: BookingFormProps) {
         <label htmlFor="terms" className="text-xs text-mist-400">I agree to the rental terms and conditions</label>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting || !agreed || days < 1}
-        className="w-full bg-[#dbb241] text-black py-3 rounded font-semibold text-sm hover:bg-[#c9a238] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {submitting ? "Processing..." : "Confirm Reservation"}
-      </button>
-    </form>
+      <PayPalBookingButton
+        bookingType="car"
+        bookingData={{
+          carId: car.id,
+          startDate,
+          endDate,
+          pickupLocation,
+          dropoffLocation: sameDropoff ? pickupLocation : dropoffLocation,
+          notes,
+        }}
+        totalPrice={total}
+        disabled={!formValid}
+        onSuccess={() => setSuccess(true)}
+        onError={(msg) => setError(msg)}
+      />
+    </div>
   )
 }

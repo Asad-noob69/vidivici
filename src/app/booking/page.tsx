@@ -9,10 +9,10 @@ import {
   Minus,
   Plus,
   Info,
-  CreditCard,
   CheckCircle,
   MapPin,
 } from "lucide-react"
+import PayPalBookingButton from "@/components/booking/PayPalBookingButton"
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -126,7 +126,6 @@ function ReservationContent() {
   const isVillaFlowLocked = searchParams.get("type") === "villa"
   const [mode, setMode] = useState<"car" | "villa">(initialMode as "car" | "villa")
   const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [submitting, setSubmitting] = useState(false)
   const [bookingId, setBookingId] = useState("")
 
   /* ---- Car selection state ---- */
@@ -177,14 +176,7 @@ function ReservationContent() {
   const [returnAddress, setReturnAddress] = useState("")
   const [isOneWay, setIsOneWay] = useState(false)
 
-  /* ---- Pay step state ---- */
-  const [cardName, setCardName] = useState("")
-  const [cardNumber, setCardNumber] = useState("")
-  const [expiry, setExpiry] = useState("")
-  const [cvv, setCvv] = useState("")
-  const [billingAddress, setBillingAddress] = useState("")
-  const [country, setCountry] = useState("United States")
-  const [zipCode, setZipCode] = useState("")
+  /* ---- Pay step state (removed - now using PayPal) ---- */
 
   const today = new Date().toISOString().split("T")[0]
 
@@ -321,9 +313,6 @@ function ReservationContent() {
         .then((r) => (r.ok ? r.json() : null))
         .then((profile) => {
           if (profile) {
-            if (profile.address && !billingAddress) setBillingAddress(profile.address)
-            if (profile.country && country === "United States") setCountry(profile.country)
-            if (profile.zipCode && !zipCode) setZipCode(profile.zipCode)
             if (profile.phone && !phone) setPhone(profile.phone)
             if (profile.driverLicense && !driverLicenseUrl) setDriverLicenseUrl(profile.driverLicense)
             if (profile.insurance && !insuranceUrl) setInsuranceUrl(profile.insurance)
@@ -400,80 +389,6 @@ function ReservationContent() {
       })
     } else {
       setSelectedCar(null)
-    }
-  }
-
-  /* ---- Submit booking ---- */
-  const handleSubmitBooking = async () => {
-    if (!session?.user) {
-      router.push("/login")
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      if (mode === "car" && selectedCar) {
-        const res = await fetch("/api/bookings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            carId: selectedCar.id,
-            startDate,
-            endDate,
-            pickupLocation: selectedCar.location,
-            dropoffLocation: selectedCar.location,
-            deliveryType,
-            deliveryAddress: deliveryType === "delivery" ? deliveryAddress : undefined,
-            returnAddress:
-              deliveryType === "delivery"
-                ? (isOneWay ? returnAddress : deliveryAddress)
-                : undefined,
-            isOneWay,
-            notes: needDriver
-              ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days`
-              : undefined,
-          }),
-        })
-        if (!res.ok) throw new Error("Booking failed")
-        const booking = await res.json()
-        setBookingId(booking.id?.slice(-6)?.toUpperCase() || "000000")
-        setStep(3)
-      } else if (mode === "villa" && selectedVilla) {
-        const villaAddOns = [
-          villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null,
-          villaPrivateChef ? "Private Chef" : null,
-          villaSecurityService ? "Security Service" : null,
-        ].filter(Boolean)
-
-        const villaNotes = [
-          `Check-in time: ${startTime || "N/A"}`,
-          `Check-out time: ${endTime || "N/A"}`,
-          `Customer: ${firstName || ""} ${lastName || ""}`.trim(),
-          `Email: ${email || "N/A"}`,
-          `Phone: ${phone || "N/A"}`,
-          `Add-ons: ${villaAddOns.length ? villaAddOns.join(", ") : "None"}`,
-        ].join("\n")
-
-        const res = await fetch("/api/villa-bookings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            villaId: selectedVilla.id,
-            checkIn: startDate,
-            checkOut: endDate,
-            guests: guestCount,
-            notes: villaNotes,
-          }),
-        })
-        if (!res.ok) throw new Error("Booking failed")
-        const booking = await res.json()
-        setBookingId(booking.id?.slice(-6)?.toUpperCase() || "000000")
-        setStep(3)
-      }
-    } catch {
-      alert("Something went wrong. Please try again.")
-    } finally {
-      setSubmitting(false)
     }
   }
 
@@ -645,25 +560,78 @@ function ReservationContent() {
             )}
 
             {step === 2 && (
-              <PayStep
-                cardName={cardName}
-                setCardName={setCardName}
-                cardNumber={cardNumber}
-                setCardNumber={setCardNumber}
-                expiry={expiry}
-                setExpiry={setExpiry}
-                cvv={cvv}
-                setCvv={setCvv}
-                billingAddress={billingAddress}
-                setBillingAddress={setBillingAddress}
-                country={country}
-                setCountry={setCountry}
-                zipCode={zipCode}
-                setZipCode={setZipCode}
-                submitting={submitting}
-                onBack={() => setStep(1)}
-                onPay={handleSubmitBooking}
-              />
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold text-mist-900">Complete Payment</h2>
+                <p className="text-xs text-mist-400 leading-relaxed">
+                  By placing this order, I agree to the{" "}
+                  <span className="text-blue-600 cursor-pointer">Terms & Conditions</span> &{" "}
+                  <span className="text-blue-600 cursor-pointer">Privacy Policy.</span>
+                </p>
+                <p className="text-xs text-mist-400 leading-relaxed">
+                  We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.
+                </p>
+
+                {mode === "car" && selectedCar && (
+                  <PayPalBookingButton
+                    bookingType="car"
+                    bookingData={{
+                      carId: selectedCar.id,
+                      startDate,
+                      endDate,
+                      pickupLocation: selectedCar.location,
+                      dropoffLocation: selectedCar.location,
+                      deliveryType,
+                      deliveryAddress: deliveryType === "delivery" ? deliveryAddress : undefined,
+                      returnAddress: deliveryType === "delivery" ? (isOneWay ? returnAddress : deliveryAddress) : undefined,
+                      isOneWay,
+                      notes: needDriver ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days` : undefined,
+                    }}
+                    totalPrice={carPricing.total}
+                    onSuccess={(id) => {
+                      setBookingId(id.slice(-6).toUpperCase())
+                      setStep(3)
+                    }}
+                    onError={(msg) => alert(msg)}
+                  />
+                )}
+
+                {mode === "villa" && selectedVilla && (
+                  <PayPalBookingButton
+                    bookingType="villa"
+                    bookingData={{
+                      villaId: selectedVilla.id,
+                      checkIn: startDate,
+                      checkOut: endDate,
+                      guests: guestCount,
+                      notes: [
+                        `Check-in time: ${startTime || "N/A"}`,
+                        `Check-out time: ${endTime || "N/A"}`,
+                        `Customer: ${firstName || ""} ${lastName || ""}`.trim(),
+                        `Email: ${email || "N/A"}`,
+                        `Phone: ${phone || "N/A"}`,
+                        [
+                          villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null,
+                          villaPrivateChef ? "Private Chef" : null,
+                          villaSecurityService ? "Security Service" : null,
+                        ].filter(Boolean).length
+                          ? `Add-ons: ${[villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null, villaPrivateChef ? "Private Chef" : null, villaSecurityService ? "Security Service" : null].filter(Boolean).join(", ")}`
+                          : "Add-ons: None",
+                      ].join("\n"),
+                    }}
+                    totalPrice={villaPricing.total}
+                    onSuccess={(id) => {
+                      setBookingId(id.slice(-6).toUpperCase())
+                      setStep(3)
+                    }}
+                    onError={(msg) => alert(msg)}
+                  />
+                )}
+
+                <button onClick={() => setStep(1)}
+                  className="w-full border border-mist-200 text-mist-700 py-3 rounded-md font-semibold text-sm hover:bg-mist-50 transition-colors">
+                  Back
+                </button>
+              </div>
             )}
 
             {step === 3 && <DoneStep bookingId={bookingId} vehicleName={vehicleName} mode={mode} />}
@@ -1391,146 +1359,6 @@ function VillaSelectStep({
 }
 
 /* ================================================================== */
-/*  Pay Step                                                            */
-/* ================================================================== */
-function PayStep({
-  cardName, setCardName, cardNumber, setCardNumber,
-  expiry, setExpiry, cvv, setCvv,
-  billingAddress, setBillingAddress, country, setCountry,
-  zipCode, setZipCode, submitting, onBack, onPay,
-}: {
-  cardName: string; setCardName: (v: string) => void
-  cardNumber: string; setCardNumber: (v: string) => void
-  expiry: string; setExpiry: (v: string) => void
-  cvv: string; setCvv: (v: string) => void
-  billingAddress: string; setBillingAddress: (v: string) => void
-  country: string; setCountry: (v: string) => void
-  zipCode: string; setZipCode: (v: string) => void
-  submitting: boolean; onBack: () => void; onPay: () => void
-}) {
-  const formatCardNumber = (val: string) => {
-    const digits = val.replace(/\D/g, "").slice(0, 16)
-    return digits.replace(/(.{4})/g, "$1 ").trim()
-  }
-  const formatExpiry = (val: string) => {
-    const digits = val.replace(/\D/g, "").slice(0, 4)
-    if (digits.length >= 3) return digits.slice(0, 2) + "/" + digits.slice(2)
-    return digits
-  }
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-mist-900">Card Info</h2>
-
-      <div className="border border-blue-200 bg-blue-50/30 rounded-md p-4">
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2.5">
-            <div className="w-4 h-4 rounded-full border-2 border-blue-600 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-blue-600" />
-            </div>
-            <span className="text-sm font-medium text-mist-900">Credit card</span>
-          </label>
-          <div className="flex items-center gap-1.5">
-            <div className="h-5 px-1.5 bg-[#1A1F71] rounded text-white text-[8px] font-bold flex items-center">VISA</div>
-            <div className="h-5 px-1.5 bg-[#2E77BC] rounded text-white text-[8px] font-bold flex items-center">AMEX</div>
-            <div className="h-5 px-1.5 bg-[#EB001B] rounded text-white text-[8px] font-bold flex items-center">MC</div>
-            <CreditCard size={18} className="text-mist-400" />
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label className="text-xs text-mist-500 block mb-1.5">Name on Card</label>
-        <input type="text" placeholder="Full name" value={cardName} onChange={(e) => setCardName(e.target.value)}
-          className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-      </div>
-
-      <div>
-        <label className="text-xs text-mist-500 block mb-1.5">Card Number</label>
-        <input type="text" placeholder="1234 1234 1234 1234" value={cardNumber}
-          onChange={(e) => setCardNumber(formatCardNumber(e.target.value))} maxLength={19}
-          className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs text-mist-500 block mb-1.5">Expiration Date</label>
-          <input type="text" placeholder="MM/YY" value={expiry}
-            onChange={(e) => setExpiry(formatExpiry(e.target.value))} maxLength={5}
-            className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-        </div>
-        <div>
-          <label className="text-xs text-mist-500 block mb-1.5">Security Code</label>
-          <input type="text" placeholder="CVV" value={cvv}
-            onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))} maxLength={4}
-            className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-        </div>
-      </div>
-
-      <div>
-        <label className="text-xs text-mist-500 block mb-1.5">Billing Address</label>
-        <input type="text" placeholder="Enter billing address" value={billingAddress}
-          onChange={(e) => setBillingAddress(e.target.value)}
-          className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs text-mist-500 block mb-1.5">Country</label>
-          <div className="relative">
-            <select value={country} onChange={(e) => setCountry(e.target.value)}
-              className="w-full appearance-none border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 bg-white focus:border-neutral-400 focus:outline-none pr-8">
-              <option>United States</option>
-              <option>Canada</option>
-              <option>United Kingdom</option>
-              <option>Australia</option>
-              <option>Germany</option>
-              <option>France</option>
-              <option>United Arab Emirates</option>
-            </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none" />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs text-mist-500 block mb-1.5">ZIP Code</label>
-          <input type="text" placeholder="ZIP code" value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
-            className="w-full border border-neutral-300 rounded-md px-4 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-        </div>
-      </div>
-
-      <div className="border border-mist-200 rounded-md p-4">
-        <label className="flex items-center gap-2.5 cursor-pointer">
-          <div className="w-4 h-4 rounded-full border-2 border-mist-300" />
-          <span className="text-sm text-mist-500">PayPal</span>
-        </label>
-      </div>
-
-      <p className="text-xs text-mist-400 leading-relaxed">
-        By placing this order, I agree to the{" "}
-        <span className="text-blue-600 cursor-pointer">Terms & Conditions</span> &{" "}
-        <span className="text-blue-600 cursor-pointer">Privacy Policy.</span>
-      </p>
-      <p className="text-xs text-mist-400 leading-relaxed">
-        We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team.
-      </p>
-      <p className="text-xs text-mist-400">Safe and Secure SSL Encrypted</p>
-
-      <div className="flex gap-3">
-        <button onClick={onBack}
-          className="flex-1 border border-mist-200 text-mist-700 py-3 rounded-md font-semibold text-sm hover:bg-mist-50 transition-colors">
-          Back
-        </button>
-        <button onClick={onPay} disabled={submitting || !cardNumber || !expiry || !cvv}
-          className="flex-1 bg-mist-900 text-white py-3 rounded-md font-semibold text-sm hover:bg-mist-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          {submitting ? "Processing..." : "Place Order"}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-/* ================================================================== */
 /*  Done Step                                                           */
 /* ================================================================== */
 function DoneStep({ bookingId, vehicleName, mode }: { bookingId: string; vehicleName: string; mode: "car" | "villa" }) {
@@ -1539,10 +1367,10 @@ function DoneStep({ bookingId, vehicleName, mode }: { bookingId: string; vehicle
       <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
         <CheckCircle size={32} className="text-green-600" />
       </div>
-      <h2 className="text-2xl font-bold text-mist-900">Reservation Confirmed!</h2>
+      <h2 className="text-2xl font-bold text-mist-900">Reservation Submitted!</h2>
       <p className="text-mist-500 text-sm max-w-md mx-auto">
-        Your booking for <span className="font-medium text-mist-900">{vehicleName}</span> has been
-        submitted successfully. Our team will confirm your reservation shortly.
+        Your payment has been authorized for <span className="font-medium text-mist-900">{vehicleName}</span>.
+        Our team will review availability and send you a contract to sign. You will only be charged after confirmation.
       </p>
       <p className="text-xs text-mist-400">
         Booking Reference: <span className="font-mono font-semibold text-mist-700">VV-{bookingId}</span>
