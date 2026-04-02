@@ -36,8 +36,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     segments.length === 2 &&
     !eventStaticPages.has(segments[1].toLowerCase());
 
-  const isDetailPage = isCarSlugPage || isVillaSlugPage || isEventSlugPage;
-
   const isBooking = pathname === "/booking" || pathname.startsWith("/booking/");
 
   // Admin layout
@@ -70,13 +68,23 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </header>
         <main className="min-h-screen">{children}</main>
         <AccountFooter />
-        <ChatBot />
       </SessionProvider>
     );
   }
 
-  // Detail layout: /cars/[slug], /villas/[slug], /events/[slug]
-  if (isDetailPage) {
+  // Car/Villa detail: no ChatBot
+  if (isCarSlugPage || isVillaSlugPage) {
+    return (
+      <SessionProvider>
+        <AccountHeader />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+      </SessionProvider>
+    );
+  }
+
+  // Event detail: keep ChatBot
+  if (isEventSlugPage) {
     return (
       <SessionProvider>
         <AccountHeader />
