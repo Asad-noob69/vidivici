@@ -115,6 +115,17 @@ function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boo
 
 function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time") {
   if (input.type !== "text") return
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+
+  const lockedWidth = Math.ceil(input.getBoundingClientRect().width)
+  if (isIOS && lockedWidth > 0) {
+    // Prevent iOS Safari from resizing date/time controls while switching input type.
+    input.style.width = `${lockedWidth}px`
+    input.style.minWidth = `${lockedWidth}px`
+    input.style.maxWidth = `${lockedWidth}px`
+    input.style.fontSize = "16px"
+  }
   input.type = kind
   requestAnimationFrame(() => {
     input.focus()
@@ -125,8 +136,18 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
         // Safari may not support or may block showPicker; focus fallback still works.
       }
     }
+    if (isIOS) {
+      requestAnimationFrame(() => {
+        input.style.width = "100%"
+        input.style.minWidth = "0"
+        input.style.maxWidth = "100%"
+        input.style.fontSize = "16px"
+      })
+    }
   })
 }
+
+const temporalInputClass = "w-full max-w-full min-w-0 box-border border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
 
 function getUploadedFileName(url: string) {
   if (!url) return "—"
@@ -918,7 +939,7 @@ function CarSelectStep({
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="Start date*"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none" />
+                className={temporalInputClass} />
             </div>
             <div>
               <label className="text-xs text-mist-500 block mb-1.5">Time</label>
@@ -930,7 +951,7 @@ function CarSelectStep({
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 placeholder="Time*"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none" />
+                className={temporalInputClass} />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -945,7 +966,7 @@ function CarSelectStep({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="End date*"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none" />
+                className={temporalInputClass} />
             </div>
             <div>
               <label className="text-xs text-mist-500 block mb-1.5">Time</label>
@@ -957,7 +978,7 @@ function CarSelectStep({
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 placeholder="Time*"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none" />
+                className={temporalInputClass} />
             </div>
           </div>
         </div>
@@ -1357,7 +1378,7 @@ function VillaSelectStep({
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="Check-in"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
+                className={temporalInputClass}
               />
             </div>
             <div>
@@ -1369,7 +1390,7 @@ function VillaSelectStep({
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 placeholder="Time"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
+                className={temporalInputClass}
               />
             </div>
           </div>
@@ -1385,7 +1406,7 @@ function VillaSelectStep({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="Check-out"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
+                className={temporalInputClass}
               />
             </div>
             <div>
@@ -1397,7 +1418,7 @@ function VillaSelectStep({
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 placeholder="Time"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
+                className={temporalInputClass}
               />
             </div>
           </div>

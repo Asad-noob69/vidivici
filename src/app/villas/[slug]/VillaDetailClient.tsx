@@ -59,6 +59,17 @@ const VILLA_ADDONS = [
 
 function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time") {
   if (input.type !== "text") return
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+
+  const lockedWidth = Math.ceil(input.getBoundingClientRect().width)
+  if (isIOS && lockedWidth > 0) {
+    // Prevent iOS Safari from resizing date/time controls while switching input type.
+    input.style.width = `${lockedWidth}px`
+    input.style.minWidth = `${lockedWidth}px`
+    input.style.maxWidth = `${lockedWidth}px`
+    input.style.fontSize = "16px"
+  }
   input.type = kind
   requestAnimationFrame(() => {
     input.focus()
@@ -69,8 +80,18 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
         // Safari can block showPicker; focus fallback still works.
       }
     }
+    if (isIOS) {
+      requestAnimationFrame(() => {
+        input.style.width = "100%"
+        input.style.minWidth = "0"
+        input.style.maxWidth = "100%"
+        input.style.fontSize = "16px"
+      })
+    }
   })
 }
+
+const temporalInputClass = "w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
 
 export default function VillaDetailClient({ villa, relatedVillas }: { villa: Villa; relatedVillas: RelatedVilla[] }) {
   const router = useRouter()
@@ -483,7 +504,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             value={checkInDate}
                             onChange={(e) => setCheckInDate(e.target.value)}
                             placeholder="Start date*"
-                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                            className={temporalInputClass}
                           />
                         </div>
                         <div className="relative">
@@ -495,7 +516,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             value={checkInTime}
                             onChange={(e) => setCheckInTime(e.target.value)}
                             placeholder="Time*"
-                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                            className={temporalInputClass}
                           />
                         </div>
                       </div>
@@ -512,7 +533,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             value={checkOutDate}
                             onChange={(e) => setCheckOutDate(e.target.value)}
                             placeholder="End date*"
-                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                            className={temporalInputClass}
                           />
                         </div>
                         <div className="relative">
@@ -524,7 +545,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             value={checkOutTime}
                             onChange={(e) => setCheckOutTime(e.target.value)}
                             placeholder="Time*"
-                            className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                            className={temporalInputClass}
                           />
                         </div>
                       </div>
@@ -1013,7 +1034,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={checkInDate}
                       onChange={(e) => setCheckInDate(e.target.value)}
                       placeholder="Start date*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className={temporalInputClass}
                     />
                     <input
                       type={checkInTime ? "time" : "text"}
@@ -1023,7 +1044,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={checkInTime}
                       onChange={(e) => setCheckInTime(e.target.value)}
                       placeholder="Time*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className={temporalInputClass}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -1036,7 +1057,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={checkOutDate}
                       onChange={(e) => setCheckOutDate(e.target.value)}
                       placeholder="End date*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className={temporalInputClass}
                     />
                     <input
                       type={checkOutTime ? "time" : "text"}
@@ -1046,7 +1067,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={checkOutTime}
                       onChange={(e) => setCheckOutTime(e.target.value)}
                       placeholder="Time*"
-                      className="w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+                      className={temporalInputClass}
                     />
                   </div>
                 </div>
