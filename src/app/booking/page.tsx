@@ -82,15 +82,20 @@ function calcCarPricing(
   driverDays: number,
   needDriver: boolean
 ) {
+  const defaultDeposit = 2000
+  const reducedDeposit = 500
   const subtotal = pricePerDay * days
   const discountPercent = getDiscount(days)
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const driverTotal = needDriver ? driverDays * driverHours * 45 : 0
   const preTax = subtotal - discountAmount + driverTotal
   const tax = Math.round(preTax * 0.085)
-  const securityDeposit = Math.round(pricePerDay * 2)
+  const driverForAllDays = needDriver && days > 0 && driverDays === days
+  const securityDeposit = driverForAllDays ? reducedDeposit : defaultDeposit
   const total = preTax + tax + securityDeposit
-  return { subtotal, discountPercent, discountAmount, driverTotal, tax, securityDeposit, total }
+  const payNow = securityDeposit
+  const dueAtPickup = Math.max(0, total - payNow)
+  return { subtotal, discountPercent, discountAmount, driverTotal, tax, securityDeposit, payNow, dueAtPickup, total }
 }
 
 function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean) {
@@ -739,6 +744,10 @@ function ReservationContent() {
                 actualDriverDays={actualDriverDays}
                 driverLicenseUrl={driverLicenseUrl}
                 insuranceUrl={insuranceUrl}
+                firstName={firstName}
+                lastName={lastName}
+                email={email}
+                phone={phone}
                 session={session}
               />
             )}
@@ -1603,12 +1612,14 @@ function CarSummaryCard({
   car, startDate, endDate, startTime, endTime, days, pricing,
   needDriver, driverHours, actualDriverDays,
   driverLicenseUrl, insuranceUrl,
+  firstName, lastName, email, phone,
   session,
 }: {
   car: CarData; startDate: string; endDate: string; startTime: string; endTime: string
   days: number; pricing: ReturnType<typeof calcCarPricing> | null
   needDriver: boolean; driverHours: number; actualDriverDays: number
   driverLicenseUrl: string; insuranceUrl: string
+  firstName: string; lastName: string; email: string; phone: string
   session: any
 }) {
   const formatDate = (d: string, t: string) => {
@@ -1655,8 +1666,9 @@ function CarSummaryCard({
       </div>
 
       <div className="text-xs text-mist-500 space-y-0.5 border-t border-mist-100 pt-3">
-        <p><span className="text-mist-700 font-medium">Full name:</span> {session?.user?.name || "—"}</p>
-        <p><span className="text-mist-700 font-medium">Email:</span> {session?.user?.email || "—"}</p>
+        <p><span className="text-mist-700 font-medium">Full name:</span> {(firstName || lastName) ? `${firstName} ${lastName}`.trim() : (session?.user?.name || "—")}</p>
+        <p><span className="text-mist-700 font-medium">Email:</span> {email || session?.user?.email || "—"}</p>
+        <p><span className="text-mist-700 font-medium">Phone number:</span> {phone || "—"}</p>
         <p><span className="text-mist-700 font-medium">Driver License:</span> {getUploadedFileName(driverLicenseUrl)}</p>
         <p><span className="text-mist-700 font-medium">Insurance:</span> {getUploadedFileName(insuranceUrl)}</p>
       </div>
@@ -1690,6 +1702,23 @@ function CarSummaryCard({
           <div className="flex justify-between text-mist-500">
             <span>Security Deposit <span className="text-xs">(Fully Refundable)</span></span>
             <span className="text-mist-900">${pricing.securityDeposit.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Delivery Fee</span>
+            <span className="text-mist-900">TBD</span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Return Fee</span>
+            <span className="text-mist-900">TBD</span>
+          </div>
+          <hr className="border-mist-100" />
+          <div className="flex justify-between text-mist-500">
+            <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
+            <span className="text-blue-600">${pricing.payNow.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Due at Pickup</span>
+            <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
           </div>
           <hr className="border-mist-100" />
           <div className="flex justify-between font-bold text-mist-900 text-base pt-1">
