@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowUpRight, ChevronLeft, ChevronRight, Heart, BedDouble, Users, Maximize2 } from "lucide-react"
 import Banner from "@/components/ui/Banner"
 import Rentals from "@/components/home/Rentals"
@@ -304,6 +305,7 @@ function BigImageSlider() {
 /*  FIFA Page                                                          */
 /* ================================================================== */
 function FifaContent() {
+  const router = useRouter()
   return (
     <div className="bg-white">
       {/* Hero */}
@@ -314,7 +316,9 @@ function FifaContent() {
         image="/fifa.png"
         searchBar={{
           placeholder: "Search cars, villas, or events...",
-          onSearch: () => {},
+          onSearch: (value: string) => {
+            if (value.trim()) router.push(`/cars?search=${encodeURIComponent(value.trim())}`)
+          },
         }}
       />
 

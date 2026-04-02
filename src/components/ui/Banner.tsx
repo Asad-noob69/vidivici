@@ -50,13 +50,15 @@ function DefaultSearchBar({
           boxShadow: "0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2)",
         }}
       >
-        <svg
-          width="20" height="20" viewBox="0 0 20 20" fill="none"
-          className="shrink-0 text-white/70 2xl:w-10 2xl:h-10"
-        >
-          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <button type="submit" className="shrink-0 text-white/70 hover:text-white transition-colors">
+          <svg
+            width="20" height="20" viewBox="0 0 20 20" fill="none"
+            className="2xl:w-10 2xl:h-10"
+          >
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
         <input
           name="search"
           type="text"
