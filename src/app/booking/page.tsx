@@ -147,7 +147,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
   })
 }
 
-const temporalInputClass = "w-full max-w-full min-w-0 box-border border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
+const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
 
 function getUploadedFileName(url: string) {
   if (!url) return "—"

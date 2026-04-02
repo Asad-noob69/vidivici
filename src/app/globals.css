@@ -38,3 +38,25 @@ h2 {
   animation: scrollXReverse 25s linear infinite;
   width: max-content;
 }
+
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .ios-temporal-input[type="date"],
+    .ios-temporal-input[type="time"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+      font-size: 16px;
+      line-height: 1.25rem;
+    }
+
+    .ios-temporal-input[type="date"]::-webkit-date-and-time-value,
+    .ios-temporal-input[type="time"]::-webkit-date-and-time-value {
+      text-align: left;
+      min-height: 1.25rem;
+    }
+  }
+}
