@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
-import { Search, Car, Home, PartyPopper, Plus, Globe, UserPlus, Eye } from "lucide-react"
+import { Search, Car, Home, PartyPopper, Plus, Globe, UserPlus } from "lucide-react"
 
 interface Booking {
   id: string
@@ -58,6 +59,7 @@ const docColors: Record<string, string> = {
 }
 
 export default function AdminBookingsPage() {
+  const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -146,12 +148,11 @@ export default function AdminBookingsPage() {
                   <th className="px-4 py-3">Docs</th>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Source</th>
-                  <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(b => (
-                  <tr key={b.id} className="border-b border-mist-100 hover:bg-mist-50/50 transition-colors">
+                  <tr key={b.id} onClick={() => router.push(`/admin/bookings/${b.id}`)} className="border-b border-mist-100 hover:bg-mist-50/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3.5 text-sm font-medium text-mist-900">{(b.bookingNumber || b.id).slice(0, 8)}</td>
                     <td className="px-4 py-3.5">
                       <p className="text-sm text-mist-900 font-medium">{b.customerName || "N/A"}</p>
@@ -173,9 +174,6 @@ export default function AdminBookingsPage() {
                         {b.source === "manual" ? <><UserPlus size={11} /> Manual</> : <><Globe size={11} /> Website</>}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <Link href={`/admin/bookings/${b.id}`} className="inline-flex items-center gap-1 text-xs text-mist-600 hover:text-black font-medium"><Eye size={13} /> View</Link>
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -193,12 +191,11 @@ export default function AdminBookingsPage() {
                   <th className="px-4 py-3">Total</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Source</th>
-                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(b => (
-                  <tr key={b.id} className="border-b border-mist-100 hover:bg-mist-50/50 transition-colors">
+                  <tr key={b.id} onClick={() => router.push(`/admin/bookings/${b.id}`)} className="border-b border-mist-100 hover:bg-mist-50/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3">
                       <p className="text-sm text-mist-900 font-medium">{b.customerName || "N/A"}</p>
                       <p className="text-xs text-mist-400">{b.customerEmail}</p>
@@ -216,7 +213,6 @@ export default function AdminBookingsPage() {
                         {b.source === "manual" ? <><UserPlus size={10} /> Manual</> : <><Globe size={10} /> Website</>}
                       </span>
                     </td>
-                    <td className="px-4 py-3"><Link href={`/admin/bookings/${b.id}`} className="text-xs text-mist-600 hover:text-black font-medium">View</Link></td>
                   </tr>
                 ))}
               </tbody>
