@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, ChevronDown, BedDouble, Users, Bath, Maximize2, MapPin, Plane, ChefHat, Shield, CreditCard, Sparkles, Percent, Bed, Tag, Share2, Bookmark } from "lucide-react"
@@ -9,6 +9,7 @@ import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
 import HomeVillaSection from "@/components/home/Villa"
+import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
 
 interface VillaImage {
   url: string
@@ -91,13 +92,27 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
   })
 }
 
-const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300"
+const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent"
+
+function getTemporalInputClass(desktop = false) {
+  return `${temporalInputClass} ${desktop ? "2xl:px-5 2xl:text-lg" : ""} h-12 2xl:h-14 pt-6 pb-2 2xl:pt-8 2xl:pb-3 peer`
+}
+
+function getTemporalTopLabelClass(hasValue: boolean, desktop = false) {
+  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1.5 ${desktop ? "2xl:top-2" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
+}
+
+function getTemporalCenterLabelClass(hasValue: boolean, desktop = false) {
+  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1/2 -translate-y-1/2 text-sm ${desktop ? "2xl:text-lg" : ""} text-mist-300 transition-opacity duration-150 ${hasValue ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`
+}
 
 export default function VillaDetailClient({ villa, relatedVillas }: { villa: Villa; relatedVillas: RelatedVilla[] }) {
   const router = useRouter()
   const [currentImage, setCurrentImage] = useState(0)
+  const thumbsRef = useRef<HTMLDivElement | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>("Stay")
   const [showMobileBooking, setShowMobileBooking] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const [checkInDate, setCheckInDate] = useState("")
   const [checkInTime, setCheckInTime] = useState("")
   const [checkOutDate, setCheckOutDate] = useState("")
@@ -115,6 +130,16 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
   const [eventSuccess, setEventSuccess] = useState(false)
   const [productionSubmitting, setProductionSubmitting] = useState(false)
   const [productionSuccess, setProductionSuccess] = useState(false)
+
+  const handleCheckInDateChange = (value: string) => {
+    setCheckInDate(value)
+    if (!value) setCheckInTime("")
+  }
+
+  const handleCheckOutDateChange = (value: string) => {
+    setCheckOutDate(value)
+    if (!value) setCheckOutTime("")
+  }
 
   const handleEventSubmit = async () => {
     if (!eventForm.firstName || !eventForm.email || !eventForm.eventType || !eventForm.eventDate) {
@@ -200,6 +225,12 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
 
   const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length)
   const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
+  const scrollThumbs = (direction: "left" | "right") => {
+    const node = thumbsRef.current
+    if (!node) return
+    const step = Math.max(140, Math.floor(node.clientWidth * 0.7))
+    node.scrollBy({ left: direction === "left" ? -step : step, behavior: "smooth" })
+  }
 
   // Calculate days
   const days = checkInDate && checkOutDate ? Math.max(1, Math.ceil((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24))) : 1
@@ -285,23 +316,35 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
               {/* Thumbnails */}
               {images.length > 1 && (
                 <div className="relative mb-8">
-                  <div className="flex gap-2 overflow-x-auto pb-1">
+                  <div
+                    ref={thumbsRef}
+                    className="mx-7 flex gap-2 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                  >
                     {images.map((img, i) => (
                       <button
                         key={i}
                         onClick={() => setCurrentImage(i)}
-                        className={`flex-shrink-0 w-[118px] h-[80px] 2xl:w-[160px] 2xl:h-[110px] rounded-xl overflow-hidden transition-all ${i === currentImage ? "ring-2 ring-mist-800" : "opacity-70 hover:opacity-100"
-                          }`}
+                        className={`w-[118px] h-[80px] 2xl:w-[160px] 2xl:h-[110px] rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${i === currentImage ? "border-transparent" : "border-mist-200 hover:border-mist-400"}`}
                       >
                         <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
                   {/* Thumbnail row arrows */}
-                  <button onClick={prevImage} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-7 h-7 bg-white border border-mist-200 rounded-full flex items-center justify-center shadow-sm hover:bg-mist-50 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => scrollThumbs("left")}
+                    className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full border border-mist-200 bg-white p-1.5 text-mist-600 shadow-sm transition-colors hover:bg-mist-50"
+                    aria-label="Scroll thumbnails left"
+                  >
                     <ChevronLeft size={14} className="text-mist-600" />
                   </button>
-                  <button onClick={nextImage} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-7 h-7 bg-white border border-mist-200 rounded-full flex items-center justify-center shadow-sm hover:bg-mist-50 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => scrollThumbs("right")}
+                    className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full border border-mist-200 bg-white p-1.5 text-mist-600 shadow-sm transition-colors hover:bg-mist-50"
+                    aria-label="Scroll thumbnails right"
+                  >
                     <ChevronRight size={14} className="text-mist-600" />
                   </button>
                 </div>
@@ -555,18 +598,12 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                     <div className="space-y-3 2xl:space-y-4 border-t border-mist-300 pt-6 2xl:pt-8">
                       {/* Check-in date + time */}
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="relative">
-                          <input
-                            type={checkInDate ? "date" : "text"}
-                            onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                            onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                            onBlur={(e) => { if (!checkInDate) e.currentTarget.type = "text" }}
-                            value={checkInDate}
-                            onChange={(e) => setCheckInDate(e.target.value)}
-                            placeholder="Start date*"
-                            className={temporalInputClass}
-                          />
-                        </div>
+                        <DateTriggerField
+                          label="Check-in*"
+                          value={checkInDate}
+                          onClick={() => setCalendarOpen(true)}
+                          desktopLabel
+                        />
                         <div className="relative">
                           <input
                             type={checkInTime ? "time" : "text"}
@@ -575,27 +612,23 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             onBlur={(e) => { if (!checkInTime) e.currentTarget.type = "text" }}
                             value={checkInTime}
                             onChange={(e) => setCheckInTime(e.target.value)}
-                            placeholder="Time*"
-                            className={temporalInputClass}
+                            placeholder=" "
+                            disabled={!checkInDate}
+                            className={getTemporalInputClass(true)}
                           />
+                          <span className={getTemporalTopLabelClass(Boolean(checkInTime), true)}>Time*</span>
+                          <span className={getTemporalCenterLabelClass(Boolean(checkInTime), true)}>Time*</span>
                         </div>
                       </div>
 
                       {/* Check-out date + time */}
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="relative">
-                          <input
-                            type={checkOutDate ? "date" : "text"}
-                            onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                            onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                            onBlur={(e) => { if (!checkOutDate) e.currentTarget.type = "text" }}
-                            min={checkInDate}
-                            value={checkOutDate}
-                            onChange={(e) => setCheckOutDate(e.target.value)}
-                            placeholder="End date*"
-                            className={temporalInputClass}
-                          />
-                        </div>
+                        <DateTriggerField
+                          label="Check-out*"
+                          value={checkOutDate}
+                          onClick={() => setCalendarOpen(true)}
+                          desktopLabel
+                        />
                         <div className="relative">
                           <input
                             type={checkOutTime ? "time" : "text"}
@@ -604,9 +637,12 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                             onBlur={(e) => { if (!checkOutTime) e.currentTarget.type = "text" }}
                             value={checkOutTime}
                             onChange={(e) => setCheckOutTime(e.target.value)}
-                            placeholder="Time*"
-                            className={temporalInputClass}
+                            placeholder=" "
+                            disabled={!checkOutDate}
+                            className={getTemporalInputClass(true)}
                           />
+                          <span className={getTemporalTopLabelClass(Boolean(checkOutTime), true)}>Time*</span>
+                          <span className={getTemporalCenterLabelClass(Boolean(checkOutTime), true)}>Time*</span>
                         </div>
                       </div>
                     </div>
@@ -1072,6 +1108,18 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
         </div>
       </div>
 
+      {/* Date Range Calendar Popup */}
+      <DateRangeCalendarPopup
+        open={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        startDate={checkInDate}
+        endDate={checkOutDate}
+        onStartDateChange={handleCheckInDateChange}
+        onEndDateChange={handleCheckOutDateChange}
+        startLabel="check-in"
+        endLabel="check-out"
+      />
+
       {/* Mobile Full-Screen Booking Popup */}
       {showMobileBooking && (
         <div className="lg:hidden fixed inset-0 z-50 bg-white overflow-y-auto">
@@ -1112,15 +1160,10 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
 
                 <div className="space-y-3 border-t border-mist-300 pt-6">
                   <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type={checkInDate ? "date" : "text"}
-                      onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onBlur={(e) => { if (!checkInDate) e.currentTarget.type = "text" }}
+                    <DateTriggerField
+                      label="Check-in*"
                       value={checkInDate}
-                      onChange={(e) => setCheckInDate(e.target.value)}
-                      placeholder="Start date*"
-                      className={temporalInputClass}
+                      onClick={() => setCalendarOpen(true)}
                     />
                     <div className="relative">
                       <input
@@ -1130,22 +1173,19 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                         onBlur={(e) => { if (!checkInTime) e.currentTarget.type = "text" }}
                         value={checkInTime}
                         onChange={(e) => setCheckInTime(e.target.value)}
-                        placeholder="Time*"
-                        className={temporalInputClass}
+                        placeholder=" "
+                        disabled={!checkInDate}
+                        className={getTemporalInputClass()}
                       />
+                      <span className={getTemporalTopLabelClass(Boolean(checkInTime))}>Time*</span>
+                      <span className={getTemporalCenterLabelClass(Boolean(checkInTime))}>Time*</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type={checkOutDate ? "date" : "text"}
-                      onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onBlur={(e) => { if (!checkOutDate) e.currentTarget.type = "text" }}
-                      min={checkInDate}
+                    <DateTriggerField
+                      label="Check-out*"
                       value={checkOutDate}
-                      onChange={(e) => setCheckOutDate(e.target.value)}
-                      placeholder="End date*"
-                      className={temporalInputClass}
+                      onClick={() => setCalendarOpen(true)}
                     />
                     <div className="relative">
                       <input
@@ -1155,9 +1195,12 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                         onBlur={(e) => { if (!checkOutTime) e.currentTarget.type = "text" }}
                         value={checkOutTime}
                         onChange={(e) => setCheckOutTime(e.target.value)}
-                        placeholder="Time*"
-                        className={temporalInputClass}
+                        placeholder=" "
+                        disabled={!checkOutDate}
+                        className={getTemporalInputClass()}
                       />
+                      <span className={getTemporalTopLabelClass(Boolean(checkOutTime))}>Time*</span>
+                      <span className={getTemporalCenterLabelClass(Boolean(checkOutTime))}>Time*</span>
                     </div>
                   </div>
                 </div>

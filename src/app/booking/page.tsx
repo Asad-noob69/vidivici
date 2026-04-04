@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import {
+  ChevronLeft,
   ChevronDown,
   Minus,
   Plus,
@@ -13,6 +14,8 @@ import {
   MapPin,
 } from "lucide-react"
 import PayPalBookingButton from "@/components/booking/PayPalBookingButton"
+import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
+import TimeSelectDropdown from "@/components/ui/TimeSelectDropdown"
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -155,6 +158,46 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
 
 const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:border-neutral-400 focus:outline-none"
 
+const TIME_OPTIONS = [
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "12:30", label: "12:30 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "13:30", label: "1:30 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "17:30", label: "5:30 PM" },
+  { value: "18:00", label: "6:00 PM" },
+  { value: "18:30", label: "6:30 PM" },
+  { value: "19:00", label: "7:00 PM" },
+  { value: "19:30", label: "7:30 PM" },
+  { value: "20:00", label: "8:00 PM" },
+  { value: "20:30", label: "8:30 PM" },
+  { value: "21:00", label: "9:00 PM" },
+]
+
+function getTemporalSelectClass() {
+  return "w-full appearance-none bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 h-12 pt-6 pb-2 peer"
+}
+
+function getTemporalTopLabelClass(hasValue: boolean) {
+  return `pointer-events-none absolute left-3 top-1.5 text-[10px] text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
+}
+
+function getTemporalCenterLabelClass(hasValue: boolean) {
+  return `pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-mist-300 transition-opacity duration-150 ${hasValue ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`
+}
+
 function getUploadedFileName(url: string) {
   if (!url) return "—"
   const clean = url.split("?")[0]
@@ -251,6 +294,7 @@ function ReservationContent() {
   const [deliveryAddress, setDeliveryAddress] = useState("")
   const [returnAddress, setReturnAddress] = useState("")
   const [isOneWay, setIsOneWay] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("paypal")
 
   /* ---- Pay step state (removed - now using PayPal) ---- */
 
@@ -479,6 +523,19 @@ function ReservationContent() {
   return (
     <div className="bg-white min-h-screen pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {step > 1 && (
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : prev))}
+              className="inline-flex items-center gap-2 rounded-md border border-mist-300 bg-white px-5 py-2 text-sm font-medium cursor-pointer text-mist-600 transition-colors hover:border-mist-400 hover:bg-mist-50 focus:outline-none focus:ring-2 focus:ring-mist-300"
+            >
+              <ChevronLeft size={18} />
+              Back
+            </button>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex gap-0 mb-8 border border-mist-200 rounded-md overflow-hidden max-w-sm mx-auto">
           <button
@@ -654,75 +711,158 @@ function ReservationContent() {
             {step === 2 && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-mist-900">Complete Payment</h2>
-                <p className="text-xs text-mist-400 leading-relaxed">
-                  By placing this order, I agree to the{" "}
-                  <span className="text-blue-600 cursor-pointer">Terms & Conditions</span> &{" "}
-                  <span className="text-blue-600 cursor-pointer">Privacy Policy.</span>
-                </p>
-                <p className="text-xs text-mist-400 leading-relaxed">
-                  We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.
-                </p>
+                <div className="space-y-3">
+                  <div className="rounded-xl border border-mist-200 bg-mist-50 p-3 sm:p-4">
+                    <div className={`rounded-md border ${paymentMethod === "card" ? "border-blue-500" : "border-mist-200"}`}>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("card")}
+                        className={`w-full flex items-center justify-between rounded-md px-3 py-2.5 text-sm transition-colors ${paymentMethod === "card" ? "bg-blue-50 text-mist-900" : "bg-white text-mist-700 hover:bg-mist-50"}`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <span className={`h-4 w-4 rounded-full border-2 ${paymentMethod === "card" ? "border-blue-600" : "border-mist-300"} flex items-center justify-center`}>
+                            {paymentMethod === "card" && <span className="h-2 w-2 rounded-full bg-blue-600" />}
+                          </span>
+                          Credit card
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-mist-400">
+                          <span className="rounded bg-white border border-mist-200 px-1.5 py-0.5 text-blue-700">Visa</span>
+                          <span className="rounded bg-white border border-mist-200 px-1.5 py-0.5 text-cyan-700">Amex</span>
+                          <span className="rounded bg-white border border-mist-200 px-1.5 py-0.5 text-orange-700">MC</span>
+                        </span>
+                      </button>
 
-                {mode === "car" && selectedCar && (
-                  <PayPalBookingButton
-                    bookingType="car"
-                    bookingData={{
-                      carId: selectedCar.id,
-                      startDate,
-                      endDate,
-                      pickupLocation: selectedCar.location,
-                      dropoffLocation: selectedCar.location,
-                      deliveryType,
-                      deliveryAddress: deliveryType === "delivery" ? deliveryAddress : undefined,
-                      returnAddress: deliveryType === "delivery" ? (isOneWay ? returnAddress : deliveryAddress) : undefined,
-                      isOneWay,
-                      notes: needDriver ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days` : undefined,
-                    }}
-                    totalPrice={carPricing.total}
-                    onSuccess={(id) => {
-                      setBookingId(id.slice(-6).toUpperCase())
-                      setStep(3)
-                    }}
-                    onError={(msg) => alert(msg)}
-                  />
-                )}
+                      {paymentMethod === "card" && (
+                        <div className="space-y-3 border-t border-mist-200 bg-white p-3 sm:p-4">
+                          <div>
+                            <label className="mb-1 block text-xs text-mist-500">Name on Card</label>
+                            <input type="text" disabled placeholder="Name on card" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs text-mist-500">Card Number</label>
+                            <input type="text" disabled placeholder="1234 1234 1234 1234" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="mb-1 block text-xs text-mist-500">Expiration Date</label>
+                              <input type="text" disabled placeholder="MM/YY" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs text-mist-500">Security Code</label>
+                              <input type="text" disabled placeholder="CVV" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs text-mist-500">Billing Address</label>
+                            <input type="text" disabled placeholder="Enter billing address" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="mb-1 block text-xs text-mist-500">Country</label>
+                              <input type="text" disabled placeholder="United States" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs text-mist-500">ZIP Code</label>
+                              <input type="text" disabled placeholder="ZIP code" className="w-full rounded-md border border-mist-200 bg-mist-50 px-3 py-2.5 text-sm text-mist-400 placeholder:text-mist-300" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-                {mode === "villa" && selectedVilla && (
-                  <PayPalBookingButton
-                    bookingType="villa"
-                    bookingData={{
-                      villaId: selectedVilla.id,
-                      checkIn: startDate,
-                      checkOut: endDate,
-                      guests: guestCount,
-                      notes: [
-                        `Check-in time: ${startTime || "N/A"}`,
-                        `Check-out time: ${endTime || "N/A"}`,
-                        `Customer: ${firstName || ""} ${lastName || ""}`.trim(),
-                        `Email: ${email || "N/A"}`,
-                        `Phone: ${phone || "N/A"}`,
-                        [
-                          villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null,
-                          villaPrivateChef ? "Private Chef" : null,
-                          villaSecurityService ? "Security Service" : null,
-                        ].filter(Boolean).length
-                          ? `Add-ons: ${[villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null, villaPrivateChef ? "Private Chef" : null, villaSecurityService ? "Security Service" : null].filter(Boolean).join(", ")}`
-                          : "Add-ons: None",
-                      ].join("\n"),
-                    }}
-                    totalPrice={villaPricing.total}
-                    onSuccess={(id) => {
-                      setBookingId(id.slice(-6).toUpperCase())
-                      setStep(3)
-                    }}
-                    onError={(msg) => alert(msg)}
-                  />
-                )}
+                    <div className="mt-3 rounded-md border border-mist-200 bg-white">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("paypal")}
+                        className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm transition-colors ${paymentMethod === "paypal" ? "bg-blue-50 text-mist-900" : "text-mist-700 hover:bg-mist-50"}`}
+                      >
+                        <span className={`h-4 w-4 rounded-full border ${paymentMethod === "paypal" ? "border-blue-600" : "border-mist-300"} flex items-center justify-center`}>
+                          {paymentMethod === "paypal" && <span className="h-2 w-2 rounded-full bg-blue-600" />}
+                        </span>
+                        PayPal
+                      </button>
+                    </div>
+                  </div>
 
-                <button onClick={() => setStep(1)}
-                  className="w-full border border-mist-200 text-mist-700 py-3 rounded-md font-semibold text-sm hover:bg-mist-50 transition-colors">
-                  Back
-                </button>
+                  <p className="text-xs text-mist-400 leading-relaxed">
+                    By placing this order, I agree to the{" "}
+                    <Link href="/terms" className="text-blue-600 hover:underline">Terms & Conditions</Link> &{" "}
+                    <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
+                  </p>
+                  <p className="text-xs text-mist-400 leading-relaxed">
+                    {paymentMethod === "card"
+                      ? "We will temporarily reserve the funds on your credit card with a pre-authorization. Your card will only be charged after the reservation is confirmed by our team and the contract is signed."
+                      : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed."}
+                  </p>
+                  <p className="text-xs text-mist-500">Safe and Secure SSL Encrypted</p>
+
+                  {paymentMethod === "paypal" && mode === "car" && selectedCar && (
+                    <PayPalBookingButton
+                      bookingType="car"
+                      bookingData={{
+                        carId: selectedCar.id,
+                        startDate,
+                        endDate,
+                        pickupLocation: selectedCar.location,
+                        dropoffLocation: selectedCar.location,
+                        deliveryType,
+                        deliveryAddress: deliveryType === "delivery" ? deliveryAddress : undefined,
+                        returnAddress: deliveryType === "delivery" ? (isOneWay ? returnAddress : deliveryAddress) : undefined,
+                        isOneWay,
+                        notes: needDriver ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days` : undefined,
+                      }}
+                      totalPrice={carPricing.total}
+                      onSuccess={(id) => {
+                        setBookingId(id.slice(-6).toUpperCase())
+                        setStep(3)
+                      }}
+                      onError={(msg) => alert(msg)}
+                    />
+                  )}
+
+                  {paymentMethod === "paypal" && mode === "villa" && selectedVilla && (
+                    <PayPalBookingButton
+                      bookingType="villa"
+                      bookingData={{
+                        villaId: selectedVilla.id,
+                        checkIn: startDate,
+                        checkOut: endDate,
+                        guests: guestCount,
+                        notes: [
+                          `Check-in time: ${startTime || "N/A"}`,
+                          `Check-out time: ${endTime || "N/A"}`,
+                          `Customer: ${firstName || ""} ${lastName || ""}`.trim(),
+                          `Email: ${email || "N/A"}`,
+                          `Phone: ${phone || "N/A"}`,
+                          [
+                            villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null,
+                            villaPrivateChef ? "Private Chef" : null,
+                            villaSecurityService ? "Security Service" : null,
+                          ].filter(Boolean).length
+                            ? `Add-ons: ${[villaAirportTransfer ? "Airport Transfer (Luxury SUV)" : null, villaPrivateChef ? "Private Chef" : null, villaSecurityService ? "Security Service" : null].filter(Boolean).join(", ")}`
+                            : "Add-ons: None",
+                        ].join("\n"),
+                      }}
+                      totalPrice={villaPricing.total}
+                      onSuccess={(id) => {
+                        setBookingId(id.slice(-6).toUpperCase())
+                        setStep(3)
+                      }}
+                      onError={(msg) => alert(msg)}
+                    />
+                  )}
+
+                  {paymentMethod === "card" && (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full rounded-md bg-mist-200 py-3 text-sm font-semibold text-mist-500 cursor-not-allowed"
+                    >
+                      Place Order
+                    </button>
+                  )}
+                </div>
+
               </div>
             )}
 
@@ -852,6 +992,7 @@ function CarSelectStep({
   autoScrollToCustomerInfo: boolean
 }) {
   const [showOneWayInfo, setShowOneWayInfo] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const customerInfoRef = useRef<HTMLDivElement | null>(null)
   const didAutoScrollRef = useRef(false)
 
@@ -886,6 +1027,16 @@ function CarSelectStep({
     && endTime
     && days > 0
   )
+
+  const handleStartDateChange = (value: string) => {
+    setStartDate(value)
+    if (!value) setStartTime("")
+  }
+
+  const handleEndDateChange = (value: string) => {
+    setEndDate(value)
+    if (!value) setEndTime("")
+  }
 
   return (
     <div className="space-y-8">
@@ -936,63 +1087,51 @@ function CarSelectStep({
         <h2 className="text-lg font-semibold text-mist-900 mb-4">When & Where</h2>
 
         <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Start Date</label>
-              <input
-                type={startDate ? "date" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onBlur={(e) => { if (!startDate) e.currentTarget.type = "text" }}
-                min={today}
+              <DateTriggerField
+                label="Start date*"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                placeholder="Start date*"
-                className={temporalInputClass} />
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Time</label>
-              <input
-                type={startTime ? "time" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                placeholder="Time*"
-                className={temporalInputClass}
+                onClick={() => setCalendarOpen(true)}
               />
             </div>
+            <TimeSelectDropdown
+              label="Time*"
+              value={startTime}
+              onChange={setStartTime}
+              options={TIME_OPTIONS}
+              disabled={!startDate}
+            />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-mist-500 block mb-1.5">End Date</label>
-              <input
-                type={endDate ? "date" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onBlur={(e) => { if (!endDate) e.currentTarget.type = "text" }}
-                min={startDate || today}
+              <DateTriggerField
+                label="End date*"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                placeholder="End date*"
-                className={temporalInputClass} />
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Time</label>
-              <input
-                type={endTime ? "time" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onBlur={(e) => { if (!endTime) e.currentTarget.type = "text" }}
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                placeholder="Time*"
-                className={temporalInputClass}
+                onClick={() => setCalendarOpen(true)}
               />
             </div>
+            <TimeSelectDropdown
+              label="Time*"
+              value={endTime}
+              onChange={setEndTime}
+              options={TIME_OPTIONS}
+              disabled={!endDate}
+            />
           </div>
         </div>
+
+        <DateRangeCalendarPopup
+          open={calendarOpen}
+          onClose={() => setCalendarOpen(false)}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={handleStartDateChange}
+          onEndDateChange={handleEndDateChange}
+          minDate={today}
+          startLabel="start date"
+          endLabel="end date"
+        />
       </div>
 
       {/* Need a Driver */}
@@ -1071,7 +1210,7 @@ function CarSelectStep({
               Delivery
             </button>
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={isOneWay} onChange={(e) => setIsOneWay(e.target.checked)}
                 className="w-4 h-4 rounded border-mist-300 text-blue-600 focus:ring-blue-500" />
@@ -1155,7 +1294,7 @@ function CarSelectStep({
 
         <h2 className="text-lg font-semibold text-mist-900 mb-4">Customer Info</h2>
         <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-mist-500 block mb-1.5">First Name <span className="text-red-400">*</span></label>
               <input type="text" placeholder="Enter first name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
@@ -1167,7 +1306,7 @@ function CarSelectStep({
                 className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-mist-500 block mb-1.5">Email Address</label>
               <input type="email" placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)}
@@ -1179,7 +1318,7 @@ function CarSelectStep({
                 className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div>
               <label className="text-xs text-mist-500 block mb-1.5">Drivers License</label>
               <input
@@ -1287,6 +1426,7 @@ function VillaSelectStep({
   setVillaIdDocumentName: (v: string) => void
 }) {
   const locations = [...new Set(villaOptions.map((v) => v.location))].sort()
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const [locationFilter, setLocationFilter] = useState("")
   const customerInfoRef = useRef<HTMLDivElement | null>(null)
   const didAutoScrollRef = useRef(false)
@@ -1300,6 +1440,16 @@ function VillaSelectStep({
     && guestCount > 0
     && days > 0
   )
+
+  const handleStartDateChange = (value: string) => {
+    setStartDate(value)
+    if (!value) setStartTime("")
+  }
+
+  const handleEndDateChange = (value: string) => {
+    setEndDate(value)
+    if (!value) setEndTime("")
+  }
 
   useEffect(() => {
     if (!autoScrollToCustomerInfo || !showCustomerInfo || didAutoScrollRef.current) return
@@ -1377,21 +1527,15 @@ function VillaSelectStep({
       <div>
         <h2 className="text-3xl font-semibold text-mist-900 mb-4">Stay Details</h2>
         <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div>
-              <input
-                type={startDate ? "date" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onBlur={(e) => { if (!startDate) e.currentTarget.type = "text" }}
-                min={today}
+              <DateTriggerField
+                label="Check-in*"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                placeholder="Check-in"
-                className={temporalInputClass}
+                onClick={() => setCalendarOpen(true)}
               />
             </div>
-            <div>
+            <div className="relative">
               <input
                 type={startTime ? "time" : "text"}
                 onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
@@ -1399,27 +1543,23 @@ function VillaSelectStep({
                 onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                placeholder="Time*"
-                className={temporalInputClass}
+                disabled={!startDate}
+                className={`${getTemporalSelectClass()} disabled:opacity-60 disabled:cursor-not-allowed`}
               />
+              <span className={getTemporalTopLabelClass(Boolean(startTime))}>Time*</span>
+              <span className={getTemporalCenterLabelClass(Boolean(startTime))}>Time*</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div>
-              <input
-                type={endDate ? "date" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                onBlur={(e) => { if (!endDate) e.currentTarget.type = "text" }}
-                min={startDate || today}
+              <DateTriggerField
+                label="Check-out*"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                placeholder="Check-out"
-                className={temporalInputClass}
+                onClick={() => setCalendarOpen(true)}
               />
             </div>
-            <div>
+            <div className="relative">
               <input
                 type={endTime ? "time" : "text"}
                 onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
@@ -1427,12 +1567,26 @@ function VillaSelectStep({
                 onBlur={(e) => { if (!endTime) e.currentTarget.type = "text" }}
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                placeholder="Time*"
-                className={temporalInputClass}
+                disabled={!endDate}
+                className={`${getTemporalSelectClass()} disabled:opacity-60 disabled:cursor-not-allowed`}
               />
+              <span className={getTemporalTopLabelClass(Boolean(endTime))}>Time*</span>
+              <span className={getTemporalCenterLabelClass(Boolean(endTime))}>Time*</span>
             </div>
           </div>
         </div>
+
+        <DateRangeCalendarPopup
+          open={calendarOpen}
+          onClose={() => setCalendarOpen(false)}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={handleStartDateChange}
+          onEndDateChange={handleEndDateChange}
+          minDate={today}
+          startLabel="check-in"
+          endLabel="check-out"
+        />
       </div>
 
       {/* Guests */}
