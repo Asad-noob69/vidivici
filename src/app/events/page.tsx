@@ -336,9 +336,9 @@ function EventsContent() {
                 className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-72 2xl:h-72 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="pt-1">
-                <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services or Party Bus</h3>
+                <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services</h3>
                 <p className="text-base 2xl:text-xl text-mist-500 font-normal leading-relaxed">
-                  Professional bartenders to craft signature drinks for your guests.
+                 Professional bartenders to craft signature for drinks
                 </p>
               </div>
             </div>
@@ -353,7 +353,7 @@ function EventsContent() {
               <div className="pt-1">
                 <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Security & Bodyguards</h3>
                 <p className="text-base 2xl:text-xl text-mist-500 font-normal leading-relaxed">
-                  Hassle-free parking management for you and your guests.
+                  Hassle-free parking management for you.
                 </p>
               </div>
             </div>

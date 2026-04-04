@@ -38,28 +38,35 @@ function BrowseCard({
   isType: boolean; 
   onClick: (name: string) => void 
 }) {
+  const logoSizeClass = isType
+    ? "w-36 h-20 sm:w-36 sm:h-20 2xl:w-72 2xl:h-40"
+    : item.name === "Bentley" || item.name === "Aston Martin"
+      ? "w-20 h-20 sm:w-24 sm:h-24 2xl:w-44 2xl:h-44"
+      : "w-16 h-16 sm:w-18 sm:h-18 2xl:w-36 2xl:h-36";
+
+  const logoScaleClass = isType
+    ? "scale-[1.35] sm:scale-[1.35] 2xl:scale-150"
+    : item.name === "Bentley" || item.name === "Aston Martin"
+      ? "scale-[1.4] sm:scale-[1.3] 2xl:scale-140"
+      : "scale-125 sm:scale-110";
+
   return (
     <button
       onClick={() => onClick(item.name)}
       className="flex flex-col items-center justify-center gap-4 2xl:gap-10
-      py-7 px-10 2xl:py-16 2xl:px-28 my-4 rounded-2xl border shrink-0
+      py-5 px-7 sm:py-7 sm:px-10 2xl:py-16 2xl:px-28 my-4 rounded-2xl border shrink-0
       transition-all duration-300 border-mist-200 bg-white
       hover:border-black hover:scale-105 group shadow-sm hover:shadow-xl"
     >
-      <div className={`relative transition-transform duration-500 group-hover:scale-110
-        ${isType 
-          ? "w-18 h-9 sm:w-24 sm:h-12 2xl:w-56 2xl:h-28" 
-          : "w-12 h-12 sm:w-18 sm:h-18 2xl:w-36 2xl:h-36"
-        }`}
-      >
+      <div className={`relative transition-transform duration-500 group-hover:scale-110 ${logoSizeClass}`}>
         <Image
           src={item.logo}
           alt={item.name}
           fill
-          className="object-contain filter mistscale group-hover:mistscale-0 transition-all"
+          className={`object-contain filter mistscale group-hover:mistscale-0 transition-all duration-300 ${logoScaleClass}`}
         />
       </div>
-      
+
       <span className="text-[10px] sm:text-xs 2xl:text-2xl font-bold uppercase tracking-[0.2em] text-mist-400 group-hover:text-black">
         {item.name}
       </span>

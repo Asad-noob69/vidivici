@@ -411,6 +411,8 @@ import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
 import Contact from "@/components/home/Contact"
+import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
+import TimeSelectDropdown from "@/components/ui/TimeSelectDropdown"
 import { MapPin, Shield, Clock, DollarSign, Share2, Bookmark, Minus, Plus } from "lucide-react"
 import {
   AlertCircle,
@@ -506,6 +508,8 @@ const TIME_OPTIONS = [
   { value: "19:00", label: "7:00 PM" },
   { value: "19:30", label: "7:30 PM" },
   { value: "20:00", label: "8:00 PM" },
+  { value: "20:30", label: "8:30 PM" },
+  { value: "21:00", label: "9:00 PM" },
 ]
 
 function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time") {
@@ -553,6 +557,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const [driverAvailability, setDriverAvailability] = useState<"full" | "select">("select")
   const [driverDays, setDriverDays] = useState(1)
   const [showMobileBooking, setShowMobileBooking] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const [discountsOpen, setDiscountsOpen] = useState(true);
   const [showMore, setShowMore] = useState(false);
   const today = new Date().toISOString().split("T")[0]
@@ -601,6 +606,16 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
       }),
     })
     router.push(`/booking/${car.slug}?${params.toString()}`)
+  }
+
+  const handleStartDateChange = (value: string) => {
+    setStartDate(value)
+    if (!value) setStartTime("")
+  }
+
+  const handleEndDateChange = (value: string) => {
+    setEndDate(value)
+    if (!value) setEndTime("")
   }
 
   const fieldBox = "w-full px-5 py-4 bg-white border border-mist-200 rounded-lg text-mist-400 text-lg transition-all";
@@ -834,78 +849,38 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                   <div className="space-y-3 2xl:space-y-4 border-t border-mist-300 pt-6 2xl:pt-8">
                     {/* Start date + time */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="relative">
-                        {startDate && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-2 2xl:top-3 text-[10px] 2xl:text-xs text-mist-400">Start date*</span>
-                        )}
-                        <input
-                          type={startDate ? "date" : "text"}
-                          onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                          onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                          onBlur={(e) => { if (!startDate) e.currentTarget.type = "text" }}
-                          min={today}
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          placeholder="Start date*"
-                          className={`ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300 ${startDate ? "pt-6 2xl:pt-8 pb-2 2xl:pb-3" : "py-2.5 2xl:py-4"}`}
-                        />
-                      </div>
-                      <div className="relative">
-                        {startTime && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-2 2xl:top-3 text-[10px] 2xl:text-xs text-mist-400">Time*</span>
-                        )}
-                        <select
-                          value={startTime}
-                          onChange={(e) => setStartTime(e.target.value)}
-                          className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 2xl:px-5 text-sm 2xl:text-lg text-mist-900 focus:outline-none focus:border-mist-400 ${startTime ? "pt-6 2xl:pt-8 pb-2 2xl:pb-3" : "py-2.5 2xl:py-4"}`}
-                        >
-                          <option value="" />
-                          {TIME_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
-                        {!startTime && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-1/2 -translate-y-1/2 text-sm 2xl:text-lg text-mist-300">Time*</span>
-                        )}
-                      </div>
+                      <DateTriggerField
+                        label="Start date*"
+                        value={startDate}
+                        onClick={() => setCalendarOpen(true)}
+                        desktopLabel
+                      />
+                      <TimeSelectDropdown
+                        label="Time*"
+                        value={startTime}
+                        onChange={setStartTime}
+                        options={TIME_OPTIONS}
+                        disabled={!startDate}
+                        desktop
+                      />
                     </div>
 
                     {/* End date + time */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="relative">
-                        {endDate && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-2 2xl:top-3 text-[10px] 2xl:text-xs text-mist-400">End date*</span>
-                        )}
-                        <input
-                          type={endDate ? "date" : "text"}
-                          onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                          onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                          onBlur={(e) => { if (!endDate) e.currentTarget.type = "text" }}
-                          min={startDate || today}
-                          value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          placeholder="End date*"
-                          className={`ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 2xl:px-5 text-sm 2xl:text-lg text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300 ${endDate ? "pt-6 2xl:pt-8 pb-2 2xl:pb-3" : "py-2.5 2xl:py-4"}`}
-                        />
-                      </div>
-                      <div className="relative">
-                        {endTime && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-2 2xl:top-3 text-[10px] 2xl:text-xs text-mist-400">Time*</span>
-                        )}
-                        <select
-                          value={endTime}
-                          onChange={(e) => setEndTime(e.target.value)}
-                          className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 2xl:px-5 text-sm 2xl:text-lg text-mist-900 focus:outline-none focus:border-mist-400 ${endTime ? "pt-6 2xl:pt-8 pb-2 2xl:pb-3" : "py-2.5 2xl:py-4"}`}
-                        >
-                          <option value="" />
-                          {TIME_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
-                        {!endTime && (
-                          <span className="pointer-events-none absolute left-3 2xl:left-5 top-1/2 -translate-y-1/2 text-sm 2xl:text-lg text-mist-300">Time*</span>
-                        )}
-                      </div>
+                      <DateTriggerField
+                        label="End date*"
+                        value={endDate}
+                        onClick={() => setCalendarOpen(true)}
+                        desktopLabel
+                      />
+                      <TimeSelectDropdown
+                        label="Time*"
+                        value={endTime}
+                        onChange={setEndTime}
+                        options={TIME_OPTIONS}
+                        disabled={!endDate}
+                        desktop
+                      />
                     </div>
                   </div>
 
@@ -1099,6 +1074,19 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
         </div>
       </div>
 
+      {/* Date Range Calendar Popup */}
+      <DateRangeCalendarPopup
+        open={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={handleStartDateChange}
+        onEndDateChange={handleEndDateChange}
+        minDate={today}
+        startLabel="start date"
+        endLabel="end date"
+      />
+
       {/* Mobile Full-Screen Booking Popup */}
       {showMobileBooking && (
         <div className="lg:hidden fixed inset-0 z-50 bg-white overflow-y-auto">
@@ -1136,77 +1124,33 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
 
               <div className="space-y-3 border-t border-mist-300 pt-6">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="relative">
-                      {startDate && (
-                        <span className="pointer-events-none absolute left-3 top-2 text-[10px] text-mist-400">Start date*</span>
-                      )}
-                    <input
-                      type={startDate ? "date" : "text"}
-                      onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onBlur={(e) => { if (!startDate) e.currentTarget.type = "text" }}
-                      min={today}
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                        placeholder="Start date*"
-                        className={`ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300 ${startDate ? "pt-6 pb-2" : "py-2.5"}`}
-                    />
-                  </div>
-                  <div className="relative">
-                      {startTime && (
-                        <span className="pointer-events-none absolute left-3 top-2 text-[10px] text-mist-400">Time*</span>
-                      )}
-                    <select
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                        className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 ${startTime ? "pt-6 pb-2" : "py-2.5"}`}
-                    >
-                      <option value="" />
-                      {TIME_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                      ))}
-                    </select>
-                      {!startTime && (
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-mist-300">Time*</span>
-                      )}
-                  </div>
+                  <DateTriggerField
+                    label="Start date*"
+                    value={startDate}
+                    onClick={() => setCalendarOpen(true)}
+                  />
+                  <TimeSelectDropdown
+                    label="Time*"
+                    value={startTime}
+                    onChange={setStartTime}
+                    options={TIME_OPTIONS}
+                    disabled={!startDate}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="relative">
-                      {endDate && (
-                        <span className="pointer-events-none absolute left-3 top-2 text-[10px] text-mist-400">End date*</span>
-                      )}
-                    <input
-                      type={endDate ? "date" : "text"}
-                      onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onFocus={(e) => switchTemporalInputType(e.currentTarget, "date")}
-                      onBlur={(e) => { if (!endDate) e.currentTarget.type = "text" }}
-                      min={startDate || today}
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                        placeholder="End date*"
-                        className={`ios-temporal-input w-full bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-mist-300 ${endDate ? "pt-6 pb-2" : "py-2.5"}`}
-                    />
-                  </div>
-                  <div className="relative">
-                      {endTime && (
-                        <span className="pointer-events-none absolute left-3 top-2 text-[10px] text-mist-400">Time*</span>
-                      )}
-                    <select
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                        className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 ${endTime ? "pt-6 pb-2" : "py-2.5"}`}
-                    >
-                      <option value="" />
-                      {TIME_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                      ))}
-                    </select>
-                      {!endTime && (
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-mist-300">Time*</span>
-                      )}
-                  </div>
+                  <DateTriggerField
+                    label="End date*"
+                    value={endDate}
+                    onClick={() => setCalendarOpen(true)}
+                  />
+                  <TimeSelectDropdown
+                    label="Time*"
+                    value={endTime}
+                    onChange={setEndTime}
+                    options={TIME_OPTIONS}
+                    disabled={!endDate}
+                  />
                 </div>
               </div>
 
