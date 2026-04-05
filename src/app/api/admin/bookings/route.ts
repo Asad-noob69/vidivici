@@ -176,6 +176,18 @@ export async function POST(request: NextRequest) {
       include: { car: { include: { brand: true, images: { take: 1, orderBy: { isPrimary: 'desc' } } } }, user: { select: { name: true, email: true, phone: true } } },
     })
 
+    notifyAdmin(
+      `New Manual Booking #${booking.bookingNumber}`,
+      `<h2>New Manual Car Booking</h2>
+      <p><strong>Customer:</strong> ${customerName || customerEmail}</p>
+      <p><strong>Email:</strong> ${customerEmail}</p>
+      <p><strong>Car:</strong> ${booking.car.brand.name} ${booking.car.name}</p>
+      <p><strong>Dates:</strong> ${new Date(startDate).toLocaleDateString()} – ${new Date(endDate).toLocaleDateString()}</p>
+      <p><strong>Total:</strong> $${(totalPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+      <p><strong>Source:</strong> Manual (admin created)</p>
+      <p><a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/admin/bookings/${booking.id}">View Booking →</a></p>`
+    )
+
     return NextResponse.json({ ...booking, bookingType: 'car' }, { status: 201 })
   } catch (error) {
     console.error('Failed to create manual booking:', error)
