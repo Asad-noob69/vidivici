@@ -288,6 +288,8 @@ function ReservationContent() {
   const [uploadingLicense, setUploadingLicense] = useState(false)
   const [uploadingInsurance, setUploadingInsurance] = useState(false)
   const [villaIdDocumentName, setVillaIdDocumentName] = useState("")
+  const [villaIdDocumentUrl, setVillaIdDocumentUrl] = useState("")
+  const [uploadingVillaId, setUploadingVillaId] = useState(false)
 
   /* ---- Delivery state ---- */
   const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">("pickup")
@@ -524,7 +526,9 @@ function ReservationContent() {
     && startDate
     && endDate
     && days > 0
-    && (mode === "car" || (!!startTime && !!endTime && !!firstName && !!email && !!phone))
+    && (mode === "car"
+      ? (!!driverLicenseUrl && !!insuranceUrl)
+      : (!!startTime && !!endTime && !!firstName && !!email && !!phone && !!villaIdDocumentUrl))
 
   return (
     <div className="bg-white min-h-screen pt-24 pb-16">
@@ -711,6 +715,10 @@ function ReservationContent() {
                 autoScrollToCustomerInfo={isFlowLockedFromDetails}
                 villaIdDocumentName={villaIdDocumentName}
                 setVillaIdDocumentName={setVillaIdDocumentName}
+                villaIdDocumentUrl={villaIdDocumentUrl}
+                setVillaIdDocumentUrl={setVillaIdDocumentUrl}
+                uploadingVillaId={uploadingVillaId}
+                setUploadingVillaId={setUploadingVillaId}
               />
             )}
 
@@ -1377,11 +1385,11 @@ function CarSelectStep({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
             <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Drivers License</label>
+              <label className="text-xs text-mist-500 block mb-1.5">Drivers License <span className="text-red-400">*</span></label>
               <input
                 id="license-upload"
                 type="file"
-                accept="image/*"
+                accept="image/*,.pdf"
                 className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "license") }} />
               {uploadingLicense && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
@@ -1397,11 +1405,11 @@ function CarSelectStep({
               )}
             </div>
             <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Insurance</label>
+              <label className="text-xs text-mist-500 block mb-1.5">Insurance <span className="text-red-400">*</span></label>
               <input
                 id="insurance-upload"
                 type="file"
-                accept="image/*"
+                accept="image/*,.pdf"
                 className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "insurance") }} />
               {uploadingInsurance && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
@@ -1443,6 +1451,8 @@ function VillaSelectStep({
   villaSecurityService, setVillaSecurityService,
   firstName, setFirstName, lastName, setLastName, email, setEmail, phone, setPhone,
   villaIdDocumentName, setVillaIdDocumentName,
+  villaIdDocumentUrl, setVillaIdDocumentUrl,
+  uploadingVillaId, setUploadingVillaId,
   days, today, onNext, canProceed,
   autoScrollToCustomerInfo,
 }: {
@@ -1481,6 +1491,10 @@ function VillaSelectStep({
   autoScrollToCustomerInfo: boolean
   villaIdDocumentName: string
   setVillaIdDocumentName: (v: string) => void
+  villaIdDocumentUrl: string
+  setVillaIdDocumentUrl: (v: string) => void
+  uploadingVillaId: boolean
+  setUploadingVillaId: (v: boolean) => void
 }) {
   const locations = [...new Set(villaOptions.map((v) => v.location))].sort()
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -1760,15 +1774,45 @@ function VillaSelectStep({
           </div>
 
           <div>
-            <label className="text-xs text-mist-500 block mb-1.5">Upload ID / Passport</label>
+            <label className="text-xs text-mist-500 block mb-1.5">Upload ID / Passport <span className="text-red-400">*</span></label>
             <input
               type="file"
-              onChange={(e) => {
+              accept="image/*,.pdf"
+              onChange={async (e) => {
                 const file = e.target.files?.[0]
-                setVillaIdDocumentName(file?.name || "")
+                if (!file) return
+                setVillaIdDocumentName(file.name)
+                setUploadingVillaId(true)
+                try {
+                  const fd = new FormData()
+                  fd.append("files", file)
+                  const res = await fetch("/api/upload", { method: "POST", body: fd })
+                  if (!res.ok) throw new Error()
+                  const data = await res.json()
+                  const url = data.urls?.[0]
+                  if (url) {
+                    setVillaIdDocumentUrl(url)
+                    fetch("/api/account/profile", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ passport: url }),
+                    }).catch(() => {})
+                  }
+                } catch {
+                  alert("Upload failed. Please try again.")
+                  setVillaIdDocumentName("")
+                } finally {
+                  setUploadingVillaId(false)
+                }
               }}
               className="w-full text-sm text-mist-500 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700 hover:file:bg-mist-50"
             />
+            {uploadingVillaId && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
+            {villaIdDocumentUrl && (
+              <a href={villaIdDocumentUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-mist-600 underline">
+                View uploaded document
+              </a>
+            )}
           </div>
         </div>
           </>
