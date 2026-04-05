@@ -77,7 +77,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
     input.focus()
     if (typeof (input as HTMLInputElement & { showPicker?: () => void }).showPicker === "function") {
       try {
-        ;(input as HTMLInputElement & { showPicker: () => void }).showPicker()
+        ; (input as HTMLInputElement & { showPicker: () => void }).showPicker()
       } catch {
         // Safari can block showPicker; focus fallback still works.
       }
@@ -92,6 +92,23 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
     }
   })
 }
+
+// Add this CSS class for hiding date picker arrow
+const dateInputClass = "w-full bg-white border border-mist-300 rounded-md px-3 py-2.5 text-sm text-mist-700 focus:outline-none focus:border-mist-400 appearance-none"
+
+// For WebKit browsers (Chrome, Safari, Edge) - hide the calendar arrow
+const dateInputStyles = `
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
+  input[type="date"],
+  input[type="time"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+`;
 
 const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent"
 
@@ -862,7 +879,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                           value={eventForm.eventDate}
                           onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
                           placeholder="Select event date"
-                          className={temporalInputClass}
+                          className={dateInputClass}
                         />
                       </div>
                     </div>
@@ -1006,7 +1023,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                           value={productionForm.shootDate}
                           onChange={(e) => setProductionForm({ ...productionForm, shootDate: e.target.value })}
                           placeholder="Select shoot date"
-                          className={temporalInputClass}
+                          className={dateInputClass}
                         />
                       </div>
                     </div>
@@ -1404,7 +1421,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={eventForm.eventDate}
                       onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
                       placeholder="Select event date"
-                      className={temporalInputClass}
+                      className={dateInputClass}
                     />
                   </div>
                 </div>
@@ -1532,7 +1549,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       value={productionForm.shootDate}
                       onChange={(e) => setProductionForm({ ...productionForm, shootDate: e.target.value })}
                       placeholder="Select shoot date"
-                      className={temporalInputClass}
+                      className={dateInputClass}
                     />
                   </div>
                 </div>

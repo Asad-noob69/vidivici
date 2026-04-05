@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useRef, useEffect } from "react";
 import Banner from "@/components/ui/Banner"
 import ExoticCarRentals from "@/components/cars/ExoticCarRentals"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
@@ -9,7 +10,7 @@ import Contact from "@/components/home/Contact"
 import CarBrowse from "@/components/home/CarBrowse"
 import Rentals from "@/components/home/Rentals"
 
-import { Tag, Calendar, RefreshCw, Gauge, HeadphonesIcon } from "lucide-react";
+import { Tag, Calendar, RefreshCw, Gauge, HeadphonesIcon, Info, X } from "lucide-react";
 
 const rows = [
   { duration: "7–13 days", discount: "15% OFF", mileage: "Up to 100 miles/day" },
@@ -54,6 +55,25 @@ const features = [
 ];
 
 export default function LongTermPage() {
+
+  const [infoOpen, setInfoOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node) &&
+        !triggerRef.current?.contains(e.target as Node)
+      ) {
+        setInfoOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div>
       <Banner
@@ -137,37 +157,71 @@ export default function LongTermPage() {
 
       <CarBrowse />
 
-      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-10 2xl:py-16 flex items-start justify-between gap-4">
+      <div className="relative px-6 sm:px-16 lg:px-20 2xl:px-32 py-10 2xl:py-16 flex items-start justify-between gap-4">
         {/* Left: Title + Subtitle */}
         <div>
           <h2 className="text-2xl sm:text-3xl 2xl:text-6xl font-bold text-mist-900 mb-2 2xl:mb-4">
             Our Long-Term Fleet
           </h2>
           <div className="flex items-start gap-2">
-            <svg
-              className="w-4 h-4 text-mist-400 mt-0.5 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              viewBox="0 0 24 24"
+            <button
+              ref={triggerRef}
+              onClick={() => setInfoOpen((prev) => !prev)}
+              className="text-mist-400 hover:text-mist-600 mt-1 transition-colors focus:outline-none"
+              aria-label="More information"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-              />
-            </svg>
+              <Info size={14} />
+            </button>
+
+
             <p className="text-mist-400 text-sm 2xl:text-xl leading-snug max-w-xs 2xl:max-w-xl">
               Explore our collection of premium vehicles available for long-term hire in Los Angeles
             </p>
           </div>
         </div>
 
+        {infoOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+
+            {/* Modal */}
+            <div
+              ref={popoverRef}
+              className="relative w-80 2xl:w-[420px] rounded-xl bg-white shadow-xl p-6 2xl:p-8"
+            >
+
+              {/* Close Button */}
+              <button
+                onClick={() => setInfoOpen(false)}
+                className="absolute top-4 right-4 text-mist-400 hover:text-mist-700"
+              >
+                <X size={18} />
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-4">
+                <Info size={18} className="text-mist-500" />
+                <h3 className="text-lg 2xl:text-xl font-semibold text-mist-900">
+                  About Long-Term Hire
+                </h3>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm 2xl:text-base text-mist-500 leading-relaxed">
+                Our long-term fleet is available for hire periods of 7 days or more.
+                Enjoy competitive rates, full insurance coverage, and dedicated
+                concierge support throughout your rental.
+              </p>
+
+              {/* List */}
+              <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2">
+                <p className="text-sm text-mist-500">✓ Starting from 7-day rental periods</p>
+                <p className="text-sm text-mist-500">✓ Flexible pickup & return in Los Angeles</p>
+                <p className="text-sm text-mist-500">✓ Save up to 65% on daily rates</p>
+              </div>
+
+            </div>
+          </div>
+        )}
         {/* Right: View All Link */}
         <a
           href="#"
@@ -185,7 +239,7 @@ export default function LongTermPage() {
           </svg>
         </a>
       </div>
-      <Rentals showHeader={false} />
+      <Rentals showHeader={false} discountBadgeText="Up to 65% OFF" />
       <section className="w-full bg-white">
         <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-24">
           {/* Heading */}
@@ -256,20 +310,20 @@ export default function LongTermPage() {
 
       <div className="relative w-full bg-[#eeeeed] py-16 2xl:py-24 px-6 sm:px-16 lg:px-20 2xl:px-32 text-center my-16 2xl:my-24 overflow-hidden">
 
-              <img
-        src="/Vector 7.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
-      />
+        <img
+          src="/Vector 7.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
+        />
 
-      {/* Right side vector decoration */}
-      <img
-        src="/Vector 7.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180"
-      />
+        {/* Right side vector decoration */}
+        <img
+          src="/Vector 7.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180"
+        />
         {/* Foreground content */}
         <div className="relative z-10 max-w-xl 2xl:max-w-5xl mx-auto flex flex-col items-center gap-5 2xl:gap-8">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl 2xl:text-7xl font-bold text-mist-900 leading-tight tracking-tight">

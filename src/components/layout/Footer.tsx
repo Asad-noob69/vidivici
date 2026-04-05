@@ -47,7 +47,7 @@ export default function Footer() {
 
   return (
     <footer className="relative w-full bg-[#1a1a1a] text-white overflow-hidden">
-      
+
       {/* Decorative Vectors - Pinned for 2XL Visibility */}
       <img
         src="/Vector 6.png"
@@ -63,7 +63,7 @@ export default function Footer() {
       />
 
       <div className="max-w-6xl 2xl:max-w-[1600px] mx-auto px-8 2xl:px-20 pt-14 2xl:pt-40 pb-8 2xl:pb-20 relative z-10">
-        
+
         {/* Top Branding Section */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 2xl:gap-20 pb-10 2xl:pb-24 border-b border-white/10">
           <div className="flex items-center gap-6 2xl:gap-12 flex-shrink-0">
@@ -104,10 +104,20 @@ export default function Footer() {
                 links={[
                   { label: "Cars", href: "/cars" },
                   { label: "Insurance Replacement", href: "/cars/insurance" },
-                  { label: "Drive the Extraordinary", href: "/cars/extraordinary" },
                   { label: "Long-Term Car Rental", href: "/cars/longterm" },
-                  { label: "Experience", href: "/cars/experience" },
-                  "Villas", "Events", "Airport Transfer", "Wedding Car Rental",
+
+                  { label: "Villas", href: "/villas" },
+                  { label: "Events", href: "/events" },
+                  { label: "Airport Transfer", href: "/airport-transfer" },
+                  { label: "Wedding Car Rental", href: "/cars/wedding" },
+
+                  { label: "Luxury Car Rental" },
+                  { label: "Corporate Car Rental" },
+                  { label: "Prom Car Rental" },
+                  { label: "Film, TV & Video Car Rental", herf: "/film-tv-production"},
+                  { label: "Film, TV & Video House Rental" },
+                  { label: "Fifa World Cup 2026", herf: "/fifa-world-cup" },
+                  { label: "Ballroom", herf: "/events/ballroom" },
                 ]}
               />
             </div>
@@ -191,13 +201,23 @@ export default function Footer() {
           <FooterCol
             title="Services"
             links={[
-              { label: "Cars", href: "/cars" },
-              { label: "Insurance Replacement", href: "/cars/insurance" },
-              { label: "Drive the Extraordinary", href: "/cars/extraordinary" },
-              { label: "Long-Term Car Rental", href: "/cars/longterm" },
-              { label: "Experience", href: "/cars/experience" },
-              "Villas", "Events", "Airport Transfer", "Wedding Car Rental",
-            ]}
+                  { label: "Cars", href: "/cars" },
+                  { label: "Insurance Replacement", href: "/cars/insurance" },
+                  { label: "Long-Term Car Rental", href: "/cars/longterm" },
+
+                  { label: "Villas", href: "/villas" },
+                  { label: "Events", href: "/events" },
+                  { label: "Airport Transfer", href: "/airport-transfer" },
+                  { label: "Wedding Car Rental", href: "/cars/wedding" },
+
+                  { label: "Luxury Car Rental" },
+                  { label: "Corporate Car Rental" },
+                  { label: "Prom Car Rental" },
+                  { label: "Film, TV & Video Car Rental" },
+                  { label: "Film, TV & Video House Rental" },
+                  { label: "Ballroom" },
+                  { label: "Fifa World Cup 2026" },
+                ]}
           />
 
           <FooterCol
@@ -262,7 +282,7 @@ export default function Footer() {
 
         {/* Bottom Bar: Copyright, Legal, and Payments */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pt-8 2xl:pt-16">
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 2xl:gap-10">
             <p className="text-[12px] 2xl:text-xl text-white/40 text-center sm:text-left">
               ©2026 <span className="font-normal text-white/60">Vidi Vici.</span> All rights reserved.

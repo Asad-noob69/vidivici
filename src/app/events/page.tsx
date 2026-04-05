@@ -79,7 +79,7 @@ function EventCard({ event }: { event: EventFromAPI }) {
         <button
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
           className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav
-              ? "bg-mist-700 text-red-500"
+              ? "bg-mist-700 text-mist-700"
               : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
             }`}
         >

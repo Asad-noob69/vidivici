@@ -588,7 +588,9 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const taxRate = 0.085
   const preTax = subtotal - discountAmount + driverTotal
   const tax = Math.round(preTax * taxRate)
-  const securityDeposit = Math.round(car.pricePerDay * 2)
+  const qualifiesForReducedDeposit =
+    needDriver === true && (days >= 15 || driverAvailability === "full")
+  const securityDeposit = qualifiesForReducedDeposit ? 500 : 2000
   const total = preTax + tax + securityDeposit
 
   const hasOriginalPrice =
@@ -1332,11 +1334,10 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
             </svg>
           </a>
         </div>
-      <Rentals showHeader={false} />
+      <Rentals showHeader={false} discountBadgeText={undefined} />
       <WhyChooseUs />
       <Reviews />
       <FAQ />
-      <Contact />
     </div>
   )
 } 

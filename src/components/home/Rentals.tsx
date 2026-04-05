@@ -80,7 +80,7 @@ export const cars = [
 
 const CARD_WIDTH = 270 + 20;
 
-export default function ExoticCarRentals({ showHeader = true }) {
+export default function ExoticCarRentals({ showHeader = true, discountBadgeText }) {
   const trackRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [canLeft, setCanLeft] = useState(false);
@@ -143,7 +143,7 @@ export default function ExoticCarRentals({ showHeader = true }) {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {cars.map((car) => (
-            <CarCard key={car.id} car={car} />
+            <CarCard key={car.id} car={car} discountBadgeText={discountBadgeText} />
           ))}
           <div className="w-6 shrink-0" />
         </div>
