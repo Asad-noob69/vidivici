@@ -33,8 +33,10 @@ export async function notifyAdmin(subject: string, html: string) {
     console.warn("ADMIN_EMAIL not configured, skipping admin notification")
     return
   }
+  // Supports multiple comma-separated addresses: "a@x.com,b@x.com"
+  const recipients = adminEmail.split(",").map((e) => e.trim()).filter(Boolean)
   try {
-    await sendEmail({ to: adminEmail, subject: `[Vidi Vici] ${subject}`, html })
+    await sendEmail({ to: recipients.join(", "), subject: `[Vidi Vici] ${subject}`, html })
   } catch (err) {
     console.error("Failed to send admin notification:", err)
   }

@@ -17,7 +17,7 @@ export async function GET() {
     })
 
     await sendEmail({
-      to: 'abrishjutt162@gmail.com, sabaynanoor@gmail.com',
+      to: process.env.ADMIN_EMAIL || 'asadaliabbasi787@gmail.com',
       subject: 'Test Contract — Vidi Vici Rental Agreement',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -43,7 +43,7 @@ export async function GET() {
       ],
     })
 
-    return NextResponse.json({ success: true, message: 'Test email sent to asadaliabbasi787@gmail.com' })
+    return NextResponse.json({ success: true, message: `Test email sent to ${process.env.ADMIN_EMAIL || 'asadaliabbasi787@gmail.com'}` })
   } catch (error: any) {
     console.error('Test email error:', error)
     return NextResponse.json({ success: false, error: error.message || 'Failed to send test email' }, { status: 500 })
