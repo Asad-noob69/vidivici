@@ -421,6 +421,12 @@ function ReservationContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
 
+   useEffect(() => {
+    if (step >= 2) {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [step])
+
   /* ---- Profile pre-fill ---- */
   useEffect(() => {
     if (session?.user) {

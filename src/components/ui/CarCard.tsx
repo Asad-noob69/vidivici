@@ -13,7 +13,7 @@ function StatPill({ icon, label, value }) {
   );
 }
 
-export default function CarCard({ car }) {
+export default function CarCard({ car, discountBadgeText }) {
   const [liked, setLiked] = useState(car.liked || false);
 
   return (
@@ -22,6 +22,12 @@ export default function CarCard({ car }) {
 
       {/* Image - Height increased for 2xl */}
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
+        {/* Discount badge */}
+        {discountBadgeText && (
+          <div className="absolute top-5 left-5 z-10 flex items-center gap-2 bg-green-500 text-white font-bold text-xs 2xl:text-xl px-3 py-1 2xl:px-5 2xl:py-2 rounded-full shadow-lg" style={{ minWidth: 'fit-content' }}>
+            <span role="img" aria-label="fire" className=" ">🔥</span> <p>{discountBadgeText}</p>
+          </div>
+        )}
         <img
           src={car.image}
           alt={car.name}

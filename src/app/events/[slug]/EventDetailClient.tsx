@@ -94,18 +94,18 @@ function parseHighlightsConfig(raw: string | null | undefined): {
     const parsed = JSON.parse(raw)
     const whyChooseCards = Array.isArray(parsed?.whyChooseCards)
       ? parsed.whyChooseCards.map((item: any) => ({
-          title: String(item?.title || "").trim(),
-          description: String(item?.description || "").trim(),
-          icon: String(item?.icon || "Star").trim(),
-        })).filter((item: WhyChooseCard) => item.title || item.description)
+        title: String(item?.title || "").trim(),
+        description: String(item?.description || "").trim(),
+        icon: String(item?.icon || "Star").trim(),
+      })).filter((item: WhyChooseCard) => item.title || item.description)
       : []
 
     const showcaseCards = Array.isArray(parsed?.showcaseCards)
       ? parsed.showcaseCards.map((item: any) => ({
-          title: String(item?.title || "").trim(),
-          description: String(item?.description || "").trim(),
-          imageUrl: String(item?.imageUrl || "").trim(),
-        })).filter((item: ShowcaseCard) => item.title || item.description || item.imageUrl)
+        title: String(item?.title || "").trim(),
+        description: String(item?.description || "").trim(),
+        imageUrl: String(item?.imageUrl || "").trim(),
+      })).filter((item: ShowcaseCard) => item.title || item.description || item.imageUrl)
       : []
 
     return { whyChooseCards, showcaseCards }
@@ -178,7 +178,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
     input.focus()
     if (typeof (input as HTMLInputElement & { showPicker?: () => void }).showPicker === "function") {
       try {
-        ;(input as HTMLInputElement & { showPicker: () => void }).showPicker()
+        ; (input as HTMLInputElement & { showPicker: () => void }).showPicker()
       } catch {
         // Fallback to native focus behavior when showPicker is blocked.
       }
@@ -262,18 +262,18 @@ export function VenueBookingForm() {
 
   return (
     <section className="w-full bg-white py-12 2xl:py-24 sm:px-16 lg:px-20 2xl:px-32 px-6 " id="booking-form">
-     
+
       <div className="border border-mist-200 rounded-3xl overflow-hidden gap-8 2xl:gap-16 sm:p-8 2xl:sm:p-16 px-4 py-6 2xl:px-8 2xl:py-12 flex flex-col md:flex-row shadow-sm">
 
         {/* Left Panel - Info */}
         <div className="bg-mist-100 px-4 sm:px-8 2xl:sm:px-12 py-8 2xl:py-12 md:w-1/3 flex-shrink-0 flex flex-col gap-8 2xl:gap-12 relative overflow-hidden rounded-3xl">
-           <img
-              src="/Vector 7.png"
-              alt=""
-              aria-hidden="true"
-              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
-            />
-          
+          <img
+            src="/Vector 7.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none  rotate-180"
+          />
+
           <div className="relative z-10">
             <h3 className="text-xl md:text-2xl 2xl:text-4xl font-bold text-mist-900 leading-snug mb-3 2xl:mb-5">
               Have questions or want to book your luxury experience?
@@ -323,7 +323,7 @@ export function VenueBookingForm() {
                       required
                     />
                   </Field>
-                   <Field label="Last Name">
+                  <Field label="Last Name">
                     <input
                       type="text"
                       placeholder="Enter your last name"
@@ -335,7 +335,7 @@ export function VenueBookingForm() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 
+
                   <Field label="Email Address">
                     <input
                       type="email"
@@ -366,18 +366,18 @@ export function VenueBookingForm() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Field label="Selected Venue">
                     <div className="relative">
-                    <select
-                      value={form.clubVenue}
-                      onChange={(e) => setForm({ ...form, clubVenue: e.target.value })}
-                      className={`${inputClass} appearance-none pr-10`}
-                      required
-                    >
-                      <option value="" disabled>Select venue</option>
-                      {VENUE_OPTIONS.map((venue) => (
-                        <option key={venue} value={venue}>{venue}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mist-400" />
+                      <select
+                        value={form.clubVenue}
+                        onChange={(e) => setForm({ ...form, clubVenue: e.target.value })}
+                        className={`${inputClass} appearance-none pr-10`}
+                        required
+                      >
+                        <option value="" disabled>Select venue</option>
+                        {VENUE_OPTIONS.map((venue) => (
+                          <option key={venue} value={venue}>{venue}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mist-400" />
                     </div>
                   </Field>
                   <Field label="Booking Date">
@@ -407,15 +407,15 @@ export function VenueBookingForm() {
                   </Field>
                   <Field label="Budget Range">
                     <div className="relative">
-                    <select
-                      value={form.budget}
-                      onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                      className={`${inputClass} appearance-none pr-10 cursor-pointer`}
-                    >
-                      <option value="">Select range</option>
-                      {BUDGET_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
-                    </select>
-                    <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mist-400" />
+                      <select
+                        value={form.budget}
+                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                        className={`${inputClass} appearance-none pr-10 cursor-pointer`}
+                      >
+                        <option value="">Select range</option>
+                        {BUDGET_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
+                      </select>
+                      <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mist-400" />
                     </div>
                   </Field>
                 </div>
@@ -428,14 +428,14 @@ export function VenueBookingForm() {
                         type="button"
                         onClick={() => toggleAddOn(addon)}
                         className={`w-full px-4 2xl:px-6 py-3 2xl:py-5 rounded-2xl text-sm 2xl:text-xl font-medium border transition-all flex items-center gap-4 ${form.addOns.includes(addon)
-                            ? "bg-white text-mist-900 border-mist-300"
-                            : "bg-white text-mist-700 border-mist-200 hover:border-mist-300"
+                          ? "bg-white text-mist-900 border-mist-300"
+                          : "bg-white text-mist-700 border-mist-200 hover:border-mist-300"
                           }`}
                       >
                         <span
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${form.addOns.includes(addon)
-                              ? "border-blue-500"
-                              : "border-mist-400"
+                            ? "border-blue-500"
+                            : "border-mist-400"
                             }`}
                         >
                           {form.addOns.includes(addon) && <span className="w-3 h-3 rounded-full bg-blue-500" />}
@@ -563,10 +563,10 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             alt={images[currentImage].alt || event.name}
             className="w-full h-full object-cover"
           />
-          
+
           {/* Darker gradient at bottom for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          
+
           <div className="absolute bottom-12 2xl:bottom-20 left-10 2xl:left-20 right-10 2xl:right-20">
             <h1 className="text-4xl lg:text-5xl 2xl:text-7xl font-semibold text-white mb-3 2xl:mb-5 tracking-tight">
               {event.name}
@@ -576,10 +576,10 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
                 {event.shortDescription}
               </p>
             )}
-            
-            <button 
-               className="bg-white text-black px-10 2xl:px-14 py-3.5 2xl:py-6 rounded-3xl text-sm 2xl:text-2xl font-bold hover:bg-mist-100 transition-all shadow-lg"
-               onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
+
+            <button
+              className="bg-white text-black px-10 2xl:px-14 py-3.5 2xl:py-6 rounded-xl text-sm 2xl:text-2xl font-bold hover:bg-mist-100 transition-all shadow-lg"
+              onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
             >
               Reserve Now
             </button>
@@ -588,14 +588,14 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           {/* Navigation Arrows */}
           {images.length > 1 && (
             <div className="absolute top-1/2 -translate-y-1/2 w-full px-6 flex justify-between pointer-events-none">
-              <button 
-                onClick={prevImage} 
+              <button
+                onClick={prevImage}
                 className="w-12 h-12 2xl:w-14 2xl:h-14 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center transition-all pointer-events-auto text-white"
               >
                 <ChevronLeft size={24} />
               </button>
-              <button 
-                onClick={nextImage} 
+              <button
+                onClick={nextImage}
                 className="w-12 h-12 2xl:w-14 2xl:h-14 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center transition-all pointer-events-auto text-white"
               >
                 <ChevronRight size={24} />
@@ -618,130 +618,130 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         </div>
       </div>
 
-    {/* Why Choose Section */}
-{whyChooseCards.length > 0 && (
-  <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 text-center">
-    {/* Header */}
-    <h2 className="text-3xl lg:text-4xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">
-      Why Choose {event.name}?
-    </h2>
-    <p className="text-mist-600 text-base 2xl:text-2xl max-w-2xl 2xl:max-w-5xl mx-auto mb-12 2xl:mb-20 leading-relaxed">
-      {event.shortDescription || "Experience the perfect blend of luxury, entertainment, and world-class service in one unforgettable event."}
-    </p>
+      {/* Why Choose Section */}
+      {whyChooseCards.length > 0 && (
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 text-center">
+          {/* Header */}
+          <h2 className="text-3xl lg:text-4xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">
+            Why Choose {event.name}?
+          </h2>
+          <p className="text-mist-600 text-base 2xl:text-2xl max-w-2xl 2xl:max-w-5xl mx-auto mb-12 2xl:mb-20 leading-relaxed">
+            {event.shortDescription || "Experience the perfect blend of luxury, entertainment, and world-class service in one unforgettable event."}
+          </p>
 
-    {/* Feature Cards Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
-      {whyChooseCards.map((card, i) => {
-        const Icon = ICON_MAP[card.icon] || Star
+          {/* Feature Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
+            {whyChooseCards.map((card, i) => {
+              const Icon = ICON_MAP[card.icon] || Star
 
-        return (
-          <div
-            key={i}
-            className="bg-[#f5f5f5] p-8 2xl:p-12 rounded-3xl text-left flex flex-col h-full"
-          >
-            {/* Icon Container */}
-            <div className="w-12 h-12 bg-mist-200 rounded-lg flex items-center justify-center mb-6">
-              <Icon size={24} className="text-mist-600" />
-            </div>
+              return (
+                <div
+                  key={i}
+                  className="bg-[#f5f5f5] p-8 2xl:p-12 rounded-3xl text-left flex flex-col h-full"
+                >
+                  {/* Icon Container */}
+                  <div className="w-12 h-12 bg-mist-200 rounded-lg flex items-center justify-center mb-6">
+                    <Icon size={24} className="text-mist-600" />
+                  </div>
 
-            {/* Content */}
-              <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-3 2xl:mb-5">
-              {card.title}
-            </h3>
-            {card.description && (
-              <p className="text-mist-600 text-sm 2xl:text-2xl leading-relaxed">
-                {card.description}
-              </p>
-            )}
+                  {/* Content */}
+                  <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-3 2xl:mb-5">
+                    {card.title}
+                  </h3>
+                  {card.description && (
+                    <p className="text-mist-600 text-sm 2xl:text-2xl leading-relaxed">
+                      {card.description}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
       {/* The Experience Section */}
-{fullDescriptionParagraphs.length > 0 && (
-  <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 flex flex-col lg:flex-row items-center gap-12 2xl:gap-20 bg-white">
-    
-    {/* Left Side: Bento Image Grid */}
-    <div className="w-full lg:w-1/2 flex gap-4">
-      {/* Main Large Image */}
-      <div className="w-2/3 h-[450px] lg:h-[500px]">
-        <img
-          src={experienceImages[0]}
-          alt={event.name}
-          className="w-full h-full object-cover rounded-3xl"
-        />
-      </div>
+      {fullDescriptionParagraphs.length > 0 && (
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 flex flex-col lg:flex-row items-center gap-12 2xl:gap-20 bg-white">
 
-      {/* Secondary Vertical Stack */}
-      <div className="w-1/3 flex flex-col gap-4">
-        <div className="h-3/5">
-          <img
-            src={experienceImages[1]}
-            alt="Interior Details"
-            className="w-full h-full object-cover rounded-3xl"
-          />
-        </div>
-        <div className="h-2/5">
-          <img
-            src={experienceImages[2]}
-            alt="Atmosphere"
-            className="w-full h-full object-cover rounded-3xl"
-          />
-        </div>
-      </div>
-    </div>
+          {/* Left Side: Bento Image Grid */}
+          <div className="w-full lg:w-1/2 flex gap-4">
+            {/* Main Large Image */}
+            <div className="w-2/3 h-80 sm:h-[450px] sm:h-[500px]">
+              <img
+                src={experienceImages[0]}
+                alt={event.name}
+                className="w-full h-full object-cover rounded-2xl sm:rounded-3xl"
+              />
+            </div>
 
-    {/* Right Side: Content */}
-    <div className="w-full lg:w-1/2">
-      <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] leading-tight mb-4 2xl:mb-6">
-        Experience the <br /> {event.name}
-      </h2>
-
-      <h3 className="text-lg 2xl:text-3xl font-semibold text-mist-500 mb-6 2xl:mb-8">
-        {experienceConfig.subtitle || "Modern luxury meets classic elegance"}
-      </h3>
-
-      <div className="text-mist-600 2xl:text-2xl leading-relaxed mb-8 2xl:mb-10 max-w-xl 2xl:max-w-4xl space-y-4 2xl:space-y-6">
-        {fullDescriptionParagraphs.map((para, i) => (
-          <p key={i}>{para}</p>
-        ))}
-      </div>
-
-      <button 
-        onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
-        className="bg-[#1a1a1a] text-white px-10 2xl:px-14 py-4 2xl:py-6 rounded-3xl font-bold 2xl:text-2xl hover:bg-black transition-colors shadow-lg"
-      >
-        Reserve Now
-      </button>
-    </div>
-
-  </section>
-)}
-
-{showcaseCards.length > 0 && (
-  <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 max-w-[1840px] mx-auto">
-      {showcaseCards.map((card, idx) => (
-        <div key={idx} className="flex flex-col gap-6">
-          <div className={`h-[220px] sm:h-[300px] ${idx === 1 ? "lg:h-[400px] md:order-2" : "lg:h-[350px]"}`}>
-            <img
-              src={card.imageUrl || `https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800&v=${idx}`}
-              alt={card.title || `${event.name} showcase ${idx + 1}`}
-              className="w-full h-full object-cover rounded-3xl"
-            />
+            {/* Secondary Vertical Stack */}
+            <div className="w-1/3 flex flex-col gap-4">
+              <div className="h-3/5">
+                <img
+                  src={experienceImages[1]}
+                  alt="Interior Details"
+                  className="w-full h-full object-cover rounded-2xl sm:rounded-3xl"
+                />
+              </div>
+              <div className="h-2/5">
+                <img
+                  src={experienceImages[2]}
+                  alt="Atmosphere"
+                  className="w-full h-full object-cover rounded-2xl sm:rounded-3xl"
+                />
+              </div>
+            </div>
           </div>
-          <div className={`bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${idx === 1 ? "md:order-1" : ""}`}>
-            <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">{card.title}</h3>
-            <p className="text-mist-500 text-sm 2xl:text-xl leading-relaxed">{card.description}</p>
+
+          {/* Right Side: Content */}
+          <div className="w-full lg:w-1/2">
+            <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] leading-tight mb-4 2xl:mb-6">
+              Experience the <br /> {event.name}
+            </h2>
+
+            <h3 className="text-lg 2xl:text-3xl font-semibold text-mist-500 mb-6 2xl:mb-8">
+              {experienceConfig.subtitle || "Modern luxury meets classic elegance"}
+            </h3>
+
+            <div className="text-mist-600 2xl:text-2xl leading-relaxed mb-8 2xl:mb-10 max-w-xl 2xl:max-w-4xl space-y-4 2xl:space-y-6">
+              {fullDescriptionParagraphs.map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+
+            <button
+              onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
+              className="bg-[#1a1a1a] text-white px-10 2xl:px-14 py-4 2xl:py-6 rounded-xl font-bold 2xl:text-2xl hover:bg-black transition-colors shadow-lg"
+            >
+              Reserve Now
+            </button>
           </div>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+
+        </section>
+      )}
+
+      {showcaseCards.length > 0 && (
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 max-w-[1840px] mx-auto">
+            {showcaseCards.map((card, idx) => (
+              <div key={idx} className="flex flex-col gap-6">
+                <div className={`h-[220px] sm:h-[300px] ${idx === 1 ? "lg:h-[400px] md:order-2" : "lg:h-[350px]"}`}>
+                  <img
+                    src={card.imageUrl || `https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800&v=${idx}`}
+                    alt={card.title || `${event.name} showcase ${idx + 1}`}
+                    className="w-full h-full object-cover rounded-3xl"
+                  />
+                </div>
+                <div className={`bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${idx === 1 ? "md:order-1" : ""}`}>
+                  <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">{card.title}</h3>
+                  <p className="text-mist-500 text-sm 2xl:text-xl leading-relaxed">{card.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       <section className="py-16 2xl:py-28 px-6 sm:px-12 lg:px-20 2xl:px-32 bg-white">
         <div className="">
 
@@ -768,7 +768,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
               <div className="pt-1">
                 <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services</h3>
                 <p className="text-base 2xl:text-xl text-mist-500 font-normal leading-relaxed">
-                  Professional bartenders to craft signature for drinks 
+                  Professional bartenders to craft signature for drinks
                 </p>
               </div>
             </div>
@@ -829,55 +829,55 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28">
         <div className="max-w-[1840px] mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16 2xl:mb-24">
-          <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-6 2xl:mb-8">Gallery</h2>
-          <p className="text-mist-600 text-base 2xl:text-2xl max-w-3xl 2xl:max-w-6xl mx-auto leading-relaxed">
-            Explore the vibrant atmosphere, elegant décor, and unforgettable
-            performances that make Delilah Los Angeles a must-visit nightlife destination.
-          </p>
-        </div>
-
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 h-auto md:h-[700px] 2xl:h-[860px]">
-
-          {/* Left Column: Full Height */}
-          <div className="h-[260px] sm:h-[320px] md:h-full">
-            <img
-              src="https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=800"
-              alt="Bar interior"
-              className="w-full h-full object-cover rounded-3xl"
-            />
+          {/* Header */}
+          <div className="text-center mb-16 2xl:mb-24">
+            <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-6 2xl:mb-8">Gallery</h2>
+            <p className="text-mist-600 text-base 2xl:text-2xl max-w-3xl 2xl:max-w-6xl mx-auto leading-relaxed">
+              Explore the vibrant atmosphere, elegant décor, and unforgettable
+              performances that make Delilah Los Angeles a must-visit nightlife destination.
+            </p>
           </div>
 
-          {/* Middle Column: Two Stacked Images */}
-          <div className="flex flex-col gap-6 h-auto md:h-full">
-            <div className="h-[260px] sm:h-[320px] md:h-1/2">
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 h-auto md:h-[700px] 2xl:h-[860px]">
+
+            {/* Left Column: Full Height */}
+            <div className="h-[260px] sm:h-[320px] md:h-full">
               <img
-                src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
-                alt="Lounge seating"
+                src="https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=800"
+                alt="Bar interior"
                 className="w-full h-full object-cover rounded-3xl"
               />
             </div>
-            <div className="h-[260px] sm:h-[320px] md:h-1/2">
+
+            {/* Middle Column: Two Stacked Images */}
+            <div className="flex flex-col gap-6 h-auto md:h-full">
+              <div className="h-[260px] sm:h-[320px] md:h-1/2">
+                <img
+                  src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
+                  alt="Lounge seating"
+                  className="w-full h-full object-cover rounded-3xl"
+                />
+              </div>
+              <div className="h-[260px] sm:h-[320px] md:h-1/2">
+                <img
+                  src="https://images.unsplash.com/photo-1485872299829-c673f5194813?q=80&w=800"
+                  alt="Elegant lighting"
+                  className="w-full h-full object-cover rounded-3xl"
+                />
+              </div>
+            </div>
+
+            {/* Right Column: Full Height */}
+            <div className="h-[260px] sm:h-[320px] md:h-full">
               <img
-                src="https://images.unsplash.com/photo-1485872299829-c673f5194813?q=80&w=800"
-                alt="Elegant lighting"
+                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
+                alt="Atmospheric dining"
                 className="w-full h-full object-cover rounded-3xl"
               />
             </div>
-          </div>
 
-          {/* Right Column: Full Height */}
-          <div className="h-[260px] sm:h-[320px] md:h-full">
-            <img
-              src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
-              alt="Atmospheric dining"
-              className="w-full h-full object-cover rounded-3xl"
-            />
           </div>
-
-        </div>
         </div>
       </section>
       <FAQ />
@@ -888,7 +888,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
 
 
-     
+
     </div>
   )
 }

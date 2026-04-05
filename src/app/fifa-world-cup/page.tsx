@@ -403,7 +403,7 @@ function FifaContent() {
 
       {/* Car Rentals Slider */}
       <div className="py-4">
-        <Rentals showHeader={true} />
+        <Rentals showHeader={true} discountBadgeText={undefined} />
       </div>
 
       {/* Browse by Make & Type */}

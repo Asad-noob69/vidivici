@@ -27,24 +27,36 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const contactDetails: ContactDetail[] = [
   {
-    icon: <Phone size={20} />,
+    icon: <>
+      <span className="block 2xl:hidden"><Phone size={20} /></span>
+      <span className="hidden 2xl:block"><Phone size={30} /></span>
+    </>,
     label: "Phone",
     lines: ["(310) 774-0991"],
   },
   {
-    icon: <Mail size={20} />,
+    icon: <>
+      <span className="block 2xl:hidden"><Mail size={20} /></span>
+      <span className="hidden 2xl:block"><Mail size={30} /></span>
+    </>,
     label: "Email",
     lines: ["admin@vidivicitrental.com", "We reply within 24 hours"],
   },
   {
-    icon: <MapPin size={20} />,
+    icon: <>
+      <span className="block 2xl:hidden"><MapPin size={20} /></span>
+      <span className="hidden 2xl:block"><MapPin size={30} /></span>
+    </>,
     label: "Address",
     lines: ["8687 Melrose Ave, Los Angeles", "CA 90069, United States"],
   },
   {
-    icon: <Clock size={20} />,
+    icon: <>
+      <span className="block 2xl:hidden"><Clock size={20} /></span>
+      <span className="hidden 2xl:block"><Clock size={30} /></span>
+    </>,
     label: "Working Hours",
-    lines: ["Mon–Sun: 9 AM – 11 PM", "24/7 VIP Concierge Available"],
+    lines: ["Mon–Sun: 9 AM – 9 PM", "24/7 VIP Concierge Available"],
   },
 ];
 
@@ -126,18 +138,18 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 2xl:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 2xl:gap-8 mx-4 sm:mx-0">
             {contactDetails.map((item) => (
               <div
                 key={item.label}
-                className="bg-white border border-mist-100 rounded-2xl 2xl:rounded-[40px] py-4 2xl:py-8 flex flex-col items-center text-center gap-2 2xl:gap-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="bg-white border border-mist-100 rounded-2xl 2xl:rounded-3xl py-4 2xl:py-8 flex flex-col items-center text-center gap-2 2xl:gap-4 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                <div className="w-10 h-10 2xl:w-16 2xl:h-16 rounded-md bg-mist-200 flex items-center justify-center text-mist-500">
+                <div className="w-10 h-10 2xl:w-16 2xl:h-16 rounded-md 2xl:rounded-xl bg-mist-200 flex items-center justify-center text-mist-500">
                   {item.icon}
                 </div>
-                <p className="text-[13px] 2xl:text-xl font-normal text-mist-900">{item.label}</p>
+                <p className="text-base 2xl:text-2xl font-normal text-mist-900">{item.label}</p>
                 {item.lines.map((line, i) => (
-                  <p key={i} className="text-[12px] 2xl:text-lg text-mist-500 leading-snug">
+                  <p key={i} className="text-sm 2xl:text-xl text-mist-500 leading-snug">
                     {line}
                   </p>
                 ))}

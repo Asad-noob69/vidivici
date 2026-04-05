@@ -4,6 +4,7 @@ import { useState } from "react";
 import FAQ from "@/components/home/FAQ";
 import Banner from "@/components/ui/Banner";
 import toast, { Toaster } from "react-hot-toast";
+import HowItWorks from "@/components/ui/HowItWorks";
 import {
     Eye, SlidersHorizontal, ShieldCheck,
     BadgeDollarSign, Headphones, Globe, ChevronDown
@@ -247,93 +248,7 @@ export default function PartnerPage() {
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section className="w-full bg-white sm:px-16 lg:px-20 px-6 mb-56 mt-72">
-                <div className="">
-
-                    {/* Heading */}
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-mist-900">How It Works</h2>
-
-                        <p className="mt-6 text-base text-mist-500 max-w-xl mx-auto">
-                            Partner with Vidi Vici Rental in four easy steps and start earning from your luxury
-                            assets with ease and confidence.
-                        </p>
-                    </div>
-
-                    {/* Steps Container */}
-                    <div className="relative my-20 top-20">
-
-                        {/* Connector Line */}
-                        <div className="hidden md:block absolute top-7 left-10 right-10 border-t-2 border-dashed border-mist-200"></div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-0">
-
-                            {/* Step 1 */}
-                            <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
-                                    1
-                                </div>
-
-                                <div className="mt-4 max-w-[150px]">
-                                    <p className="font-semibold text-mist-900">Sign Up</p>
-                                    <p className="text-sm text-mist-500 mt-1">
-                                        Fill out our partner application form.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Step 2 */}
-                            <div className="flex flex-col items-center text-center relative z-10 -mt-20">
-                                <div className="max-w-[150px] mb-4">
-                                    <p className="text-sm text-mist-500">
-                                        Our team reviews and approves your asset.
-                                    </p>
-                                    <p className="font-semibold text-mist-900 mt-1">
-                                        Verify & Approve
-                                    </p>
-                                </div>
-
-                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
-                                    2
-                                </div>
-                            </div>
-
-                            {/* Step 3 */}
-                            <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
-                                    3
-                                </div>
-
-                                <div className="mt-4 max-w-[150px]">
-                                    <p className="font-semibold text-mist-900">List & Manage</p>
-                                    <p className="text-sm text-mist-500 mt-1">
-                                        Upload your cars, villas, clubs, or events.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Step 4 */}
-                            <div className="flex flex-col items-center text-center relative z-10 -mt-20">
-                                <div className="max-w-[150px] mb-4">
-                                    <p className="text-sm text-mist-500">
-                                        Start receiving bookings from high-end clients.
-                                    </p>
-                                    <p className="font-semibold text-mist-900 mt-1">
-                                        Earn Revenue
-                                    </p>
-                                </div>
-
-                                <div className="w-14 h-14 rounded-full bg-mist-900 text-white flex items-center justify-center text-lg font-bold shadow-md">
-                                    4
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </section>
+        <HowItWorks />
 
             {/* Become a Partner Form */}
             <section className="w-full sm:px-16 lg:px-20 px-6 py-16">
