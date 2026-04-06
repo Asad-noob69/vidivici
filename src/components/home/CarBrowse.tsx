@@ -6,18 +6,18 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const carMakes = [
-  { name: "Rolls-Royce", logo: "/carlogo5.png" },
-  { name: "Cadillac", logo: "/carlogo2.png" },
+  { name: "Rolls-Royce", logo: "/Mask group-4.png" },
+  { name: "Cadillac", logo: "/carlogo7.png" },
   { name: "Mercedes", logo: "/carlogo4.png" },
-  { name: "Bentley", logo: "/carlogo9.png" },
+  { name: "Bentley", logo: "/carlogo8.png" },
   { name: "Lamborghini", logo: "/carlogo3.png" },
-  { name: "Aston Martin", logo: "/Mask group-4.png" },
-  { name: "BMW", logo: "/carlogo2.png" },
-  { name: "Porsche", logo: "/carlogo6.png" },
-  { name: "Audi", logo: "/carlogo10.png" },
-  { name: "Maserati", logo: "/carlogo13.png" },
-  { name: "Range Rover", logo: "/carlogo7.png" },
-  { name: "McLaren", logo: "/carlogo11.png" },
+  { name: "Aston Martin", logo: "/carlogo2.png" },
+  { name: "BMW", logo: "/carlogo5.png" },
+  { name: "Porsche", logo: "/carlogo11.png" },
+  { name: "Audi", logo: "/carlogo9.png" },
+  { name: "Maserati", logo: "/carlogo12.png" },
+  { name: "Range Rover", logo: "/carlogo6.png" },
+  { name: "McLaren", logo: "/carlogo10.png" },
 ];
 
 const carTypes = [
@@ -185,11 +185,11 @@ export default function CarBrowseSection() {
         }
 
         .speed-make {
-          animation: scroll 45s linear infinite;
+          animation: scroll 70s linear infinite;
         }
 
         .speed-type {
-          animation: scroll 28s linear infinite;
+          animation: scroll 35s linear infinite;
         }
 
         @media (min-width: 1900px) {

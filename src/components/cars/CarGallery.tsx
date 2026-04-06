@@ -179,31 +179,31 @@ export default function CarGallery({ images }: CarGalleryProps) {
 
         {/* MAIN IMAGE */}
         <div className="relative rounded-2xl overflow-hidden
-                        h-[320px] sm:h-[420px] md:h-[500px] 2xl:h-[560px]
+                      
                         mb-3 bg-mist-100">
           <img
             src={images[activeIndex].url}
             alt={images[activeIndex].alt || "Car image"}
-            className="w-full h-full object-cover cursor-zoom-in"
+            className="w-full h-full object-contain cursor-zoom-in"
             onClick={openLightbox}
           />
           <button
             onClick={prev}
             disabled={activeIndex === 0}
-            className="absolute left-3 top-1/2 -translate-y-1/2
-                       w-10 h-10 rounded-full bg-white shadow
+            className="absolute left-2 top-1/2 -translate-y-1/2
+                       w-6 h-6 rounded-full bg-white shadow
                        flex items-center justify-center"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={12} />
           </button>
           <button
             onClick={next}
             disabled={activeIndex === images.length - 1}
-            className="absolute right-3 top-1/2 -translate-y-1/2
-                       w-10 h-10 rounded-full bg-white shadow
+            className="absolute right-2 top-1/2 -translate-y-1/2
+                       w-6 h-6 rounded-full bg-white shadow
                        flex items-center justify-center"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={12} />
           </button>
         </div>
 
@@ -213,11 +213,11 @@ export default function CarGallery({ images }: CarGalleryProps) {
             <button
               onClick={prev}
               disabled={activeIndex === 0}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10
-                         w-8 h-8 rounded-full bg-white shadow
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10
+                         w-6 h-6 rounded-full bg-white shadow
                          flex items-center justify-center"
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={12} />
             </button>
 
             <div
@@ -247,11 +247,11 @@ export default function CarGallery({ images }: CarGalleryProps) {
             <button
               onClick={next}
               disabled={activeIndex === images.length - 1}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-10
-                         w-8 h-8 rounded-full bg-white shadow
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10
+                         w-6 h-6 rounded-full bg-white shadow
                          flex items-center justify-center"
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={12} />
             </button>
           </div>
         )}

@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Heart, ImageOff, Users, Gauge, Settings } from "lucide-react"
+import { Heart, ImageOff, Users, Gauge, Settings, BedDouble, Maximize2, MapPin, ArrowUpRight, Zap } from "lucide-react"
 
 interface WishlistItem {
   id: string
-  car: {
+  carId?: string
+  villaId?: string
+  eventId?: string
+  car?: {
     id: string
     name: string
     slug: string
@@ -18,6 +21,210 @@ interface WishlistItem {
     brand: { name: string }
     images: { url: string }[]
   }
+  villa?: {
+    id: string
+    name: string
+    slug: string
+    pricePerNight: number
+    bedrooms: number
+    guests: number
+    sqft: number
+    location: string
+    images: { url: string }[]
+  }
+  event?: {
+    id: string
+    name: string
+    slug: string
+    location: string
+    category: string
+    capacity: number
+    images: { url: string }[]
+  }
+}
+
+function StatPill({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5 2xl:gap-2">
+      <div className="text-mist-600 2xl:scale-150">{icon}</div>
+      <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">{label}</span>
+      <span className="text-[10px] 2xl:text-base text-mist-600">{value}</span>
+    </div>
+  )
+}
+
+const formatSqft = (sqft: number) => sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
+
+function WishlistCarCard({ item }: { item: WishlistItem }) {
+  const car = item.car!
+  const img = car.images?.[0]?.url
+
+  return (
+    <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+      <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
+        <Link href={`/cars/${car.slug}`} className="block w-full h-full">
+          {img ? (
+            <img src={img} alt={car.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
+          ) : (
+            <div className="w-full h-full rounded-2xl 2xl:rounded-[30px] flex items-center justify-center bg-mist-100">
+              <ImageOff size={32} className="text-mist-300" />
+            </div>
+          )}
+        </Link>
+        <button
+          onClick={() => {}}
+          className="absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 bg-mist-700 text-red-500"
+        >
+          <Heart size={13} className="2xl:w-6 2xl:h-6" fill="currentColor" strokeWidth={2} />
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2 2xl:gap-5 px-8 2xl:px-12 pt-3.5 2xl:pt-6 pb-4 2xl:pb-8">
+        <p className="text-xs 2xl:text-lg text-mist-400 font-medium tracking-wide uppercase truncate">{car.brand.name}</p>
+        <h3 className="text-lg sm:text-xl 2xl:text-4xl font-semibold text-mist-900 leading-snug -mt-0.5 line-clamp-1">{car.name}</h3>
+
+        <div className="flex items-center justify-between px-4 2xl:px-0 py-3 2xl:py-4">
+          <StatPill icon={<Users size={12} />} label="Seats" value={car.seats || "—"} />
+          <div className="w-px h-8 2xl:h-14 bg-mist-100" />
+          <StatPill icon={<Gauge size={12} />} label="0-60 mph" value={car.acceleration || "—"} />
+          <div className="w-px h-8 2xl:h-14 bg-mist-100" />
+          <StatPill icon={<Zap size={12} />} label="Engine" value={car.horsepower ? `${car.horsepower} hp` : "—"} />
+        </div>
+
+        <div className="h-px bg-mist-100 mt-0.5 2xl:mt-0" />
+
+        <div className="flex items-center justify-between mt-0.5 2xl:mt-0">
+          <Link href={`/cars/${car.slug}`} className="flex items-center gap-1 2xl:gap-3 text-sm 2xl:text-2xl text-mist-500 hover:text-mist-900 transition-colors">
+            View Details <ArrowUpRight size={11} className="2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+          </Link>
+          <div className="flex flex-col items-end">
+            <span className="text-base 2xl:text-3xl font-semibold text-mist-900">${car.pricePerDay}</span>
+            <span className="text-[10px] 2xl:text-lg text-mist-400 line-through">${Math.round(car.pricePerDay * 1.2).toLocaleString()} / day</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WishlistVillaCard({ item }: { item: WishlistItem }) {
+  const villa = item.villa!
+  const img = villa.images?.[0]?.url
+
+  return (
+    <div className="relative flex flex-col bg-white rounded-2xl 2xl:rounded-3xl overflow-hidden shadow-xl border border-mist-200 hover:shadow-md transition-all duration-300 group cursor-pointer">
+      <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
+        <Link href={`/villas/${villa.slug}`} className="block w-full h-full">
+          {img ? (
+            <img src={img} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
+          )}
+        </Link>
+        <button
+          onClick={() => {}}
+          className="absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 bg-mist-700 text-red-500"
+        >
+          <Heart size={13} className="2xl:w-6 2xl:h-6" fill="currentColor" strokeWidth={2} />
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2 2xl:gap-5 px-6 2xl:px-10 pt-3.5 2xl:pt-6 pb-4 2xl:pb-8">
+        <p className="text-xs 2xl:text-lg text-mist-400 font-medium tracking-wide uppercase truncate">
+          Luxury Villa for Rent | {villa.location}
+        </p>
+        <h3 className="text-lg sm:text-xl 2xl:text-4xl font-semibold text-mist-900 leading-snug -mt-0.5">{villa.name}</h3>
+
+        <div className="flex items-center justify-between py-3 2xl:py-4">
+          <div className="flex flex-col items-center gap-0.5 2xl:gap-2">
+            <div className="text-mist-600"><BedDouble size={12} className="2xl:w-5 2xl:h-5" /></div>
+            <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">Bedrooms</span>
+            <span className="text-[10px] 2xl:text-base text-mist-600">{villa.bedrooms}</span>
+          </div>
+          <div className="w-px h-8 2xl:h-14 bg-mist-100" />
+          <div className="flex flex-col items-center gap-0.5 2xl:gap-2">
+            <div className="text-mist-600"><Users size={12} className="2xl:w-5 2xl:h-5" /></div>
+            <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">Guests</span>
+            <span className="text-[10px] 2xl:text-base text-mist-600">{villa.guests}</span>
+          </div>
+          <div className="w-px h-8 2xl:h-14 bg-mist-100" />
+          <div className="flex flex-col items-center gap-0.5 2xl:gap-2">
+            <div className="text-mist-600"><Maximize2 size={12} className="2xl:w-5 2xl:h-5" /></div>
+            <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">Sq.ft</span>
+            <span className="text-[10px] 2xl:text-base text-mist-600">{formatSqft(villa.sqft)}</span>
+          </div>
+        </div>
+
+        <div className="h-px bg-mist-100 mt-0.5" />
+
+        <div className="flex items-center justify-between mt-0.5">
+          <Link href={`/villas/${villa.slug}`} className="flex items-center gap-1 2xl:gap-3 text-sm 2xl:text-2xl text-mist-500 hover:text-mist-900 transition-colors">
+            View Details <ArrowUpRight size={11} className="2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+          </Link>
+          <div className="flex flex-col items-end">
+            <span className="text-base 2xl:text-3xl font-semibold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
+            <span className="text-[10px] 2xl:text-lg text-mist-400">/night</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WishlistEventCard({ item }: { item: WishlistItem }) {
+  const event = item.event!
+  const img = event.images?.[0]?.url
+
+  return (
+    <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-[40px] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 w-full flex-shrink-0 group cursor-pointer">
+      <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
+        <Link href={`/events/${event.slug}`} className="block w-full h-full">
+          {img ? (
+            <img src={img} alt={event.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm 2xl:text-lg rounded-2xl 2xl:rounded-[30px]">No Image</div>
+          )}
+        </Link>
+        <button
+          onClick={() => {}}
+          className="absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 bg-mist-700 text-red-500"
+        >
+          <Heart size={13} className="2xl:w-6 2xl:h-6" fill="currentColor" strokeWidth={2} />
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2 2xl:gap-5 px-8 2xl:px-12 pt-3.5 2xl:pt-6 pb-4 2xl:pb-8">
+        <p className="text-xs 2xl:text-lg text-mist-400 font-medium tracking-wide uppercase truncate">
+          {event.category || event.location || "Venue TBA"}
+        </p>
+        <h3 className="text-lg sm:text-xl 2xl:text-4xl font-semibold text-mist-900 leading-snug -mt-0.5">
+          {event.name}
+        </h3>
+
+        <div className="flex items-center gap-4 mb-5">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <MapPin size={18} className="text-mist-400 2xl:scale-150" />
+            <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">Location</span>
+            <span className="text-[10px] 2xl:text-base text-mist-600">{event.location}</span>
+          </div>
+          <div className="w-px h-8 2xl:h-14 bg-mist-100" />
+          <div className="flex flex-col items-center gap-1 text-center">
+            <Users size={18} className="text-mist-400 2xl:scale-150" />
+            <span className="text-xs 2xl:text-xl text-mist-900 font-semibold">Capacity</span>
+            <span className="text-[10px] 2xl:text-base text-mist-600">Up to {event.capacity}</span>
+          </div>
+        </div>
+
+        <div className="h-px bg-mist-100 mt-0.5" />
+
+        <div className="flex items-center justify-between mt-0.5">
+          <Link href={`/events/${event.slug}`} className="flex items-center gap-1 2xl:gap-3 text-sm 2xl:text-2xl text-mist-500 hover:text-mist-900 transition-colors">
+            View Details <ArrowUpRight size={11} className="2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function MyWishlistPage() {
@@ -38,65 +245,65 @@ export default function MyWishlistPage() {
     }
   }
 
-  const removeFromWishlist = async (carId: string) => {
+  const removeItem = async (id: string, type: 'car' | 'villa' | 'event') => {
+    const item = items.find(i => i.id === id)
+    const body: any = {}
+    if (type === 'car' && item?.car) body.carId = item.car.id
+    if (type === 'villa' && item?.villa) body.villaId = item.villa.id
+    if (type === 'event' && item?.event) body.eventId = item.event.id
+
     const res = await fetch("/api/wishlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ carId }),
+      body: JSON.stringify(body),
     })
     if (res.ok) {
-      setItems((prev) => prev.filter((i) => i.car.id !== carId))
+      setItems((prev) => prev.filter((i) => i.id !== id))
     }
   }
 
-  const originalDayRate = (price: number) => Math.round(price * 1.2)
+  const carItems = items.filter(i => i.car)
+  const villaItems = items.filter(i => i.villa)
+  const eventItems = items.filter(i => i.event)
+
+  const filteredItems = activeTab === "Cars" ? carItems : activeTab === "Villas" ? villaItems : eventItems
 
   return (
     <div className="overflow-hidden">
-
-      {/* ── Heading ─────────────────────────────────────────── */}
       <div className="px-4 sm:px-6 2xl:px-10 py-10 sm:py-12 2xl:py-16 border-b-2 border-mist-300 font-medium flex items-center justify-between">
         <h1 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900">My Wishlist</h1>
       </div>
 
-      {/* ── Body ────────────────────────────────────────────── */}
       <div className="py-10 sm:py-12 2xl:py-16 px-4 sm:px-6 lg:px-10 2xl:px-14">
-
-        {/* Tabs — only show when there are items */}
         {(items.length > 0 || activeTab !== "Cars") && (
           <div className="flex flex-wrap gap-2 mb-10">
-            {["Cars", "Villas", "Events"].map((tab) => (
+            {[
+              { label: "Cars", count: carItems.length },
+              { label: "Villas", count: villaItems.length },
+              { label: "Events", count: eventItems.length },
+            ].map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={tab.label}
+                onClick={() => setActiveTab(tab.label)}
                 className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors ${
-                  activeTab === tab
-                   ? "bg-mist-500 text-white"
-                  : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
+                  activeTab === tab.label
+                    ? "bg-mist-500 text-white"
+                    : "bg-white text-mist-600 border-mist-200 hover:border-mist-400"
                 }`}
               >
-                {tab}
+                {tab.label} ({tab.count})
               </button>
             ))}
           </div>
         )}
 
-        {/* Non-cars tab */}
-        {activeTab !== "Cars" ? (
-          <div className="text-center py-16 text-mist-400">
-            <p className="text-lg font-medium text-mist-500">Coming soon</p>
-            <p className="text-sm">{activeTab} wishlist is not available yet</p>
-          </div>
-
-        ) : loading ? (
+        {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5 2xl:gap-7">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-72 bg-mist-100 rounded-2xl animate-pulse" />
             ))}
           </div>
-
         ) : items.length === 0 ? (
-          /* ── Empty state (Image 2) ── */
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-lg font-semibold text-mist-700 mb-3">Your wishlist is empty</p>
             <p className="text-sm text-mist-400 max-w-sm leading-relaxed mb-8">
@@ -104,7 +311,7 @@ export default function MyWishlistPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {[
-                { label: "Explore Cars",   href: "/cars"   },
+                { label: "Explore Cars", href: "/cars" },
                 { label: "Explore Villas", href: "/villas" },
                 { label: "Explore Events", href: "/events" },
               ].map((link) => (
@@ -118,88 +325,22 @@ export default function MyWishlistPage() {
               ))}
             </div>
           </div>
-
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-16 text-mist-400">
+            <p className="text-lg font-medium text-mist-500">No {activeTab.toLowerCase()} in your wishlist</p>
+            <p className="text-sm mt-2">
+              <Link href={`/${activeTab.toLowerCase()}`} className="text-mist-700 underline hover:text-mist-900">
+                Explore {activeTab.toLowerCase()}
+              </Link>
+            </p>
+          </div>
         ) : (
-          /* ── Cards grid (Image 1) ── */
           <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5 2xl:gap-7">
-            {items.map((item) => {
-              const img = item.car.images?.[0]?.url
-              return (
-                <div
-                  key={item.id}
-                  className="bg-white border border-mist-100 rounded-2xl overflow-hidden shadow-sm"
-                >
-                  {/* Image */}
-                  <div className="relative h-48 bg-mist-100">
-                    {img ? (
-                      <Image src={img} alt={item.car.name} fill className="object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-mist-300">
-                        <ImageOff size={32} />
-                      </div>
-                    )}
-                    {/* Heart remove button */}
-                    <button
-                      onClick={() => removeFromWishlist(item.car.id)}
-                      className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-sm hover:scale-110 transition-transform"
-                    >
-                      <Heart size={16} className="fill-red-500 text-red-500" />
-                    </button>
-                  </div>
-
-                  {/* Card body */}
-                  <div className="p-5">
-                    {/* Brand + name */}
-                    <p className="text-xs text-mist-400 mb-0.5">{item.car.brand.name}</p>
-                    <p className="text-lg font-bold text-mist-900 mb-4">{item.car.name}</p>
-
-                    {/* Specs row */}
-                    <div className="flex items-center gap-4 mb-5">
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <Users size={18} className="text-mist-400" />
-                        <span className="text-[11px] font-semibold text-mist-700">Seats</span>
-                        <span className="text-[11px] text-mist-400">{item.car.seats || "2+2"}</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <Gauge size={18} className="text-mist-400" />
-                        <span className="text-[11px] font-semibold text-mist-700">0-60 mph</span>
-                        <span className="text-[11px] text-mist-400">{item.car.acceleration || "—"}</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <Settings size={18} className="text-mist-400" />
-                        <span className="text-[11px] font-semibold text-mist-700">Engine</span>
-                        <span className="text-[11px] text-mist-400">
-                          {item.car.horsepower ? `${item.car.horsepower} hp` : "—"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="h-px bg-mist-100 mb-4" />
-
-                    {/* Footer: View Details + Price */}
-                    <div className="flex items-end justify-between">
-                      <Link
-                        href={`/cars/${item.car.slug}`}
-                        className="flex items-center gap-1 text-sm text-mist-700 font-medium hover:text-mist-900 transition-colors"
-                      >
-                        View Details
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="mt-px">
-                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </Link>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-mist-900">
-                          ${item.car.pricePerDay.toLocaleString()}
-                        </p>
-                        <p className="text-[11px] text-mist-400 line-through">
-                          ${originalDayRate(item.car.pricePerDay).toLocaleString()}/day
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
+            {filteredItems.map((item) => {
+              if (item.car) return <WishlistCarCard key={item.id} item={item} />
+              if (item.villa) return <WishlistVillaCard key={item.id} item={item} />
+              if (item.event) return <WishlistEventCard key={item.id} item={item} />
+              return null
             })}
           </div>
         )}

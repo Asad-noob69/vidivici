@@ -47,11 +47,17 @@ model Wishlist {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
-  carId     String
+  car       Car?     @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId     String?
+  villa     Villa?   @relation(fields: [villaId], references: [id], onDelete: Cascade)
+  villaId   String?
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String?
   createdAt DateTime @default(now())
 
   @@unique([userId, carId])
+  @@unique([userId, villaId])
+  @@unique([userId, eventId])
 }
 
 model Category {
@@ -288,6 +294,7 @@ model Villa {
   isFeatured       Boolean      @default(false)
   images           VillaImage[]
   villaBookings    VillaBooking[]
+  wishlist         Wishlist[]
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 }
@@ -362,6 +369,7 @@ model Event {
   isFeatured       Boolean        @default(false)
   images           EventImage[]
   bookings         EventBooking[]
+  wishlist         Wishlist[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }

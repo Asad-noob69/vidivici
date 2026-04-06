@@ -166,7 +166,6 @@ const scrollTo = (index) => {
       <div className="flex items-center justify-center gap-2 mt-4">
         {cars.map((_, i) => (
           <button
-          
             key={i}
             onClick={() => scrollTo(i)}
             className={`rounded-full transition-all duration-300 ${
