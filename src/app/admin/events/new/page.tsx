@@ -25,6 +25,29 @@ const ICON_OPTIONS = [
   "ShieldCheck",
   "GlassWater",
   "Gem",
+  "Crown",
+  "Wine",
+  "PartyPopper",
+  "Camera",
+  "Mic2",
+  "Palette",
+  "Theater",
+  "Martini",
+  "Flame",
+  "Zap",
+  "Trophy",
+  "Clapperboard",
+  "ChefHat",
+  "Landmark",
+  "Castle",
+  "Trees",
+  "Sun",
+  "Moon",
+  "Firework",
+  "Ticket",
+  "Award",
+  "Globe",
+  "Building2",
 ]
 
 const DEFAULT_WHY_CHOOSE: WhyChooseCard[] = [
@@ -40,9 +63,10 @@ const DEFAULT_SHOWCASE: ShowcaseCard[] = [
 function parseHighlightsConfig(raw: string | null | undefined): {
   whyChooseCards: WhyChooseCard[]
   showcaseCards: ShowcaseCard[]
+  descriptionUnderWhyChoose: string
 } {
   if (!raw) {
-    return { whyChooseCards: DEFAULT_WHY_CHOOSE, showcaseCards: DEFAULT_SHOWCASE }
+    return { whyChooseCards: DEFAULT_WHY_CHOOSE, showcaseCards: DEFAULT_SHOWCASE, descriptionUnderWhyChoose: "" }
   }
 
   try {
@@ -63,9 +87,12 @@ function parseHighlightsConfig(raw: string | null | undefined): {
         }))
       : []
 
+    const descriptionUnderWhyChoose = String(parsed?.descriptionUnderWhyChoose || "")
+
     return {
       whyChooseCards: whyChooseCards.length > 0 ? whyChooseCards : DEFAULT_WHY_CHOOSE,
       showcaseCards: showcaseCards.length > 0 ? showcaseCards : DEFAULT_SHOWCASE,
+      descriptionUnderWhyChoose,
     }
   } catch {
     const legacy = raw
@@ -84,6 +111,7 @@ function parseHighlightsConfig(raw: string | null | undefined): {
     return {
       whyChooseCards: legacy.length > 0 ? legacy : DEFAULT_WHY_CHOOSE,
       showcaseCards: DEFAULT_SHOWCASE,
+      descriptionUnderWhyChoose: "",
     }
   }
 }
@@ -91,18 +119,20 @@ function parseHighlightsConfig(raw: string | null | undefined): {
 function parseExperienceConfig(raw: string | null | undefined): {
   subtitle: string
   images: string[]
+  heading: string
 } {
-  if (!raw) return { subtitle: "", images: ["", "", ""] }
+  if (!raw) return { subtitle: "", images: ["", "", ""], heading: "" }
 
   try {
     const parsed = JSON.parse(raw)
     const subtitle = String(parsed?.subtitle || "")
+    const heading = String(parsed?.heading || "")
     const images = Array.isArray(parsed?.images)
       ? [0, 1, 2].map((i) => String(parsed.images[i] || ""))
       : ["", "", ""]
-    return { subtitle, images }
+    return { subtitle, images, heading }
   } catch {
-    return { subtitle: "", images: ["", "", ""] }
+    return { subtitle: "", images: ["", "", ""], heading: "" }
   }
 }
 
@@ -151,7 +181,9 @@ function EventForm() {
   const [newFiles, setNewFiles] = useState<File[]>([])
   const [whyChooseCards, setWhyChooseCards] = useState<WhyChooseCard[]>(DEFAULT_WHY_CHOOSE)
   const [showcaseCards, setShowcaseCards] = useState<ShowcaseCard[]>(DEFAULT_SHOWCASE)
+  const [descriptionUnderWhyChoose, setDescriptionUnderWhyChoose] = useState("")
   const [experienceSubtitle, setExperienceSubtitle] = useState("")
+  const [experienceHeading, setExperienceHeading] = useState("")
   const [experienceImages, setExperienceImages] = useState<string[]>(["", "", ""])
   const [uploadingExperienceIndex, setUploadingExperienceIndex] = useState<number | null>(null)
   const [uploadingShowcaseIndex, setUploadingShowcaseIndex] = useState<number | null>(null)
@@ -182,9 +214,11 @@ function EventForm() {
             const highlightsConfig = parseHighlightsConfig(event.highlights)
             setWhyChooseCards(highlightsConfig.whyChooseCards)
             setShowcaseCards(highlightsConfig.showcaseCards)
+            setDescriptionUnderWhyChoose(highlightsConfig.descriptionUnderWhyChoose)
 
             const experienceConfig = parseExperienceConfig(event.experience)
             setExperienceSubtitle(experienceConfig.subtitle)
+            setExperienceHeading(experienceConfig.heading)
             setExperienceImages(experienceConfig.images)
             if (event.images) setExistingImages(event.images)
           } else {
@@ -238,8 +272,10 @@ function EventForm() {
         highlights: JSON.stringify({
           whyChooseCards: whyChooseCards.filter((c) => c.title.trim() || c.description.trim()),
           showcaseCards: showcaseCards.filter((c) => c.title.trim() || c.description.trim() || c.imageUrl.trim()),
+          descriptionUnderWhyChoose,
         }),
         experience: JSON.stringify({
+          heading: experienceHeading,
           subtitle: experienceSubtitle,
           images: experienceImages,
         }),
@@ -392,6 +428,16 @@ function EventForm() {
                   Add Card
                 </button>
               </div>
+              <div className="mb-3">
+                <label className="text-xs text-mist-400 block mb-1">Description (below Why Choose heading)</label>
+                <textarea
+                  rows={3}
+                  value={descriptionUnderWhyChoose}
+                  onChange={(e) => setDescriptionUnderWhyChoose(e.target.value)}
+                  className={`${inputClass} resize-none`}
+                  placeholder="e.g., Experience the perfect blend of luxury, entertainment, and world-class service"
+                />
+              </div>
               <div className="space-y-2.5">
                 {whyChooseCards.map((card, idx) => (
                   <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center bg-mist-50 rounded-lg p-3">
@@ -429,7 +475,18 @@ function EventForm() {
             </div>
 
             <div>
-              <label className="text-xs text-mist-400 block mb-1">Experience Section Subtitle (line below main heading)</label>
+              <label className="text-xs text-mist-400 block mb-1">Experience Section Heading</label>
+              <input
+                type="text"
+                value={experienceHeading}
+                onChange={(e) => setExperienceHeading(e.target.value)}
+                className={inputClass}
+                placeholder="e.g., Experience the {event name}"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-mist-400 block mb-1">Experience Section Subtitle (line below heading)</label>
               <input
                 type="text"
                 value={experienceSubtitle}

@@ -523,11 +523,13 @@ function VillaListCard({ villa }: { villa: VillaFromAPI }) {
 
       {/* Image */}
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
-        {image ? (
-          <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
-        ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
-        )}
+        <Link href={`/villas/${villa.slug}`} className="block w-full h-full">
+          {image ? (
+            <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
+          )}
+        </Link>
         <button
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
           className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav ? "bg-mist-700 text-red-500" : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"

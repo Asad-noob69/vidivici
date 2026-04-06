@@ -65,15 +65,17 @@ function EventCard({ event }: { event: EventFromAPI }) {
 
       {/* Image with padding */}
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
-        {image ? (
-          <img
-            src={image}
-            alt={event.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
-          />
-        ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm 2xl:text-lg rounded-2xl 2xl:rounded-[30px]">No Image</div>
-        )}
+        <Link href={`/events/${event.slug}`} className="block w-full h-full">
+          {image ? (
+            <img
+              src={image}
+              alt={event.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
+            />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm 2xl:text-lg rounded-2xl 2xl:rounded-[30px]">No Image</div>
+          )}
+        </Link>
 
         {/* Updated favorite button - positioned inside padding, dark bg */}
         <button

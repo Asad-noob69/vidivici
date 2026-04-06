@@ -83,17 +83,32 @@ const CARD_WIDTH = 270 + 20;
 export default function ExclusiveNightlife({ showHeader = true }) {
   const trackRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
 
   const handleScroll = () => {
     const el = trackRef.current;
     if (!el) return;
-    setActiveIndex(Math.round(el.scrollLeft / CARD_WIDTH));
+    const firstCard = el.children[0];
+    const cardWidth = firstCard
+      ? firstCard.getBoundingClientRect().width + 20
+      : CARD_WIDTH;
+    setActiveIndex(Math.round(el.scrollLeft / cardWidth));
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
 
   const scrollTo = (index) => {
     if (!trackRef.current) return;
     const clamped = Math.max(0, Math.min(index, events.length - 1));
-    trackRef.current.scrollTo({ left: clamped * CARD_WIDTH, behavior: "smooth" });
+
+    // Get actual card width dynamically
+    const firstCard = trackRef.current.children[0];
+    const cardWidth = firstCard
+      ? firstCard.getBoundingClientRect().width + 20 // 20 = gap
+      : CARD_WIDTH;
+
+    trackRef.current.scrollTo({ left: clamped * cardWidth, behavior: "smooth" });
     setActiveIndex(clamped);
   };
 
@@ -117,7 +132,7 @@ export default function ExclusiveNightlife({ showHeader = true }) {
 
         {/* Left Arrow */}
         <button
-          onClick={() => scrollTo(activeIndex - 2)}
+          onClick={() => scrollTo(activeIndex - 1)}
           className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700  2xl:w-6 2xl:h-6" />
@@ -125,7 +140,7 @@ export default function ExclusiveNightlife({ showHeader = true }) {
 
         {/* Right Arrow */}
         <button
-          onClick={() => scrollTo(activeIndex + 2)}
+          onClick={() => scrollTo(activeIndex + 1)}
           className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700  2xl:w-6 2xl:h-6" />

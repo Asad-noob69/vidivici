@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import VillaCard from "@/components/ui/VillaCard";
 
@@ -91,35 +91,38 @@ const villas = [
   },
 ];
 
-const CARD_WIDTH = 240 + 16; // card width + gap
+const CARD_WIDTH = 240 + 16; // desktop
 
 export default function Villa({ showHeader = true }) {
   const trackRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
 
-  const updateScrollState = () => {
+  const handleScroll = () => {
     const el = trackRef.current;
     if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 4);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
-    setActiveIndex(Math.min(Math.round(el.scrollLeft / CARD_WIDTH), villas.length - 1));
+    const firstCard = el.children[0];
+    const cardWidth = firstCard
+      ? firstCard.getBoundingClientRect().width + 16
+      : CARD_WIDTH;
+    setActiveIndex(Math.round(el.scrollLeft / cardWidth));
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
 
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", updateScrollState, { passive: true });
-    return () => el.removeEventListener("scroll", updateScrollState);
-  }, []);
+  const scrollTo = (index) => {
+    if (!trackRef.current) return;
+    const clamped = Math.max(0, Math.min(index, villas.length - 1));
 
-  const scroll = (dir) => {
-    trackRef.current?.scrollBy({ left: dir * CARD_WIDTH * 2, behavior: "smooth" });
-  };
+    // Get actual card width dynamically
+    const firstCard = trackRef.current.children[0];
+    const cardWidth = firstCard
+      ? firstCard.getBoundingClientRect().width + 16 // 16 = gap
+      : CARD_WIDTH;
 
-  const scrollToIndex = (i) => {
-    trackRef.current?.scrollTo({ left: i * CARD_WIDTH, behavior: "smooth" });
+    trackRef.current.scrollTo({ left: clamped * cardWidth, behavior: "smooth" });
+    setActiveIndex(clamped);
   };
 
   return (
@@ -143,14 +146,14 @@ export default function Villa({ showHeader = true }) {
         <div className="relative">
          
             <button
-              onClick={() => scroll(-1)}
+              onClick={() => scrollTo(activeIndex - 1)}
               className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
             >
               <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700 2xl:w-6 2xl:h-6" />
             </button>
-    
+
             <button
-              onClick={() => scroll(1)}
+              onClick={() => scrollTo(activeIndex + 1)}
               className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
             >
               <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700 2xl:w-6 2xl:h-6" />
@@ -161,6 +164,7 @@ export default function Villa({ showHeader = true }) {
           {/* Carousel Track */}
           <div
             ref={trackRef}
+            onScroll={handleScroll}
             className="flex gap-5 px-6 md:px-12 overflow-x-auto pb-2 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
@@ -188,7 +192,7 @@ export default function Villa({ showHeader = true }) {
           {villas.map((_, i) => (
             <button
               key={i}
-              onClick={() => scrollToIndex(i)}
+              onClick={() => scrollTo(i)}
               className={`rounded-full transition-all duration-300 ${i === activeIndex
                 ? "w-5 h-2 bg-mist-900"
                 : "w-2 h-2 bg-mist-300 hover:bg-mist-500"

@@ -66,15 +66,17 @@ export default function TimeSelectDropdown({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 ${desktop ? "2xl:px-5 2xl:text-lg" : ""} text-sm text-mist-900 focus:outline-none focus:border-mist-400 h-12 2xl:h-14 pt-6 pb-2 2xl:pt-8 2xl:pb-3 text-left ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+        className={`w-full appearance-none bg-white border border-mist-300 rounded-md px-3 ${desktop ? "2xl:px-5 2xl:text-lg" : ""} text-sm text-mist-900 focus:outline-none focus:border-mist-400 h-11 2xl:h-13 flex items-end pb-1 text-left ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         {selectedLabel}
       </button>
 
       <span
-        className={`pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1.5 ${desktop ? "2xl:top-2" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue || open ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1 ${desktop ? "2xl:top-1.5" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue || open ? "opacity-100" : "opacity-0"}`}
       >
         {label}
+        
+
       </span>
       <span
         className={`pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1/2 -translate-y-1/2 text-sm ${desktop ? "2xl:text-lg" : ""} text-mist-300 transition-opacity duration-150 ${hasValue || open ? "opacity-0" : "opacity-100"}`}

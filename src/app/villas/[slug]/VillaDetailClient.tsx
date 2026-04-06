@@ -10,6 +10,7 @@ import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
 import HomeVillaSection from "@/components/home/Villa"
 import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
+import CarGallery from "@/components/cars/CarGallery" // adjust path as needed
 
 interface VillaImage {
   url: string
@@ -113,11 +114,11 @@ const dateInputStyles = `
 const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent"
 
 function getTemporalInputClass(desktop = false) {
-  return `${temporalInputClass} ${desktop ? "2xl:px-5 2xl:text-lg" : ""} h-12 2xl:h-14 pt-6 pb-2 2xl:pt-8 2xl:pb-3 peer`
+  return `${temporalInputClass} ${desktop ? "2xl:px-5 2xl:text-lg" : ""} h-11 2xl:h-13 pt-5 pb-1 2xl:pt-6 2xl:pb-2 peer`
 }
 
 function getTemporalTopLabelClass(hasValue: boolean, desktop = false) {
-  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1.5 ${desktop ? "2xl:top-2" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
+  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1 ${desktop ? "2xl:top-1.5" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
 }
 
 function getTemporalCenterLabelClass(hasValue: boolean, desktop = false) {
@@ -319,63 +320,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
           <div className="flex flex-col lg:flex-row gap-10 2xl:gap-16">
             {/* Left Column */}
             <div className="flex-1 min-w-0 space-y-8 2xl:space-y-12">
-              {/* Gallery */}
-              {/* Main Image */}
-              <div className="relative rounded-2xl overflow-hidden mb-4">
-                <img
-                  src={images[currentImage].url}
-                  alt={images[currentImage].alt || villa.name}
-                  className="w-full h-[340px] lg:h-[420px] 2xl:h-[600px] object-cover"
-                />
-                {images.length > 1 && (
-                  <>
-                    <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 2xl:w-12 2xl:h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-sm">
-                      <ChevronLeft size={18} className="text-mist-700" />
-                    </button>
-                    <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 2xl:w-12 2xl:h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-sm">
-                      <ChevronRight size={18} className="text-mist-700" />
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="relative mb-8">
-                  <div
-                    ref={thumbsRef}
-                    className="mx-7 flex gap-2 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                  >
-                    {images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentImage(i)}
-                        className={`w-[118px] h-[80px] 2xl:w-[160px] 2xl:h-[110px] rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${i === currentImage ? "border-transparent" : "border-mist-200 hover:border-mist-400"}`}
-                      >
-                        <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                  {/* Thumbnail row arrows */}
-                  <button
-                    type="button"
-                    onClick={() => scrollThumbs("left")}
-                    className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full border border-mist-200 bg-white p-1.5 text-mist-600 shadow-sm transition-colors hover:bg-mist-50"
-                    aria-label="Scroll thumbnails left"
-                  >
-                    <ChevronLeft size={14} className="text-mist-600" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => scrollThumbs("right")}
-                    className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full border border-mist-200 bg-white p-1.5 text-mist-600 shadow-sm transition-colors hover:bg-mist-50"
-                    aria-label="Scroll thumbnails right"
-                  >
-                    <ChevronRight size={14} className="text-mist-600" />
-                  </button>
-                </div>
-              )}
-
+             <CarGallery images={images} />
               {/* Mobile breadcrumb under gallery */}
               <div className="sm:hidden min-w-0 flex items-center gap-1.5 text-sm text-mist-700 whitespace-nowrap -mt-3">
                 <Link href="/" className="hover:text-mist-700">Home</Link>
@@ -1639,9 +1584,20 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
         </div>
       )}
 
-      <section className="pt-8 2xl:pt-12">
-        <div className="px-6 sm:px-16 lg:px-20 2xl:px-32">
-          <h2 className="text-2xl sm:text-4xl 2xl:text-5xl font-bold text-mist-900 tracking-tight">You may also like</h2>
+      <section className="pt-16 2xl:pt-24">
+        <div className="px-6 sm:px-16 lg:px-20 2xl:px-32  flex items-center justify-between gap-4">
+          <h2 className="text-2xl sm:text-4xl 2xl:text-5xl font-bold text-mist-900 tracking-tight">
+            You may also like
+          </h2>
+          <a
+            href="#"
+            className="flex items-center gap-1 text-sm font-medium text-mist-500 bg-mist-100 rounded-md px-4 py-2 hover:bg-mist-50 transition-colors duration-150 whitespace-nowrap shrink-0"
+          >
+            View all
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M7 7h10v10" />
+            </svg>
+          </a>
         </div>
         <HomeVillaSection showHeader={false} />
       </section>
