@@ -828,6 +828,13 @@ function ReservationContent() {
                             />
                           </div>
                         </div>
+                        <button
+                          type="button"
+                          disabled
+                          className="w-full rounded-lg bg-mist-900 py-3 text-sm font-semibold text-white opacity-40 cursor-not-allowed"
+                        >
+                          Place Order
+                        </button>
                       </div>
                     )}
 
@@ -912,16 +919,6 @@ function ReservationContent() {
                       }}
                       onError={(msg) => alert(msg)}
                     />
-                  )}
-
-                  {paymentMethod === "card" && (
-                    <button
-                      type="button"
-                      disabled
-                      className="w-full rounded-lg bg-mist-200 py-3 text-sm font-semibold text-mist-500 cursor-not-allowed"
-                    >
-                      Place Order
-                    </button>
                   )}
                 </div>
 
