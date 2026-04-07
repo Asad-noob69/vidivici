@@ -6,18 +6,18 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const carMakes = [
-  { name: "Rolls-Royce", logo: "/carlogo5.png" },
-  { name: "Cadillac", logo: "/carlogo2.png" },
+  { name: "Rolls-Royce", logo: "/Mask group-4.png" },
+  { name: "Cadillac", logo: "/carlogo7.png" },
   { name: "Mercedes", logo: "/carlogo4.png" },
-  { name: "Bentley", logo: "/carlogo9.png" },
+  { name: "Bentley", logo: "/carlogo8.png" },
   { name: "Lamborghini", logo: "/carlogo3.png" },
-  { name: "Aston Martin", logo: "/carlogo1.png" },
-  { name: "BMW", logo: "/carlogo2.png" },
-  { name: "Porsche", logo: "/carlogo6.png" },
-  { name: "Audi", logo: "/carlogo10.png" },
-  { name: "Maserati", logo: "/carlogo13.png" },
-  { name: "Range Rover", logo: "/carlogo7.png" },
-  { name: "McLaren", logo: "/carlogo11.png" },
+  { name: "Aston Martin", logo: "/carlogo2.png" },
+  { name: "BMW", logo: "/carlogo5.png" },
+  { name: "Porsche", logo: "/carlogo11.png" },
+  { name: "Audi", logo: "/carlogo9.png" },
+  { name: "Maserati", logo: "/carlogo12.png" },
+  { name: "Range Rover", logo: "/carlogo6.png" },
+  { name: "McLaren", logo: "/carlogo10.png" },
 ];
 
 const carTypes = [
@@ -38,25 +38,23 @@ function BrowseCard({
   isType: boolean; 
   onClick: (name: string) => void 
 }) {
-  const logoSizeClass = isType
-    ? "w-36 h-20 sm:w-36 sm:h-20 2xl:w-72 2xl:h-40"
-    : item.name === "Bentley" || item.name === "Aston Martin"
-      ? "w-20 h-20 sm:w-24 sm:h-24 2xl:w-44 2xl:h-44"
-      : "w-16 h-16 sm:w-18 sm:h-18 2xl:w-36 2xl:h-36";
 
-  const logoScaleClass = isType
-    ? "scale-[1.35] sm:scale-[1.35] 2xl:scale-150"
-    : item.name === "Bentley" || item.name === "Aston Martin"
-      ? "scale-[1.4] sm:scale-[1.3] 2xl:scale-140"
-      : "scale-125 sm:scale-110";
+const logoSizeClass = isType
+  ? "w-36 h-20 sm:w-36 sm:h-20 2xl:w-72 2xl:h-40"
+  : "w-36 h-20 sm:w-36 sm:h-20 2xl:w-72 2xl:h-40";
+
+const logoScaleClass = isType
+  ? "scale-[1.35] sm:scale-[1.35] 2xl:scale-150"
+  : "scale-100 2xl:scale-110";
+
 
   return (
     <button
       onClick={() => onClick(item.name)}
-      className="flex flex-col items-center justify-center gap-4 2xl:gap-10
+      className={`flex flex-col items-center justify-center gap-4 2xl:gap-10
       py-5 px-7 sm:py-7 sm:px-10 2xl:py-16 2xl:px-28 my-4 rounded-2xl border shrink-0
       transition-all duration-300 border-mist-200 bg-white
-      hover:border-black hover:scale-105 group shadow-sm hover:shadow-xl"
+      hover:border-black hover:scale-105 group shadow-sm hover:shadow-xl   `} 
     >
       <div className={`relative transition-transform duration-500 group-hover:scale-110 ${logoSizeClass}`}>
         <Image
@@ -187,11 +185,11 @@ export default function CarBrowseSection() {
         }
 
         .speed-make {
-          animation: scroll 45s linear infinite;
+          animation: scroll 70s linear infinite;
         }
 
         .speed-type {
-          animation: scroll 28s linear infinite;
+          animation: scroll 35s linear infinite;
         }
 
         @media (min-width: 1900px) {

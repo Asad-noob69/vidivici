@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Banner from "@/components/ui/Banner"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
@@ -56,34 +57,61 @@ const NIGHTLIFE_CATEGORIES = [
 /* ================================================================== */
 /*  Event Card                                                         */
 /* ================================================================== */
-function EventCard({ event }: { event: EventFromAPI }) {
-  const [fav, setFav] = useState(false)
+function EventCard({ event, wishlisted: initialWishlisted }: { event: EventFromAPI; wishlisted?: boolean }) {
+  const [wishlisted, setWishlisted] = useState(initialWishlisted || false)
+  const [toggling, setToggling] = useState(false)
   const image = event.images?.[0]?.url
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!event.id || toggling) return
+    setToggling(true)
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId: event.id }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWishlisted(data.wishlisted)
+      } else if (res.status === 401) {
+        window.location.href = "/login"
+      }
+    } catch {} finally {
+      setToggling(false)
+    }
+  }
 
   return (
     <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-[40px] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 w-xs 2xl:w-[500px] flex-shrink-0 group cursor-pointer">
 
       {/* Image with padding */}
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
-        {image ? (
-          <img
-            src={image}
-            alt={event.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
-          />
-        ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm 2xl:text-lg rounded-2xl 2xl:rounded-[30px]">No Image</div>
-        )}
+        <Link href={`/events/${event.slug}`} className="block w-full h-full">
+          {image ? (
+            <img
+              src={image}
+              alt={event.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
+            />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm 2xl:text-lg rounded-2xl 2xl:rounded-[30px]">No Image</div>
+          )}
+        </Link>
 
         {/* Updated favorite button - positioned inside padding, dark bg */}
         <button
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
-          className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav
-              ? "bg-mist-700 text-mist-700"
+          onClick={toggleWishlist}
+          disabled={toggling}
+          className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${
+            wishlisted
+              ? "bg-mist-700 text-red-500"
               : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
-            }`}
+          }`}
         >
-          <Heart size={13} fill={fav ? "currentColor" : "none"} strokeWidth={2} />
+          <Heart size={13} fill={wishlisted ? "currentColor" : "none"} strokeWidth={2} />
         </button>
       </div>
 
@@ -127,10 +155,12 @@ function EventCard({ event }: { event: EventFromAPI }) {
 function EventsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
   const [events, setEvents] = useState<EventFromAPI[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [hovered, setHovered] = useState(null);
+  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set())
 
   const sort = searchParams.get("sort") || "newest"
   const activeCategory = searchParams.get("category") || ""
@@ -159,6 +189,18 @@ function EventsContent() {
   }, [searchParams, activeCategory])
 
   useEffect(() => { fetchEvents() }, [fetchEvents])
+
+  // Fetch wishlist IDs
+  useEffect(() => {
+    if (!session?.user) return
+    fetch("/api/wishlist?type=event")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        const ids = new Set<string>(data.map((item: any) => item.eventId).filter(Boolean))
+        setWishlistIds(ids)
+      })
+      .catch(() => {})
+  }, [session])
 
   const handleCategoryChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -410,7 +452,7 @@ function EventsContent() {
               <div className="w-full text-center py-12 2xl:py-20 text-mist-500 2xl:text-2xl">No events found</div>
             ) : (
               events.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard key={event.id} event={event} wishlisted={wishlistIds.has(event.id)} />
               ))
             )}
             <div className="w-6 shrink-0" />

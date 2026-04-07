@@ -86,20 +86,33 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
 
-  const handleScroll = () => {
-    const el = trackRef.current;
-    if (!el) return;
-    setActiveIndex(Math.round(el.scrollLeft / CARD_WIDTH));
-    setCanLeft(el.scrollLeft > 4);
-    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
-  };
+ const handleScroll = () => {
+  const el = trackRef.current;
+  if (!el) return;
+  const firstCard = el.children[0];
+  const cardWidth = firstCard 
+    ? firstCard.getBoundingClientRect().width + 20 
+    : CARD_WIDTH;
+  setActiveIndex(Math.round(el.scrollLeft / cardWidth));
+  setCanLeft(el.scrollLeft > 4);
+  setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+};
 
-  const scrollTo = (index) => {
-    if (!trackRef.current) return;
-    const clamped = Math.max(0, Math.min(index, cars.length - 1));
-    trackRef.current.scrollTo({ left: clamped * CARD_WIDTH, behavior: "smooth" });
-    setActiveIndex(clamped);
-  };
+ const CARD_WIDTH = 270 + 20; // desktop
+
+const scrollTo = (index) => {
+  if (!trackRef.current) return;
+  const clamped = Math.max(0, Math.min(index, cars.length - 1));
+  
+  // Get actual card width dynamically
+  const firstCard = trackRef.current.children[0];
+  const cardWidth = firstCard 
+    ? firstCard.getBoundingClientRect().width + 20 // 20 = gap
+    : CARD_WIDTH;
+  
+  trackRef.current.scrollTo({ left: clamped * cardWidth, behavior: "smooth" });
+  setActiveIndex(clamped);
+};
 
   return (
     <section className="bg-white w-full py-16 overflow-hidden">
@@ -121,14 +134,14 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
       <div className="relative">
         
           <button
-            onClick={() => scrollTo(activeIndex - 2)}
+            onClick={() => scrollTo(activeIndex - 1)}
             className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700 2xl:w-6 2xl:h-6" />
           </button>
        
           <button
-            onClick={() => scrollTo(activeIndex + 2)}
+            onClick={() => scrollTo(activeIndex + 1)}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
           >
             <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700 2xl:w-6 2xl:h-6" />
@@ -150,7 +163,7 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
       </div>
 
       {/* Dot indicators */}
-      <div className="flex items-center justify-center gap-2 mt-7">
+      <div className="flex items-center justify-center gap-2 mt-4">
         {cars.map((_, i) => (
           <button
             key={i}

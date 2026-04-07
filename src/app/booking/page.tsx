@@ -140,7 +140,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
     input.focus()
     if (typeof (input as HTMLInputElement & { showPicker?: () => void }).showPicker === "function") {
       try {
-        ;(input as HTMLInputElement & { showPicker: () => void }).showPicker()
+        ; (input as HTMLInputElement & { showPicker: () => void }).showPicker()
       } catch {
         // Safari may not support or may block showPicker; focus fallback still works.
       }
@@ -187,11 +187,11 @@ const TIME_OPTIONS = [
 ]
 
 function getTemporalSelectClass() {
-  return "w-full appearance-none bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 h-12 pt-6 pb-2 peer"
+  return "w-full appearance-none bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-900 focus:outline-none focus:border-mist-400 h-11 pt-5 pb-1 peer"
 }
 
 function getTemporalTopLabelClass(hasValue: boolean) {
-  return `pointer-events-none absolute left-3 top-1.5 text-[10px] text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
+  return `pointer-events-none absolute left-3 top-1 text-[10px] text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
 }
 
 function getTemporalCenterLabelClass(hasValue: boolean) {
@@ -310,7 +310,7 @@ function ReservationContent() {
         const b = Array.isArray(data) ? data : []
         setBrands(b.map((x: any) => ({ id: x.id, name: x.name, slug: x.slug })))
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   /* ---- Fetch cars when brand changes ---- */
@@ -367,7 +367,7 @@ function ReservationContent() {
           }
         })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* ---- Fetch villas ---- */
@@ -420,10 +420,10 @@ function ReservationContent() {
           }
         })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
 
-   useEffect(() => {
+  useEffect(() => {
     if (step >= 2) {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
@@ -446,9 +446,9 @@ function ReservationContent() {
             if (profile.insurance && !insuranceUrl) setInsuranceUrl(profile.insurance)
           }
         })
-        .catch(() => {})
+        .catch(() => { })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session])
 
   /* ---- File upload helper ---- */
@@ -470,7 +470,7 @@ function ReservationContent() {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ [type === "license" ? "driverLicense" : "insurance"]: url }),
-        }).catch(() => {})
+        }).catch(() => { })
       }
     } catch {
       alert("Upload failed. Please try again.")
@@ -555,13 +555,12 @@ function ReservationContent() {
               setStep(1)
             }}
             disabled={(isFlowLockedFromDetails && sourceMode !== "car") || (step >= 2 && mode !== "car")}
-            className={`flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
-              mode === "car"
+            className={`flex-1 py-2.5 text-center text-sm font-medium transition-colors ${mode === "car"
                 ? "bg-mist-900 text-white"
                 : ((isFlowLockedFromDetails && sourceMode !== "car") || step >= 2)
                   ? "text-mist-300 bg-mist-50 cursor-not-allowed"
                   : "text-mist-400 bg-mist-50 hover:bg-mist-100"
-            }`}
+              }`}
           >
             Car
           </button>
@@ -572,13 +571,12 @@ function ReservationContent() {
               setStep(1)
             }}
             disabled={(isFlowLockedFromDetails && sourceMode !== "villa") || (step >= 2 && mode !== "villa")}
-            className={`flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
-              mode === "villa"
+            className={`flex-1 py-2.5 text-center text-sm font-medium transition-colors ${mode === "villa"
                 ? "bg-mist-900 text-white"
                 : ((isFlowLockedFromDetails && sourceMode !== "villa") || step >= 2)
                   ? "text-mist-300 bg-mist-50 cursor-not-allowed"
                   : "text-mist-400 bg-mist-50 hover:bg-mist-100"
-            }`}
+              }`}
           >
             Villa
           </button>
@@ -587,27 +585,24 @@ function ReservationContent() {
         {/* Stepper */}
         <div className="flex items-center justify-center gap-0 mb-10 max-w-md mx-auto">
           <div className="flex flex-col items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-              step >= 1 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
-            }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step >= 1 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
+              }`}>
               {step > 1 ? <CheckCircle size={16} /> : "1"}
             </div>
             <span className={`text-xs mt-1.5 ${step >= 1 ? "text-blue-600 font-medium" : "text-mist-400"}`}>Select</span>
           </div>
           <div className={`flex-1 h-0.5 mx-2 -mt-3 ${step >= 2 ? "bg-blue-600" : "bg-mist-200"}`} />
           <div className="flex flex-col items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-              step >= 2 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
-            }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step >= 2 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
+              }`}>
               {step > 2 ? <CheckCircle size={16} /> : "2"}
             </div>
             <span className={`text-xs mt-1.5 ${step >= 2 ? "text-blue-600 font-medium" : "text-mist-400"}`}>Pay</span>
           </div>
           <div className={`flex-1 h-0.5 mx-2 -mt-3 ${step >= 3 ? "bg-blue-600" : "bg-mist-200"}`} />
           <div className="flex flex-col items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-              step >= 3 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
-            }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step >= 3 ? "bg-blue-600 text-white" : "bg-mist-200 text-mist-400"
+              }`}>
               3
             </div>
             <span className={`text-xs mt-1.5 ${step >= 3 ? "text-blue-600 font-medium" : "text-mist-400"}`}>Done</span>
@@ -659,7 +654,9 @@ function ReservationContent() {
                 phone={phone}
                 setPhone={setPhone}
                 driverLicenseUrl={driverLicenseUrl}
+                setDriverLicenseUrl={setDriverLicenseUrl}
                 insuranceUrl={insuranceUrl}
+                setInsuranceUrl={setInsuranceUrl}
                 uploadingLicense={uploadingLicense}
                 uploadingInsurance={uploadingInsurance}
                 onDocUpload={handleDocUpload}
@@ -976,11 +973,6 @@ function ReservationContent() {
                 villaIdDocumentName={villaIdDocumentName}
               />
             )}
-            {!hasVehicle && (
-              <div className="border border-mist-200 rounded-2xl p-5 text-center text-sm text-mist-400">
-                Select a {mode} to see pricing
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -1001,7 +993,7 @@ function CarSelectStep({
   days, today, onNext, canProceed,
   firstName, setFirstName, lastName, setLastName,
   email, setEmail, phone, setPhone,
-  driverLicenseUrl, insuranceUrl,
+  driverLicenseUrl, setDriverLicenseUrl, insuranceUrl, setInsuranceUrl,
   uploadingLicense, uploadingInsurance, onDocUpload,
   deliveryType, setDeliveryType,
   deliveryAddress, setDeliveryAddress,
@@ -1040,7 +1032,7 @@ function CarSelectStep({
   lastName: string; setLastName: (v: string) => void
   email: string; setEmail: (v: string) => void
   phone: string; setPhone: (v: string) => void
-  driverLicenseUrl: string; insuranceUrl: string
+  driverLicenseUrl: string; setDriverLicenseUrl: (v: string) => void; insuranceUrl: string; setInsuranceUrl: (v: string) => void
   uploadingLicense: boolean; uploadingInsurance: boolean
   onDocUpload: (file: File, type: "license" | "insurance") => void
   deliveryType: "pickup" | "delivery"
@@ -1057,6 +1049,8 @@ function CarSelectStep({
   const [calendarOpen, setCalendarOpen] = useState(false)
   const customerInfoRef = useRef<HTMLDivElement | null>(null)
   const didAutoScrollRef = useRef(false)
+const licenseInputRef = useRef<HTMLInputElement>(null)
+const insuranceInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!autoScrollToCustomerInfo || didAutoScrollRef.current) return
@@ -1135,7 +1129,7 @@ function CarSelectStep({
                   {loadingCars ? "Loading..." : !selectedBrandSlug ? "Select a make first" : "Select a model"}
                 </option>
                 {carOptions.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.name} — ${c.pricePerDay}/day</option>
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none" />
@@ -1256,173 +1250,197 @@ function CarSelectStep({
       <div ref={customerInfoRef} className="scroll-mt-28">
         {showCustomerInfo && (
           <>
-        {/* Pickup / Delivery Toggle */}
-        <div className="flex flex-row items-center justify-between gap-3 my-8">
-          <div className="flex w-fit self-start gap-0 border border-mist-200 rounded-md overflow-hidden">
-            <button type="button" onClick={() => setDeliveryType("pickup")}
-              className={`px-5 py-2 text-sm font-medium transition-colors ${
-                deliveryType === "pickup" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
-              }`}>
-              Pickup
-            </button>
-            <button type="button" onClick={() => setDeliveryType("delivery")}
-              className={`px-5 py-2 text-sm font-medium transition-colors ${
-                deliveryType === "delivery" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
-              }`}>
-              Delivery
-            </button>
-          </div>
-          <div className="flex items-center gap-1">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={isOneWay} onChange={(e) => setIsOneWay(e.target.checked)}
-                className="w-4 h-4 rounded border-mist-300 text-blue-600 focus:ring-blue-500" />
-              <span className="text-sm text-mist-600">One-way</span>
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowOneWayInfo(true)}
-              className="inline-flex h-5 w-5 items-center justify-center rounded-full text-mist-400 transition-colors hover:bg-mist-100 hover:text-mist-700"
-              aria-label="One-way information"
-            >
-              <Info size={14} />
-            </button>
-          </div>
-        </div>
-
-        {showOneWayInfo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <h3 className="text-base font-semibold text-mist-900">About one-way delivery</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowOneWayInfo(false)}
-                  className="rounded-md px-2 py-1 text-sm text-mist-400 hover:bg-mist-100 hover:text-mist-700"
-                  aria-label="Close"
-                >
-                  x
+            {/* Pickup / Delivery Toggle */}
+            <div className="flex flex-row items-center justify-between gap-3 my-8">
+              <div className="flex w-fit self-start gap-0 border border-mist-200 rounded-md overflow-hidden">
+                <button type="button" onClick={() => setDeliveryType("pickup")}
+                  className={`px-5 py-2 text-sm font-medium transition-colors ${deliveryType === "pickup" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
+                    }`}>
+                  Pickup
+                </button>
+                <button type="button" onClick={() => setDeliveryType("delivery")}
+                  className={`px-5 py-2 text-sm font-medium transition-colors ${deliveryType === "delivery" ? "bg-mist-900 text-white" : "text-mist-400 bg-mist-50 hover:bg-mist-100"
+                    }`}>
+                  Delivery
                 </button>
               </div>
-              <p className="text-sm leading-relaxed text-mist-600">
-                One-way means your vehicle can be delivered to one address and collected from a different
-                address at the end of your reservation. Additional relocation fees may apply based on
-                distance and scheduling.
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowOneWayInfo(false)}
-                className="mt-5 w-full rounded-md bg-mist-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-mist-700"
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        )}
-
-        {(deliveryType === "delivery" || (deliveryType === "pickup" && isOneWay)) && (
-          <div className="space-y-3 mb-4">
-            {deliveryType === "delivery" && !isOneWay ? (
-              <div>
-                <label className="text-xs text-mist-500 block mb-1.5">Delivery & Return Address</label>
-                <input type="text" placeholder="Delivery & return address" value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+              <div className="flex items-center gap-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={isOneWay} onChange={(e) => setIsOneWay(e.target.checked)}
+                    className="w-4 h-4 rounded border-mist-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm text-mist-600">One-way</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowOneWayInfo(true)}
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-mist-400 transition-colors hover:bg-mist-100 hover:text-mist-700"
+                  aria-label="One-way information"
+                >
+                  <Info size={14} />
+                </button>
               </div>
-            ) : deliveryType === "delivery" && isOneWay ? (
-              <>
-                <div>
-                  <label className="text-xs text-mist-500 block mb-1.5">Delivery Address</label>
-                  <input type="text" placeholder="Delivery address" value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+            </div>
+
+            {showOneWayInfo && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <h3 className="text-base font-semibold text-mist-900">About one-way delivery</h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowOneWayInfo(false)}
+                      className="rounded-md px-2 py-1 text-sm text-mist-400 hover:bg-mist-100 hover:text-mist-700"
+                      aria-label="Close"
+                    >
+                      x
+                    </button>
+                  </div>
+                  <p className="text-sm leading-relaxed text-mist-600">
+                    One-way means your vehicle can be delivered to one address and collected from a different
+                    address at the end of your reservation. Additional relocation fees may apply based on
+                    distance and scheduling.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowOneWayInfo(false)}
+                    className="mt-5 w-full rounded-md bg-mist-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-mist-700"
+                  >
+                    Got it
+                  </button>
                 </div>
-                <div>
-                  <label className="text-xs text-mist-500 block mb-1.5">Return Address</label>
-                  <input type="text" placeholder="Return address" value={returnAddress}
-                    onChange={(e) => setReturnAddress(e.target.value)}
-                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-                </div>
-              </>
-            ) : (
-              <div>
-                <label className="text-xs text-mist-500 block mb-1.5">Return Address</label>
-                <input type="text" placeholder="Return address" value={returnAddress}
-                  onChange={(e) => setReturnAddress(e.target.value)}
-                  className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
               </div>
             )}
-          </div>
-        )}
 
-        <h2 className="text-lg font-semibold text-mist-900 mb-4">Customer Info</h2>
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">First Name <span className="text-red-400">*</span></label>
-              <input type="text" placeholder="Enter first name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+            {(deliveryType === "delivery" || (deliveryType === "pickup" && isOneWay)) && (
+              <div className="space-y-3 mb-4">
+                {deliveryType === "delivery" && !isOneWay ? (
+                  <div>
+                    <label className="text-xs text-mist-500 block mb-1.5">Delivery & Return Address</label>
+                    <input type="text" placeholder="Delivery & return address" value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                  </div>
+                ) : deliveryType === "delivery" && isOneWay ? (
+                  <>
+                    <div>
+                      <label className="text-xs text-mist-500 block mb-1.5">Delivery Address</label>
+                      <input type="text" placeholder="Delivery address" value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-mist-500 block mb-1.5">Return Address</label>
+                      <input type="text" placeholder="Return address" value={returnAddress}
+                        onChange={(e) => setReturnAddress(e.target.value)}
+                        className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="text-xs text-mist-500 block mb-1.5">Return Address</label>
+                    <input type="text" placeholder="Return address" value={returnAddress}
+                      onChange={(e) => setReturnAddress(e.target.value)}
+                      className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <h2 className="text-lg font-semibold text-mist-900 mb-4">Customer Info</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">First Name <span className="text-red-400">*</span></label>
+                  <input type="text" placeholder="Enter first name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Last Name</label>
+                  <input type="text" placeholder="Enter last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                </div>
+              </div>
+              <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Email Address</label>
+                  <input type="email" placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Phone Number</label>
+                  <input type="tel" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Drivers License <span className="text-red-400">*</span></label>
+                 <input
+  id="license-upload"
+  ref={licenseInputRef}
+  type="file"
+  accept="image/*,.pdf"
+  className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
+  onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "license") }} />
+                  {uploadingLicense && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
+                  {driverLicenseUrl && (
+                    <div>
+                      <a
+                        href={driverLicenseUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-block text-xs text-mist-600 underline"
+                      >
+                        View uploaded license
+                      </a>
+                      <button
+  type="button"
+  onClick={() => {
+    setDriverLicenseUrl("");
+    if (licenseInputRef.current) licenseInputRef.current.value = "";
+  }}
+  className="text-xs text-red-500 hover:text-red-600 underline"
+>
+  Remove
+</button>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Insurance <span className="text-red-400">*</span></label>
+                  <input
+  id="insurance-upload"
+  ref={insuranceInputRef}
+  type="file"
+  accept="image/*,.pdf"
+  className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
+  onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "insurance") }} />
+                  {uploadingInsurance && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
+                {insuranceUrl && (
+                  <>
+                    <a
+                      href={insuranceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 inline-block text-xs text-mist-600 underline"
+                    >
+                      View uploaded insurance
+                    </a>
+                    <button
+  type="button"
+  onClick={() => {
+    setInsuranceUrl("");
+    if (insuranceInputRef.current) insuranceInputRef.current.value = "";
+  }}
+  className="text-xs text-red-500 hover:text-red-600 underline"
+>
+  Remove
+</button>
+                  </>
+                )}
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Last Name</label>
-              <input type="text" placeholder="Enter last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-            </div>
-          </div>
-          <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Email Address</label>
-              <input type="email" placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Phone Number</label>
-              <input type="tel" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Drivers License <span className="text-red-400">*</span></label>
-              <input
-                id="license-upload"
-                type="file"
-                accept="image/*,.pdf"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "license") }} />
-              {uploadingLicense && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
-              {driverLicenseUrl && (
-                <a
-                  href={driverLicenseUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 inline-block text-xs text-mist-600 underline"
-                >
-                  View uploaded license
-                </a>
-              )}
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Insurance <span className="text-red-400">*</span></label>
-              <input
-                id="insurance-upload"
-                type="file"
-                accept="image/*,.pdf"
-                className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm text-mist-700 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) onDocUpload(f, "insurance") }} />
-              {uploadingInsurance && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
-              {insuranceUrl && (
-                <a
-                  href={insuranceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 inline-block text-xs text-mist-600 underline"
-                >
-                  View uploaded insurance
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
           </>
         )}
       </div>
@@ -1722,96 +1740,96 @@ function VillaSelectStep({
       <div ref={customerInfoRef} className="border-t border-mist-200 pt-8 scroll-mt-28">
         {showCustomerInfo && (
           <>
-        <h2 className="text-3xl font-semibold text-mist-900 mb-4">Customer Info</h2>
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">First Name</label>
-              <input
-                type="text"
-                placeholder="Enter first name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Last Name</label>
-              <input
-                type="text"
-                placeholder="Enter last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
-              />
-            </div>
-          </div>
+            <h2 className="text-3xl font-semibold text-mist-900 mb-4">Customer Info</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">First Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Last Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
+                  />
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Email Address</label>
-              <input
-                type="email"
-                placeholder="Enter email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-mist-500 block mb-1.5">Phone Number</label>
-              <input
-                type="tel"
-                placeholder="Enter phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
-              />
-            </div>
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="Enter email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-mist-500 block mb-1.5">Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="Enter phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 placeholder:text-mist-400 focus:border-neutral-400 focus:outline-none"
+                  />
+                </div>
+              </div>
 
-          <div>
-            <label className="text-xs text-mist-500 block mb-1.5">Upload ID / Passport <span className="text-red-400">*</span></label>
-            <input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={async (e) => {
-                const file = e.target.files?.[0]
-                if (!file) return
-                setVillaIdDocumentName(file.name)
-                setUploadingVillaId(true)
-                try {
-                  const fd = new FormData()
-                  fd.append("files", file)
-                  const res = await fetch("/api/upload", { method: "POST", body: fd })
-                  if (!res.ok) throw new Error()
-                  const data = await res.json()
-                  const url = data.urls?.[0]
-                  if (url) {
-                    setVillaIdDocumentUrl(url)
-                    fetch("/api/account/profile", {
-                      method: "PUT",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ passport: url }),
-                    }).catch(() => {})
-                  }
-                } catch {
-                  alert("Upload failed. Please try again.")
-                  setVillaIdDocumentName("")
-                } finally {
-                  setUploadingVillaId(false)
-                }
-              }}
-              className="w-full text-sm text-mist-500 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700 hover:file:bg-mist-50"
-            />
-            {uploadingVillaId && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
-            {villaIdDocumentUrl && (
-              <a href={villaIdDocumentUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-mist-600 underline">
-                View uploaded document
-              </a>
-            )}
-          </div>
-        </div>
+              <div>
+                <label className="text-xs text-mist-500 block mb-1.5">Upload ID / Passport <span className="text-red-400">*</span></label>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    setVillaIdDocumentName(file.name)
+                    setUploadingVillaId(true)
+                    try {
+                      const fd = new FormData()
+                      fd.append("files", file)
+                      const res = await fetch("/api/upload", { method: "POST", body: fd })
+                      if (!res.ok) throw new Error()
+                      const data = await res.json()
+                      const url = data.urls?.[0]
+                      if (url) {
+                        setVillaIdDocumentUrl(url)
+                        fetch("/api/account/profile", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ passport: url }),
+                        }).catch(() => { })
+                      }
+                    } catch {
+                      alert("Upload failed. Please try again.")
+                      setVillaIdDocumentName("")
+                    } finally {
+                      setUploadingVillaId(false)
+                    }
+                  }}
+                  className="w-full text-sm text-mist-500 file:mr-3 file:rounded-md file:border file:border-mist-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-mist-700 hover:file:bg-mist-50"
+                />
+                {uploadingVillaId && <p className="mt-1 text-xs text-mist-400">Uploading...</p>}
+                {villaIdDocumentUrl && (
+                  <a href={villaIdDocumentUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-mist-600 underline">
+                    View uploaded document
+                  </a>
+                )}
+              </div>
+            </div>
           </>
         )}
       </div>

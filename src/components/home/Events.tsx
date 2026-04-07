@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect} from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "@/components/ui/EventCard";
 
@@ -78,24 +78,61 @@ export const events = [
   },
 ];
 
-const CARD_WIDTH = 270 + 20;
+const repeatedEvents = [...events, ...events, ...events];
 
 export default function ExclusiveNightlife({ showHeader = true }) {
-  const trackRef = useRef(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const isScrolling = useRef(false);
+
+  const CARD_WIDTH = 270 + 20;
+  const originalLength = events.length;
 
   const handleScroll = () => {
+    if (!trackRef.current || isScrolling.current) return;
     const el = trackRef.current;
-    if (!el) return;
-    setActiveIndex(Math.round(el.scrollLeft / CARD_WIDTH));
+    const singleSetWidth = el.scrollWidth / 3;
+
+    if (el.scrollLeft >= singleSetWidth * 2 - 10) {
+      isScrolling.current = true;
+      el.scrollLeft = el.scrollLeft - singleSetWidth;
+      setActiveIndex((prev) => (prev >= originalLength - 1 ? 0 : prev + 1));
+      requestAnimationFrame(() => { isScrolling.current = false; });
+    } else if (el.scrollLeft <= 10) {
+      isScrolling.current = true;
+      el.scrollLeft = el.scrollLeft + singleSetWidth;
+      setActiveIndex((prev) => (prev <= 0 ? originalLength - 1 : prev - 1));
+      requestAnimationFrame(() => { isScrolling.current = false; });
+    } else {
+      const cardWidth = el.firstElementChild
+        ? (el.firstElementChild as HTMLElement).getBoundingClientRect().width + 20
+        : CARD_WIDTH;
+      setActiveIndex(Math.round((el.scrollLeft % singleSetWidth) / cardWidth));
+    }
   };
 
-  const scrollTo = (index) => {
+  const scrollTo = (index: number) => {
     if (!trackRef.current) return;
-    const clamped = Math.max(0, Math.min(index, events.length - 1));
-    trackRef.current.scrollTo({ left: clamped * CARD_WIDTH, behavior: "smooth" });
-    setActiveIndex(clamped);
+    const el = trackRef.current;
+    const singleSetWidth = el.scrollWidth / 3;
+    const cardWidth = el.firstElementChild
+      ? (el.firstElementChild as HTMLElement).getBoundingClientRect().width + 20
+      : CARD_WIDTH;
+
+    let target = index;
+    if (target < 0) target = originalLength - 1;
+    if (target >= originalLength) target = 0;
+
+    setActiveIndex(target);
+    el.scrollTo({ left: singleSetWidth + target * cardWidth, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (!trackRef.current) return;
+    const el = trackRef.current;
+    const singleSetWidth = el.scrollWidth / 3;
+    el.scrollLeft = singleSetWidth;
+  }, []);
 
   return (
     <section className="bg-white w-full py-16 overflow-hidden">
@@ -117,7 +154,7 @@ export default function ExclusiveNightlife({ showHeader = true }) {
 
         {/* Left Arrow */}
         <button
-          onClick={() => scrollTo(activeIndex - 2)}
+          onClick={() => scrollTo(activeIndex - 1)}
           className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700  2xl:w-6 2xl:h-6" />
@@ -125,7 +162,7 @@ export default function ExclusiveNightlife({ showHeader = true }) {
 
         {/* Right Arrow */}
         <button
-          onClick={() => scrollTo(activeIndex + 2)}
+          onClick={() => scrollTo(activeIndex + 1)}
           className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronRight size={16} strokeWidth={2.5} className="text-mist-700  2xl:w-6 2xl:h-6" />
@@ -138,10 +175,11 @@ export default function ExclusiveNightlife({ showHeader = true }) {
           className="flex gap-5 px-6 md:px-12 overflow-x-auto pb-2 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
+          {repeatedEvents.map((event, i) => (
+            <div key={`${event.id}-${i}`} className="shrink-0">
+              <EventCard event={event} />
+            </div>
           ))}
-          <div className="w-6 shrink-0" />
         </div>
       </div>
 

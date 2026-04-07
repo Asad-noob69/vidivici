@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Banner from "@/components/ui/Banner"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
@@ -47,12 +48,14 @@ const GUEST_OPTIONS = [
 function VillasContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
 
   const [villas, setVillas] = useState<VillaFromAPI[]>([])
   const [total, setTotal] = useState(0)
   const [pages, setPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
+  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set())
 
   const currentPage = parseInt(searchParams.get("page") || "1")
   const sort = searchParams.get("sort") || "newest"
@@ -97,6 +100,18 @@ function VillasContent() {
   }, [searchParams, currentPage, sort])
 
   useEffect(() => { fetchVillas() }, [fetchVillas])
+
+  // Fetch wishlist IDs
+  useEffect(() => {
+    if (!session?.user) return
+    fetch("/api/wishlist?type=villa")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        const ids = new Set<string>(data.map((item: any) => item.villaId).filter(Boolean))
+        setWishlistIds(ids)
+      })
+      .catch(() => {})
+  }, [session])
 
   const handleSortChange = (newSort: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -204,7 +219,7 @@ function VillasContent() {
               ) : (
                 <div className={`grid gap-6 2xl:gap-10 ${showFilters ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
                   {villas.map((villa) => (
-                    <VillaListCard key={villa.id} villa={villa} />
+                    <VillaListCard key={villa.id} villa={villa} wishlisted={wishlistIds.has(villa.id)} />
                   ))}
                 </div>
               )}
@@ -510,9 +525,32 @@ function VillaFilters({ onHide }: { onHide?: () => void }) {
   )
 }
 
-function VillaListCard({ villa }: { villa: VillaFromAPI }) {
-  const [fav, setFav] = useState(false)
+function VillaListCard({ villa, wishlisted: initialWishlisted }: { villa: VillaFromAPI; wishlisted?: boolean }) {
+  const [wishlisted, setWishlisted] = useState(initialWishlisted || false)
+  const [toggling, setToggling] = useState(false)
   const image = villa.images?.[0]?.url
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!villa.id || toggling) return
+    setToggling(true)
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ villaId: villa.id }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWishlisted(data.wishlisted)
+      } else if (res.status === 401) {
+        window.location.href = "/login"
+      }
+    } catch {} finally {
+      setToggling(false)
+    }
+  }
 
   const formatSqft = (sqft: number) => {
     return sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
@@ -523,17 +561,23 @@ function VillaListCard({ villa }: { villa: VillaFromAPI }) {
 
       {/* Image */}
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5">
-        {image ? (
-          <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
-        ) : (
-          <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
-        )}
+        <Link href={`/villas/${villa.slug}`} className="block w-full h-full">
+          {image ? (
+            <img src={image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]" />
+          ) : (
+            <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl">No Image</div>
+          )}
+        </Link>
         <button
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setFav((p) => !p) }}
-          className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${fav ? "bg-mist-700 text-red-500" : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
-            }`}
+          onClick={toggleWishlist}
+          disabled={toggling}
+          className={`absolute top-5 right-5 2xl:top-8 2xl:right-8 w-8 h-8 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${
+            wishlisted
+              ? "bg-mist-700 text-red-500"
+              : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
+          }`}
         >
-          <Heart size={13} className="2xl:w-6 2xl:h-6" fill={fav ? "currentColor" : "none"} strokeWidth={2} />
+          <Heart size={13} className="2xl:w-6 2xl:h-6" fill={wishlisted ? "currentColor" : "none"} strokeWidth={2} />
         </button>
       </div>
 

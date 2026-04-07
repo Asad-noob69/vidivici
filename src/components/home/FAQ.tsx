@@ -41,7 +41,7 @@ export default function FAQ() {
 
   return (
     /* Increased horizontal and vertical padding for 2xl */
-    <section className="w-full bg-white py-16 2xl:pb-48 2xl:pt-96 sm:px-24 lg:px-32 px-10 2xl:px-72">
+    <section className="w-full bg-white py-16 2xl:pb-48 2xl:pt-32 sm:px-24 lg:px-32 px-10 2xl:px-72">
       <div className="2xl:max-w-[1400px] 2xl:mx-auto">
 
         {/* Header - Scaled to 7xl for 2xl screens */}

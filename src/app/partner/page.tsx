@@ -177,7 +177,7 @@ export default function PartnerPage() {
                                 <div className="w-10 h-10 rounded-lg bg-mist-100 border border-mist-100 flex items-center justify-center text-neutral-600">
                                     {f.icon}
                                 </div>
-                                <h3 className="text-xl font-bold text-mist-900">{f.title}</h3>
+                                <h3 className="text-lg font-bold text-mist-900">{f.title}</h3>
                                 <p className="text-base text-mist-400 leading-relaxed">{f.description}</p>
                             </div>
                         ))}
@@ -188,7 +188,7 @@ export default function PartnerPage() {
 
             {/* Who Can Join */}
             <section
-                className="relative w-full sm:px-16 lg:px-20 px-6 pt-16 overflow-visible"
+                className="relative w-full sm:px-16 lg:px-20 px-6 pt-16 overflow-visible h-[450px]"
                 style={{ backgroundColor: "#f0f0ee" }}
             >
                 <img
@@ -208,7 +208,7 @@ export default function PartnerPage() {
                 <div className="relative z-10">
 
                     {/* Heading */}
-                    <div className="text-center mb-12">
+                    <div className="text-center">
                         <h2 className="text-4xl font-bold text-mist-900">
                             Who Can Join
                         </h2>
@@ -220,7 +220,7 @@ export default function PartnerPage() {
                     </div>
 
                     {/* Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 top-36">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 top-20">
                         {whoCanJoin.map((item) => (
                             <div
                                 key={item.title}
@@ -251,7 +251,7 @@ export default function PartnerPage() {
         <HowItWorks />
 
             {/* Become a Partner Form */}
-            <section className="w-full sm:px-16 lg:px-20 px-6 py-16">
+            <section className="w-full sm:px-16 lg:px-28 px-6 py-16">
                 <div className="">
 
                     {/* Heading */}

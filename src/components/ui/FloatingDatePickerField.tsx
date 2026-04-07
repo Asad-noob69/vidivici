@@ -39,13 +39,13 @@ export function DateTriggerField({
   return (
     <div className="relative cursor-pointer" onClick={onClick}>
       <div
-        className={`w-full bg-white border border-mist-300 rounded-md px-3 ${desktopLabel ? "2xl:px-5 2xl:text-lg" : ""} text-sm text-mist-700 h-12 2xl:h-14 pt-6 pb-2 2xl:pt-8 2xl:pb-3`}
+        className={`w-full bg-white border border-mist-300 rounded-md px-3 ${desktopLabel ? "2xl:px-5 2xl:text-lg" : ""} text-sm text-mist-700 h-11 2xl:h-13 flex items-end pb-1`}
       >
         {displayValue}
       </div>
       {/* Top label */}
       <span
-        className={`pointer-events-none absolute left-3 ${desktopLabel ? "2xl:left-5" : ""} top-1.5 ${desktopLabel ? "2xl:top-2" : ""} text-[10px] ${desktopLabel ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute left-3 ${desktopLabel ? "2xl:left-5" : ""} top-1 ${desktopLabel ? "2xl:top-1.5" : ""} text-[10px] ${desktopLabel ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0"}`}
       >
         {label}
       </span>
@@ -186,11 +186,10 @@ export default function DateRangeCalendarPopup({
       onClick={onClose}
     >
       <div
-        className={`bg-white w-full ${
-          isMobile
+        className={`bg-white w-full ${isMobile
             ? "h-full flex flex-col"
             : "rounded-2xl shadow-2xl max-w-[750px] p-6 md:p-8"
-        }`}
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Header ── */}

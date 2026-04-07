@@ -275,16 +275,23 @@ export default function ExclusiveCollection() {
 
   const maxIndex = Math.max(0, getCardCount() - 1);
 
-  const scrollByCards = (direction: "left" | "right") => {
+  const getCardWidth = () => {
+    if (!trackRef.current) return 300;
+    const firstCard = trackRef.current.children[0] as HTMLElement | null;
+    return firstCard ? firstCard.getBoundingClientRect().width + 20 : 300;
+  };
+
+  const scrollTo = (index: number) => {
     if (!trackRef.current) return;
-    const cardWidth = 300;
-    const delta = direction === "left" ? -cardWidth * 2 : cardWidth * 2;
-    trackRef.current.scrollBy({ left: delta, behavior: "smooth" });
+    const clamped = Math.max(0, Math.min(index, getCardCount() - 1));
+    const cardWidth = getCardWidth();
+    trackRef.current.scrollTo({ left: clamped * cardWidth, behavior: "smooth" });
+    setActiveIndex(clamped);
   };
 
   const onTrackScroll = () => {
     if (!trackRef.current) return;
-    const cardWidth = 300;
+    const cardWidth = getCardWidth();
     setActiveIndex(Math.round(trackRef.current.scrollLeft / cardWidth));
   };
 
@@ -356,14 +363,14 @@ export default function ExclusiveCollection() {
 
       <div className="relative">
         <button
-          onClick={() => scrollByCards("left")}
+          onClick={() => scrollTo(activeIndex - 1)}
           className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronLeft size={16} className="text-mist-700" />
         </button>
 
         <button
-          onClick={() => scrollByCards("right")}
+          onClick={() => scrollTo(activeIndex + 1)}
           className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
         >
           <ChevronRight size={16} className="text-mist-700" />
@@ -384,11 +391,7 @@ export default function ExclusiveCollection() {
         {Array.from({ length: getCardCount() }).map((_, i) => (
           <button
             key={i}
-            onClick={() => {
-              if (!trackRef.current) return;
-              trackRef.current.scrollTo({ left: i * 300, behavior: "smooth" });
-              setActiveIndex(i);
-            }}
+            onClick={() => scrollTo(i)}
             className={`rounded-full transition-all duration-300 ${
               i === Math.min(activeIndex, maxIndex)
                 ? "w-5 h-2 bg-mist-800"

@@ -61,17 +61,19 @@ export default function CarCard({ id, name, slug, brand, pricePerDay, originalPr
   return (
     <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
       <div className="relative h-56 2xl:h-[350px] overflow-hidden p-3 2xl:p-5 ">
-        {image ? (
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
-          />
-        ) : (
-          <div className="w-full h-full rounded-2xl 2xl:rounded-[30px] flex items-center justify-center bg-mist-100">
-            <ImageOff size={32} className="text-mist-300" />
-          </div>
-        )}
+        <Link href={`/cars/${slug}`} className="block w-full h-full">
+          {image ? (
+            <img
+              src={image}
+              alt={name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-[30px]"
+            />
+          ) : (
+            <div className="w-full h-full rounded-2xl 2xl:rounded-[30px] flex items-center justify-center bg-mist-100">
+              <ImageOff size={32} className="text-mist-300" />
+            </div>
+          )}
+        </Link>
 
         <button
           onClick={toggleWishlist}

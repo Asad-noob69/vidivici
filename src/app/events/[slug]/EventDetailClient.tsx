@@ -19,6 +19,28 @@ import {
   ShieldCheck,
   GlassWater,
   Gem,
+  Crown,
+  Wine,
+  PartyPopper,
+  Camera,
+  Mic2,
+  Palette,
+  Theater,
+  Martini,
+  Flame,
+  Zap,
+  Trophy,
+  Clapperboard,
+  ChefHat,
+  Landmark,
+  Castle,
+  Trees,
+  Sun,
+  Moon,
+  Ticket,
+  Award,
+  Globe,
+  Building2,
 } from "lucide-react"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
@@ -87,8 +109,9 @@ type ShowcaseCard = {
 function parseHighlightsConfig(raw: string | null | undefined): {
   whyChooseCards: WhyChooseCard[]
   showcaseCards: ShowcaseCard[]
+  descriptionUnderWhyChoose: string
 } {
-  if (!raw) return { whyChooseCards: [], showcaseCards: [] }
+  if (!raw) return { whyChooseCards: [], showcaseCards: [], descriptionUnderWhyChoose: "" }
 
   try {
     const parsed = JSON.parse(raw)
@@ -108,7 +131,9 @@ function parseHighlightsConfig(raw: string | null | undefined): {
       })).filter((item: ShowcaseCard) => item.title || item.description || item.imageUrl)
       : []
 
-    return { whyChooseCards, showcaseCards }
+    const descriptionUnderWhyChoose = String(parsed?.descriptionUnderWhyChoose || "").trim()
+
+    return { whyChooseCards, showcaseCards, descriptionUnderWhyChoose }
   } catch {
     const legacyCards = raw
       .split("|")
@@ -123,26 +148,29 @@ function parseHighlightsConfig(raw: string | null | undefined): {
         }
       })
 
-    return { whyChooseCards: legacyCards, showcaseCards: [] }
+    return { whyChooseCards: legacyCards, showcaseCards: [], descriptionUnderWhyChoose: "" }
   }
 }
 
 function parseExperienceConfig(raw: string | null | undefined): {
   subtitle: string
   images: string[]
+  heading: string
 } {
-  if (!raw) return { subtitle: "", images: [] }
+  if (!raw) return { subtitle: "", images: [], heading: "" }
 
   try {
     const parsed = JSON.parse(raw)
+    const heading = String(parsed?.heading || "").trim()
     const subtitle = String(parsed?.subtitle || "").trim()
     const images = Array.isArray(parsed?.images)
       ? parsed.images.map((img: any) => String(img || "").trim()).filter(Boolean)
       : []
 
-    return { subtitle, images }
+    return { heading, subtitle, images }
   } catch {
     return {
+      heading: "",
       subtitle: "",
       images: [],
     }
@@ -157,6 +185,28 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: 
   ShieldCheck,
   GlassWater,
   Gem,
+  Crown,
+  Wine,
+  PartyPopper,
+  Camera,
+  Mic2,
+  Palette,
+  Theater,
+  Martini,
+  Flame,
+  Zap,
+  Trophy,
+  Clapperboard,
+  ChefHat,
+  Landmark,
+  Castle,
+  Trees,
+  Sun,
+  Moon,
+  Ticket,
+  Award,
+  Globe,
+  Building2,
 }
 
 function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time") {
@@ -626,7 +676,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             Why Choose {event.name}?
           </h2>
           <p className="text-mist-600 text-base 2xl:text-2xl max-w-2xl 2xl:max-w-5xl mx-auto mb-12 2xl:mb-20 leading-relaxed">
-            {event.shortDescription || "Experience the perfect blend of luxury, entertainment, and world-class service in one unforgettable event."}
+            {highlightsConfig.descriptionUnderWhyChoose || event.shortDescription || "Experience the perfect blend of luxury, entertainment, and world-class service in one unforgettable event."}
           </p>
 
           {/* Feature Cards Grid */}
@@ -697,7 +747,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           {/* Right Side: Content */}
           <div className="w-full lg:w-1/2">
             <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] leading-tight mb-4 2xl:mb-6">
-              Experience the <br /> {event.name}
+              {experienceConfig.heading || `Experience the ${event.name}`}
             </h2>
 
             <h3 className="text-lg 2xl:text-3xl font-semibold text-mist-500 mb-6 2xl:mb-8">
