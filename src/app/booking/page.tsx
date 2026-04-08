@@ -259,6 +259,9 @@ function ReservationContent() {
   const [selectedVilla, setSelectedVilla] = useState<VillaData | null>(null)
   const [loadingVillas, setLoadingVillas] = useState(false)
 
+  /* ---- Booked date ranges (availability blocking) ---- */
+  const [bookedRanges, setBookedRanges] = useState<{ start: string; end: string }[]>([])
+
   /* ---- Shared date state ---- */
   const [startDate, setStartDate] = useState(searchParams.get("startDate") || searchParams.get("checkIn") || "")
   const [endDate, setEndDate] = useState(searchParams.get("endDate") || searchParams.get("checkOut") || "")
@@ -304,6 +307,66 @@ function ReservationContent() {
   /* ---- Pay step state (removed - now using PayPal) ---- */
 
   const today = new Date().toISOString().split("T")[0]
+
+  /* ---- Save booking state to sessionStorage before login redirect ---- */
+  const saveBookingState = () => {
+    const state = {
+      mode, selectedBrandSlug,
+      selectedCar: selectedCar ? { id: selectedCar.id, slug: selectedCar.slug, name: selectedCar.name, brandName: selectedCar.brandName, pricePerDay: selectedCar.pricePerDay, milesIncluded: selectedCar.milesIncluded, extraMileRate: selectedCar.extraMileRate, minRentalDays: selectedCar.minRentalDays, location: selectedCar.location, image: selectedCar.image } : null,
+      selectedVilla: selectedVilla ? { id: selectedVilla.id, slug: selectedVilla.slug, name: selectedVilla.name, location: selectedVilla.location, pricePerNight: selectedVilla.pricePerNight, cleaningFee: selectedVilla.cleaningFee, securityDeposit: selectedVilla.securityDeposit, bedrooms: selectedVilla.bedrooms, guests: selectedVilla.guests, image: selectedVilla.image } : null,
+      startDate, endDate, startTime, endTime,
+      needDriver, driverHours, driverAvailability, driverDays,
+      guestCount, villaAirportTransfer, villaPrivateChef, villaSecurityService,
+      firstName, lastName, email, phone,
+      driverLicenseUrl, driverLicenseFileName, insuranceUrl, insuranceFileName,
+      villaIdDocumentName, villaIdDocumentUrl,
+      deliveryType, deliveryAddress, returnAddress, isOneWay,
+    }
+    sessionStorage.setItem("bookingState", JSON.stringify(state))
+  }
+
+  const redirectToLogin = () => {
+    saveBookingState()
+    router.push("/login?callbackUrl=/booking")
+  }
+
+  /* ---- Restore booking state from sessionStorage after login ---- */
+  useEffect(() => {
+    const raw = sessionStorage.getItem("bookingState")
+    if (!raw || !session?.user) return
+    try {
+      const s = JSON.parse(raw)
+      if (s.mode) setMode(s.mode)
+      if (s.selectedBrandSlug) setSelectedBrandSlug(s.selectedBrandSlug)
+      if (s.selectedCar) setSelectedCar(s.selectedCar)
+      if (s.selectedVilla) setSelectedVilla(s.selectedVilla)
+      if (s.startDate) setStartDate(s.startDate)
+      if (s.endDate) setEndDate(s.endDate)
+      if (s.startTime) setStartTime(s.startTime)
+      if (s.endTime) setEndTime(s.endTime)
+      if (s.needDriver) setNeedDriver(s.needDriver)
+      if (s.driverHours) setDriverHours(s.driverHours)
+      if (s.driverAvailability) setDriverAvailability(s.driverAvailability)
+      if (s.driverDays) setDriverDays(s.driverDays)
+      if (s.guestCount) setGuestCount(s.guestCount)
+      if (s.villaAirportTransfer) setVillaAirportTransfer(s.villaAirportTransfer)
+      if (s.villaPrivateChef) setVillaPrivateChef(s.villaPrivateChef)
+      if (s.villaSecurityService) setVillaSecurityService(s.villaSecurityService)
+      if (s.firstName) setFirstName(s.firstName)
+      if (s.lastName) setLastName(s.lastName)
+      if (s.email) setEmail(s.email)
+      if (s.phone) setPhone(s.phone)
+      if (s.driverLicenseUrl) { setDriverLicenseUrl(s.driverLicenseUrl); setDriverLicenseFileName(s.driverLicenseFileName || "") }
+      if (s.insuranceUrl) { setInsuranceUrl(s.insuranceUrl); setInsuranceFileName(s.insuranceFileName || "") }
+      if (s.villaIdDocumentUrl) { setVillaIdDocumentUrl(s.villaIdDocumentUrl); setVillaIdDocumentName(s.villaIdDocumentName || "") }
+      if (s.deliveryType) setDeliveryType(s.deliveryType)
+      if (s.deliveryAddress) setDeliveryAddress(s.deliveryAddress)
+      if (s.returnAddress) setReturnAddress(s.returnAddress)
+      if (s.isOneWay) setIsOneWay(s.isOneWay)
+      sessionStorage.removeItem("bookingState")
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session])
 
   /* ---- Fetch brands on mount ---- */
   useEffect(() => {
@@ -425,6 +488,23 @@ function ReservationContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
+
+  /* ---- Fetch booked date ranges when car/villa is selected ---- */
+  useEffect(() => {
+    if (mode === "car" && selectedCar) {
+      fetch(`/api/cars/${selectedCar.id}/availability`)
+        .then((r) => (r.ok ? r.json() : { bookedRanges: [] }))
+        .then((data) => setBookedRanges(data.bookedRanges || []))
+        .catch(() => setBookedRanges([]))
+    } else if (mode === "villa" && selectedVilla) {
+      fetch(`/api/villas/${selectedVilla.id}/availability`)
+        .then((r) => (r.ok ? r.json() : { bookedRanges: [] }))
+        .then((data) => setBookedRanges(data.bookedRanges || []))
+        .catch(() => setBookedRanges([]))
+    } else {
+      setBookedRanges([])
+    }
+  }, [mode, selectedCar, selectedVilla])
 
   useEffect(() => {
     if (step >= 2) {
@@ -652,7 +732,7 @@ function ReservationContent() {
                 days={days}
                 today={today}
                 onNext={() => {
-                  if (!session?.user) { router.push("/login"); return }
+                  if (!session?.user) { redirectToLogin(); return }
                   setStep(2)
                 }}
                 canProceed={!!canProceed}
@@ -684,6 +764,7 @@ function ReservationContent() {
                 isOneWay={isOneWay}
                 setIsOneWay={setIsOneWay}
                 autoScrollToCustomerInfo={isFlowLockedFromDetails}
+                bookedRanges={bookedRanges}
               />
             )}
 
@@ -720,7 +801,7 @@ function ReservationContent() {
                 days={days}
                 today={today}
                 onNext={() => {
-                  if (!session?.user) { router.push("/login"); return }
+                  if (!session?.user) { redirectToLogin(); return }
                   setStep(2)
                 }}
                 canProceed={!!canProceed}
@@ -731,6 +812,7 @@ function ReservationContent() {
                 setVillaIdDocumentUrl={setVillaIdDocumentUrl}
                 uploadingVillaId={uploadingVillaId}
                 setUploadingVillaId={setUploadingVillaId}
+                bookedRanges={bookedRanges}
               />
             )}
 
@@ -845,8 +927,7 @@ function ReservationContent() {
                         </div>
                         <button
                           type="button"
-                          disabled
-                          className="w-full rounded-lg bg-mist-900 py-3 text-sm font-semibold text-white opacity-40 cursor-not-allowed"
+                          className="w-full rounded-lg bg-mist-900 py-3 text-sm font-semibold text-white hover:bg-mist-800 transition-colors"
                         >
                           Place Order
                         </button>
@@ -1016,6 +1097,7 @@ function CarSelectStep({
   returnAddress, setReturnAddress,
   isOneWay, setIsOneWay,
   autoScrollToCustomerInfo,
+  bookedRanges,
 }: {
   brands: BrandOption[]
   selectedBrandSlug: string
@@ -1063,6 +1145,7 @@ function CarSelectStep({
   isOneWay: boolean
   setIsOneWay: (v: boolean) => void
   autoScrollToCustomerInfo: boolean
+  bookedRanges: { start: string; end: string }[]
 }) {
   const [showOneWayInfo, setShowOneWayInfo] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -1206,6 +1289,7 @@ function CarSelectStep({
           minDate={today}
           startLabel="start date"
           endLabel="end date"
+          bookedRanges={bookedRanges}
         />
       </div>
 
@@ -1524,6 +1608,7 @@ function VillaSelectStep({
   uploadingVillaId, setUploadingVillaId,
   days, today, onNext, canProceed,
   autoScrollToCustomerInfo,
+  bookedRanges,
 }: {
   villaOptions: VillaData[]
   selectedVilla: VillaData | null
@@ -1564,6 +1649,7 @@ function VillaSelectStep({
   setVillaIdDocumentUrl: (v: string) => void
   uploadingVillaId: boolean
   setUploadingVillaId: (v: boolean) => void
+  bookedRanges: { start: string; end: string }[]
 }) {
   const locations = [...new Set(villaOptions.map((v) => v.location))].sort()
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -1726,6 +1812,7 @@ function VillaSelectStep({
           minDate={today}
           startLabel="check-in"
           endLabel="check-out"
+          bookedRanges={bookedRanges}
         />
       </div>
 
