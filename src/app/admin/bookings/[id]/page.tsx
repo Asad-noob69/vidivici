@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import toast, { Toaster } from "react-hot-toast"
-import { Calendar, Phone, User, Mail, MapPin, Car, FileText, MoreHorizontal, AlertTriangle } from "lucide-react"
+import { Calendar, Phone, User, Mail, MapPin, Car, FileText, MoreHorizontal, AlertTriangle, MessageSquare, Send, X } from "lucide-react"
 
 interface BookingDetail {
   id: string
@@ -122,6 +122,15 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     totalPrice: 0,
     guests: 1,
   })
+
+  /* ---- Messaging state ---- */
+  const [showMessaging, setShowMessaging] = useState(false)
+  const [messageText, setMessageText] = useState("")
+  const [emailSubject, setEmailSubject] = useState("")
+  const [messageType, setMessageType] = useState<"confirmation" | "alternative">("confirmation")
+  const [alternativeVehicle, setAlternativeVehicle] = useState("")
+  const [generatingMessage, setGeneratingMessage] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
 
   const fetchBooking = async () => {
     try {
@@ -267,6 +276,56 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const saveAdminNotes = () => updateBooking("adminNotes", adminNotes)
+
+  const generateMessage = async () => {
+    setGeneratingMessage(true)
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}/generate-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messageType,
+          alternativeVehicle: messageType === "alternative" ? alternativeVehicle : undefined,
+        }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to generate")
+      const data = await res.json()
+      setMessageText(data.message)
+      setEmailSubject(data.emailSubject)
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setGeneratingMessage(false)
+    }
+  }
+
+  const sendEmailToCustomer = async () => {
+    if (!booking) return
+    const to = booking.user?.email || booking.customerEmail || ""
+    if (!to) { toast.error("No customer email found"); return }
+    setSendingEmail(true)
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}/send-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, subject: emailSubject, message: messageText }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to send")
+      toast.success("Email sent to " + to)
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
+  const openWhatsApp = () => {
+    if (!booking) return
+    const phone = (booking.user?.phone || booking.customerPhone || "").replace(/[^0-9]/g, "")
+    if (!phone) { toast.error("No customer phone number found"); return }
+    const encodedMessage = encodeURIComponent(messageText)
+    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, "_blank")
+  }
 
   if (loading) return <div className="p-10"><p className="text-mist-400">Loading booking...</p></div>
   if (!booking) return <div className="p-10"><p className="text-mist-400">Booking not found</p></div>
@@ -435,7 +494,109 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
             Cancel Booking
           </button>
         )}
+        <button
+          onClick={() => { setShowMessaging(!showMessaging); if (!showMessaging && !messageText) generateMessage() }}
+          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-medium px-4 py-2 rounded border border-emerald-200 flex items-center gap-2"
+        >
+          <MessageSquare size={14} /> Send Message
+        </button>
       </div>
+
+      {/* Messaging Panel */}
+      {showMessaging && (
+        <div className="bg-white border border-mist-200 rounded-xl p-5 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-mist-900 flex items-center gap-2"><MessageSquare size={16} /> Message Customer</h3>
+            <button onClick={() => setShowMessaging(false)} className="text-mist-400 hover:text-mist-600"><X size={18} /></button>
+          </div>
+
+          {/* Message Type Selector */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setMessageType("confirmation")}
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${messageType === "confirmation" ? "bg-emerald-50 border-emerald-300 text-emerald-700" : "bg-white border-mist-200 text-mist-500 hover:border-mist-300"}`}
+            >
+              Booking Confirmation
+            </button>
+            <button
+              onClick={() => setMessageType("alternative")}
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${messageType === "alternative" ? "bg-amber-50 border-amber-300 text-amber-700" : "bg-white border-mist-200 text-mist-500 hover:border-mist-300"}`}
+            >
+              Offer Alternative
+            </button>
+          </div>
+
+          {/* Alternative Vehicle Input */}
+          {messageType === "alternative" && (
+            <div className="mb-4">
+              <label className="text-xs text-mist-500 block mb-1">Alternative Vehicle / Villa Name</label>
+              <input
+                type="text"
+                value={alternativeVehicle}
+                onChange={e => setAlternativeVehicle(e.target.value)}
+                placeholder="e.g. Range Rover Sport, Malibu Beach Villa..."
+                className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+              />
+            </div>
+          )}
+
+          {/* Generate Button */}
+          <button
+            onClick={generateMessage}
+            disabled={generatingMessage || (messageType === "alternative" && !alternativeVehicle.trim())}
+            className="text-xs font-medium px-4 py-2 rounded bg-mist-900 text-white hover:bg-mist-800 disabled:opacity-40 disabled:cursor-not-allowed mb-4"
+          >
+            {generatingMessage ? "Generating with AI..." : "✨ Generate Message"}
+          </button>
+
+          {/* Email Subject */}
+          {messageText && (
+            <div className="mb-3">
+              <label className="text-xs text-mist-500 block mb-1">Email Subject</label>
+              <input
+                type="text"
+                value={emailSubject}
+                onChange={e => setEmailSubject(e.target.value)}
+                className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+              />
+            </div>
+          )}
+
+          {/* Message Preview / Editor */}
+          <div className="mb-4">
+            <label className="text-xs text-mist-500 block mb-1">Message</label>
+            <textarea
+              rows={8}
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder={generatingMessage ? "Generating message..." : "Click 'Generate Message' to create a message, or type your own..."}
+              className="w-full bg-mist-50 border border-mist-200 text-sm text-mist-700 px-3 py-3 rounded focus:border-black focus:outline-none resize-y"
+            />
+          </div>
+
+          {/* Send Buttons */}
+          {messageText && (
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={sendEmailToCustomer}
+                disabled={sendingEmail}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              >
+                <Mail size={14} /> {sendingEmail ? "Sending..." : "Send via Email"}
+              </button>
+              <button
+                onClick={openWhatsApp}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Send size={14} /> Send via WhatsApp
+              </button>
+              <span className="text-xs text-mist-400 self-center">
+                To: {booking.user?.email || booking.customerEmail || "—"} / {booking.user?.phone || booking.customerPhone || "—"}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

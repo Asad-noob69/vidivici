@@ -87,20 +87,19 @@ function calcCarPricing(
   needDriver: boolean,
   driverAvailability: "full" | "select"
 ) {
-  const defaultDeposit = 2000
-  const reducedDeposit = 500
+  const bookingDeposit = 2000
+  const securityHold = 5000
   const subtotal = pricePerDay * days
   const discountPercent = getDiscount(days)
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const driverTotal = needDriver ? driverDays * driverHours * 45 : 0
   const preTax = subtotal - discountAmount + driverTotal
   const tax = Math.round(preTax * 0.085)
-  const qualifiesForReducedDeposit = days >= 15 || driverAvailability === "full"
-  const securityDeposit = qualifiesForReducedDeposit ? reducedDeposit : defaultDeposit
-  const total = preTax + tax + securityDeposit
-  const payNow = securityDeposit
-  const dueAtPickup = Math.max(0, total - payNow)
-  return { subtotal, discountPercent, discountAmount, driverTotal, tax, securityDeposit, payNow, dueAtPickup, total }
+  const rentalTotal = preTax + tax
+  const total = rentalTotal + securityHold
+  const payNowTotal = bookingDeposit + securityHold
+  const dueAtPickup = Math.max(0, rentalTotal - bookingDeposit)
+  return { subtotal, discountPercent, discountAmount, driverTotal, tax, bookingDeposit, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
 function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean) {
@@ -686,13 +685,22 @@ function ReservationContent() {
 
   const vehicleName = mode === "car" ? (selectedCar?.name || "Car") : (selectedVilla?.name || "Villa")
   const hasVehicle = mode === "car" ? !!selectedCar : !!selectedVilla
+  // Auto-set fixed villa check-in/out times
+  useEffect(() => {
+    if (mode === "villa") {
+      if (startTime !== "15:00") setStartTime("15:00")
+      if (endTime !== "11:00") setEndTime("11:00")
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
+
   const canProceed = hasVehicle
     && startDate
     && endDate
     && days > 0
     && (mode === "car"
       ? (!!driverLicenseUrl && !!insuranceUrl)
-      : (!!startTime && !!endTime && !!firstName && !!email && !!phone && !!villaIdDocumentUrl))
+      : (!!firstName && !!email && !!phone && !!villaIdDocumentUrl))
 
   return (
     <div className="bg-white min-h-screen pt-24 pb-16">
@@ -1053,8 +1061,12 @@ function ReservationContent() {
                   </p>
                   <p className="text-xs text-mist-400 leading-relaxed">
                     {paymentMethod === "card"
-                      ? "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team."
-                      : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed."}
+                      ? (mode === "car"
+                        ? "A $2,000 booking deposit will be charged to your card. A $5,000 security hold will be placed and released after the rental. The remaining balance is due at pickup."
+                        : "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team.")
+                      : (mode === "car"
+                        ? "A $2,000 booking deposit will be captured via PayPal. A $5,000 security hold will be authorized and released after the rental. The remaining balance is due at pickup."
+                        : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.")}
                   </p>
 
                   {paymentMethod === "paypal" && mode === "car" && selectedCar && (
@@ -1072,7 +1084,7 @@ function ReservationContent() {
                         isOneWay,
                         notes: needDriver ? `Driver: ${driverHours}hr/day × ${actualDriverDays} days` : undefined,
                       }}
-                      totalPrice={carPricing.total}
+                      totalPrice={carPricing.payNowTotal}
                       onSuccess={(id) => {
                         setBookingId(id.slice(-6).toUpperCase())
                         setStep(3)
@@ -1757,8 +1769,6 @@ function VillaSelectStep({
     selectedVilla
     && startDate
     && endDate
-    && startTime
-    && endTime
     && guestCount > 0
     && days > 0
   )
@@ -1858,18 +1868,10 @@ function VillaSelectStep({
               />
             </div>
             <div className="relative">
-              <input
-                type={startTime ? "time" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                disabled={!startDate}
-                className={`${getTemporalSelectClass()} disabled:opacity-60 disabled:cursor-not-allowed`}
-              />
-              <span className={getTemporalTopLabelClass(Boolean(startTime))}>Time*</span>
-              <span className={getTemporalCenterLabelClass(Boolean(startTime))}>Time*</span>
+              <div className={`${getTemporalSelectClass()} flex items-center`}>
+                <span className="text-mist-700 text-sm">3:00 PM</span>
+              </div>
+              <span className="pointer-events-none absolute left-3 top-1 text-[10px] text-mist-400 opacity-100">Check-in Time</span>
             </div>
           </div>
 
@@ -1882,18 +1884,10 @@ function VillaSelectStep({
               />
             </div>
             <div className="relative">
-              <input
-                type={endTime ? "time" : "text"}
-                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-                onBlur={(e) => { if (!endTime) e.currentTarget.type = "text" }}
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                disabled={!endDate}
-                className={`${getTemporalSelectClass()} disabled:opacity-60 disabled:cursor-not-allowed`}
-              />
-              <span className={getTemporalTopLabelClass(Boolean(endTime))}>Time*</span>
-              <span className={getTemporalCenterLabelClass(Boolean(endTime))}>Time*</span>
+              <div className={`${getTemporalSelectClass()} flex items-center`}>
+                <span className="text-mist-700 text-sm">11:00 AM</span>
+              </div>
+              <span className="pointer-events-none absolute left-3 top-1 text-[10px] text-mist-400 opacity-100">Check-out Time</span>
             </div>
           </div>
         </div>
@@ -2235,10 +2229,6 @@ function CarSummaryCard({
             <span className="text-mist-900">${pricing.tax.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-mist-500">
-            <span>Security Deposit <span className="text-xs">(Fully Refundable)</span></span>
-            <span className="text-mist-900">${pricing.securityDeposit.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-mist-500">
             <span>Delivery Fee</span>
             <span className="text-mist-900">TBD</span>
           </div>
@@ -2247,19 +2237,27 @@ function CarSummaryCard({
             <span className="text-mist-900">TBD</span>
           </div>
           <hr className="border-mist-100" />
-          <div className="flex justify-between text-mist-500">
-            <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
-            <span className="text-blue-600">${pricing.payNow.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-mist-500">
-            <span>Due at Pickup</span>
-            <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
+          <div className="flex justify-between font-bold text-mist-900 text-base pt-1">
+            <span>Rental Total</span>
+            <span>${pricing.rentalTotal.toLocaleString()}</span>
           </div>
           <hr className="border-mist-100" />
-          <div className="flex justify-between font-bold text-mist-900 text-base pt-1">
-            <span>Total Charges</span>
-            <span>${pricing.total.toLocaleString()}</span>
+          <p className="text-[10px] font-semibold text-mist-700 uppercase tracking-wider pt-1">Payment Breakdown</p>
+          <div className="flex justify-between text-mist-500">
+            <span>Booking Deposit <span className="text-xs">(Captured Now)</span></span>
+            <span className="text-blue-600 font-medium">${pricing.bookingDeposit.toLocaleString()}</span>
           </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Security Hold <span className="text-xs">(Authorized)</span></span>
+            <span className="text-amber-600 font-medium">${pricing.securityHold.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Due at Pickup <span className="text-xs">(Card/Wire)</span></span>
+            <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
+          </div>
+          <p className="text-[10px] text-mist-400 leading-snug pt-1">
+            $2,000 deposit is charged immediately. $5,000 security hold is authorized but not charged — it will be released after the rental with no issues.
+          </p>
         </div>
       )}
     </div>
@@ -2314,9 +2312,13 @@ function VillaSummaryCard({
         <p><span className="text-mist-700 font-medium">Upload ID / Passport:</span> {villaIdDocumentName || "—"}</p>
       </div>
 
-      <p className="text-xs text-mist-400 border-t border-mist-100 pt-3">
-        Free cancellation within 24 hours from the time you place the order.
-      </p>
+      <div className="text-xs text-mist-400 border-t border-mist-100 pt-3 space-y-1">
+        <p className="font-medium text-mist-600">Cancellation Policy</p>
+        <p>Full refund until 361 days before arrival.</p>
+        <p>10% charge from 61 to 360 days before arrival.</p>
+        <p>50% charge from 31 to 60 days before arrival.</p>
+        <p>100% charge from 0 to 30 days before arrival.</p>
+      </div>
 
       {pricing && days > 0 && (
         <div className="space-y-2 text-sm border-t border-mist-100 pt-3">

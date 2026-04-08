@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (bookingType === "car") {
       await prisma.booking.update({
         where: { id: bookingId },
-        data: { paymentStatus: "PAID", paymentIntentId: capture.id },
+        data: { paymentStatus: "PAID", adminNotes: `Security hold captured: ${capture.id}` },
       })
     } else if (bookingType === "villa") {
       await prisma.villaBooking.update({

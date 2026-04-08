@@ -39,7 +39,8 @@ export async function getPayPalAccessToken(): Promise<string> {
 export async function createPayPalOrder(
   amount: number,
   currency: string,
-  referenceId: string
+  referenceId: string,
+  intent: "AUTHORIZE" | "CAPTURE" = "AUTHORIZE"
 ) {
   const token = await getPayPalAccessToken()
 
@@ -50,7 +51,7 @@ export async function createPayPalOrder(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      intent: "AUTHORIZE",
+      intent,
       purchase_units: [
         {
           reference_id: referenceId,
@@ -66,6 +67,28 @@ export async function createPayPalOrder(
   if (!res.ok) {
     const err = await res.text()
     throw new Error(`PayPal create order failed: ${err}`)
+  }
+
+  return res.json()
+}
+
+export async function capturePayPalOrder(orderId: string) {
+  const token = await getPayPalAccessToken()
+
+  const res = await fetch(
+    `${PAYPAL_BASE}/v2/checkout/orders/${orderId}/capture`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  )
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`PayPal capture order failed: ${err}`)
   }
 
   return res.json()
@@ -97,8 +120,15 @@ export async function authorizePayPalOrder(orderId: string) {
   return { order: data, authorizationId }
 }
 
-export async function capturePayPalAuthorization(authorizationId: string) {
+export async function capturePayPalAuthorization(
+  authorizationId: string,
+  amount?: { currency_code: string; value: string },
+  finalCapture: boolean = true
+) {
   const token = await getPayPalAccessToken()
+
+  const body: Record<string, unknown> = { final_capture: finalCapture }
+  if (amount) body.amount = amount
 
   const res = await fetch(
     `${PAYPAL_BASE}/v2/payments/authorizations/${authorizationId}/capture`,
@@ -108,6 +138,7 @@ export async function capturePayPalAuthorization(authorizationId: string) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(body),
     }
   )
 
