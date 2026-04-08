@@ -179,9 +179,9 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       </button>
 
       {/* Profile header */}
-      <div className="bg-white border border-mist-200 rounded-2xl p-6">
-        <div className="flex items-start gap-5">
-          <div className="w-20 h-20 rounded-full bg-mist-200 overflow-hidden flex-shrink-0 flex items-center justify-center text-2xl font-bold text-mist-500">
+      <div className="bg-white border border-mist-200 rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-mist-200 overflow-hidden flex-shrink-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-mist-500">
             {customer.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={customer.image} alt={customer.name || ""} className="w-full h-full object-cover" />
@@ -190,8 +190,8 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div>
-                <h1 className="text-xl font-bold text-mist-900">{customer.name || "No name"}</h1>
-                <p className="text-mist-500 text-sm mt-0.5">{customer.email}</p>
+                <h1 className="text-lg sm:text-xl font-bold text-mist-900">{customer.name || "No name"}</h1>
+                <p className="text-mist-500 text-sm mt-0.5 break-all">{customer.email}</p>
                 {customer.phone && <p className="text-mist-500 text-sm">{customer.phone}</p>}
               </div>
               <div className="flex flex-wrap gap-2 text-xs">
@@ -220,11 +220,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Profile details grid */}
-      <div className="bg-white border border-mist-200 rounded-2xl p-6">
+      <div className="bg-white border border-mist-200 rounded-2xl p-4 sm:p-6">
         <h2 className="text-sm font-semibold text-mist-900 mb-4 flex items-center gap-2">
           <User size={15} /> Personal Information
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
           <InfoRow label="Full Name" value={customer.name} />
           <InfoRow label="Email" value={customer.email} />
           <InfoRow label="Phone" value={customer.phone} />
@@ -239,11 +239,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Documents */}
-      <div className="bg-white border border-mist-200 rounded-2xl p-6">
+      <div className="bg-white border border-mist-200 rounded-2xl p-4 sm:p-6">
         <h2 className="text-sm font-semibold text-mist-900 mb-4 flex items-center gap-2">
           <FileText size={15} /> Documents
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           {/* Driver's License */}
           <div className="border border-mist-200 rounded-2xl overflow-hidden">
             <div className="px-4 py-3 border-b border-mist-100 flex items-center justify-between">
@@ -392,16 +392,16 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
 
       {/* Bookings */}
       <div className="bg-white border border-mist-200 rounded-2xl overflow-hidden">
-        <div className="flex items-center gap-0 border-b border-mist-200">
+        <div className="flex items-center gap-0 border-b border-mist-200 overflow-x-auto">
           <button
             onClick={() => setTab("cars")}
-            className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition border-b-2 ${tab === "cars" ? "border-mist-900 text-mist-900" : "border-transparent text-mist-400 hover:text-mist-600"}`}
+            className={`flex items-center gap-2 px-3 sm:px-5 py-3.5 text-sm font-medium transition border-b-2 whitespace-nowrap ${tab === "cars" ? "border-mist-900 text-mist-900" : "border-transparent text-mist-400 hover:text-mist-600"}`}
           >
             <Car size={14} /> Car Bookings ({customer.bookings.length})
           </button>
           <button
             onClick={() => setTab("villas")}
-            className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition border-b-2 ${tab === "villas" ? "border-mist-900 text-mist-900" : "border-transparent text-mist-400 hover:text-mist-600"}`}
+            className={`flex items-center gap-2 px-3 sm:px-5 py-3.5 text-sm font-medium transition border-b-2 whitespace-nowrap ${tab === "villas" ? "border-mist-900 text-mist-900" : "border-transparent text-mist-400 hover:text-mist-600"}`}
           >
             <Home size={14} /> Villa Bookings ({customer.villaBookings.length})
           </button>
@@ -414,28 +414,32 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             ) : (
               <div className="divide-y divide-mist-100">
                 {customer.bookings.map((b) => (
-                  <div key={b.id} className="flex items-center gap-4 px-5 py-4">
-                    <div className="w-14 h-10 rounded-lg bg-mist-100 overflow-hidden flex-shrink-0">
-                      {b.car.images[0] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={b.car.images[0].url} alt={b.car.name} className="w-full h-full object-cover" />
-                      ) : <Car size={16} className="m-auto mt-2.5 text-mist-300" />}
+                  <div key={b.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-14 h-10 rounded-lg bg-mist-100 overflow-hidden flex-shrink-0">
+                        {b.car.images[0] ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={b.car.images[0].url} alt={b.car.name} className="w-full h-full object-cover" />
+                        ) : <Car size={16} className="m-auto mt-2.5 text-mist-300" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-mist-900 text-sm truncate">
+                          {b.car.brand?.name} {b.car.name}
+                        </p>
+                        <p className="text-xs text-mist-400 mt-0.5">
+                          #{b.bookingNumber} &middot; {new Date(b.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} — {new Date(b.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-mist-900 text-sm truncate">
-                        {b.car.brand?.name} {b.car.name}
-                      </p>
-                      <p className="text-xs text-mist-400 mt-0.5">
-                        #{b.bookingNumber} &middot; {new Date(b.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} — {new Date(b.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                      <StatusBadge value={b.status} colorMap={STATUS_COLORS} />
-                      <StatusBadge value={b.paymentStatus} colorMap={PAYMENT_COLORS} />
-                    </div>
-                    <div className="text-right flex-shrink-0 hidden sm:block">
-                      <p className="text-sm font-semibold text-mist-900">${b.totalPrice.toLocaleString()}</p>
-                      <p className="text-xs text-mist-400 mt-0.5">{new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <StatusBadge value={b.status} colorMap={STATUS_COLORS} />
+                        <StatusBadge value={b.paymentStatus} colorMap={PAYMENT_COLORS} />
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-semibold text-mist-900">${b.totalPrice.toLocaleString()}</p>
+                        <p className="text-xs text-mist-400 mt-0.5 hidden sm:block">{new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -451,26 +455,30 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             ) : (
               <div className="divide-y divide-mist-100">
                 {customer.villaBookings.map((b) => (
-                  <div key={b.id} className="flex items-center gap-4 px-5 py-4">
-                    <div className="w-14 h-10 rounded-lg bg-mist-100 overflow-hidden flex-shrink-0">
-                      {b.villa.images[0] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={b.villa.images[0].url} alt={b.villa.name} className="w-full h-full object-cover" />
-                      ) : <Home size={16} className="m-auto mt-2.5 text-mist-300" />}
+                  <div key={b.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-14 h-10 rounded-lg bg-mist-100 overflow-hidden flex-shrink-0">
+                        {b.villa.images[0] ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={b.villa.images[0].url} alt={b.villa.name} className="w-full h-full object-cover" />
+                        ) : <Home size={16} className="m-auto mt-2.5 text-mist-300" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-mist-900 text-sm truncate">{b.villa.name}</p>
+                        <p className="text-xs text-mist-400 mt-0.5">
+                          #{b.bookingNumber} &middot; {new Date(b.checkIn).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} — {new Date(b.checkOut).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-mist-900 text-sm truncate">{b.villa.name}</p>
-                      <p className="text-xs text-mist-400 mt-0.5">
-                        #{b.bookingNumber} &middot; {new Date(b.checkIn).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} — {new Date(b.checkOut).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                      <StatusBadge value={b.status} colorMap={STATUS_COLORS} />
-                      <StatusBadge value={b.paymentStatus} colorMap={PAYMENT_COLORS} />
-                    </div>
-                    <div className="text-right flex-shrink-0 hidden sm:block">
-                      <p className="text-sm font-semibold text-mist-900">${b.totalPrice.toLocaleString()}</p>
-                      <p className="text-xs text-mist-400 mt-0.5">{new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <StatusBadge value={b.status} colorMap={STATUS_COLORS} />
+                        <StatusBadge value={b.paymentStatus} colorMap={PAYMENT_COLORS} />
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-semibold text-mist-900">${b.totalPrice.toLocaleString()}</p>
+                        <p className="text-xs text-mist-400 mt-0.5 hidden sm:block">{new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                      </div>
                     </div>
                   </div>
                 ))}

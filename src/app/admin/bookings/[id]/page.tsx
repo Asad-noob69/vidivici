@@ -381,17 +381,17 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Booking Flow Stepper */}
       {!isCancelled && (
-        <div className="bg-white border border-mist-200 rounded-xl p-5 mb-6">
+        <div className="bg-white border border-mist-200 rounded-xl p-4 sm:p-5 mb-6 overflow-x-auto">
           <h3 className="text-sm font-semibold text-mist-700 mb-4">Booking Flow</h3>
-          <div className="flex items-center gap-0">
+          <div className="flex items-center gap-0 min-w-[400px]">
             {FLOW_STEPS.map((step, i) => (
               <div key={step.key} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                  <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold
                     ${i <= currentStep ? "bg-emerald-500 text-white" : "bg-mist-200 text-mist-400"}`}>
                     {i < currentStep ? "✓" : i + 1}
                   </div>
-                  <span className={`text-[10px] mt-1.5 text-center leading-tight ${i <= currentStep ? "text-emerald-600 font-medium" : "text-mist-400"}`}>
+                  <span className={`text-[9px] sm:text-[10px] mt-1.5 text-center leading-tight ${i <= currentStep ? "text-emerald-600 font-medium" : "text-mist-400"}`}>
                     {step.label}
                   </span>
                 </div>
@@ -418,7 +418,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 mb-8">
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
         {!isCancelled && (
           <button
             onClick={editing ? saveEdits : startEditing}
@@ -504,14 +504,14 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Messaging Panel */}
       {showMessaging && (
-        <div className="bg-white border border-mist-200 rounded-xl p-5 mb-6">
+        <div className="bg-white border border-mist-200 rounded-xl p-4 sm:p-5 mb-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-mist-900 flex items-center gap-2"><MessageSquare size={16} /> Message Customer</h3>
             <button onClick={() => setShowMessaging(false)} className="text-mist-400 hover:text-mist-600"><X size={18} /></button>
           </div>
 
           {/* Message Type Selector */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             <button
               onClick={() => setMessageType("confirmation")}
               className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${messageType === "confirmation" ? "bg-emerald-50 border-emerald-300 text-emerald-700" : "bg-white border-mist-200 text-mist-500 hover:border-mist-300"}`}

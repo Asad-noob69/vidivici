@@ -6,6 +6,20 @@
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
 
+/* Safari compatibility */
+@supports (-webkit-touch-callout: none) {
+  .safari-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Safari flexbox gap fallback for older versions */
+@supports not (gap: 1rem) {
+  .flex > * + * {
+    margin-left: 0.5rem;
+  }
+}
+
 .accordion-content {
   max-height: 0;
   overflow: hidden;

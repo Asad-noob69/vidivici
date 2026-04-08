@@ -72,44 +72,72 @@ export default function AdminBlogPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16"><FileText size={40} className="mx-auto text-mist-300 mb-3" /><p className="text-mist-400 text-sm">No blog posts found</p></div>
         ) : (
-          <div className="bg-white border border-mist-200 rounded-xl overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-xs text-mist-500 border-b border-mist-200 bg-mist-50/50">
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 hidden sm:table-cell">Date</th>
-                  <th className="px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p) => {
-                  const status = p.published ? "Published" : "Draft"
-                  const date = new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                  return (
-                    <tr key={p.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <FileText size={14} className="text-mist-400 flex-shrink-0" />
-                          <span className="text-sm text-mist-900">{p.title}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`text-xs px-2 py-1 rounded ${status === "Published" ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>{status}</span>
-                      </td>
-                      <td className="px-4 py-3.5 text-sm text-mist-500 hidden sm:table-cell">{date}</td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex gap-2">
-                          <button onClick={() => router.push(`/admin/blog/new?edit=${p.id}`)} className="text-xs text-black font-medium hover:underline">Edit</button>
-                          <button onClick={() => handleDelete(p.id, p.title)} className="text-xs text-red-500 hover:underline">Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Desktop Table */}
+            <div className="hidden sm:block bg-white border border-mist-200 rounded-xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-xs text-mist-500 border-b border-mist-200 bg-mist-50/50">
+                    <th className="px-4 py-3">Title</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 hidden md:table-cell">Date</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((p) => {
+                    const status = p.published ? "Published" : "Draft"
+                    const date = new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                    return (
+                      <tr key={p.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
+                        <td className="px-4 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <FileText size={14} className="text-mist-400 flex-shrink-0" />
+                            <span className="text-sm text-mist-900">{p.title}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className={`text-xs px-2 py-1 rounded ${status === "Published" ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>{status}</span>
+                        </td>
+                        <td className="px-4 py-3.5 text-sm text-mist-500 hidden md:table-cell">{date}</td>
+                        <td className="px-4 py-3.5">
+                          <div className="flex gap-2">
+                            <button onClick={() => router.push(`/admin/blog/new?edit=${p.id}`)} className="text-xs text-black font-medium hover:underline">Edit</button>
+                            <button onClick={() => handleDelete(p.id, p.title)} className="text-xs text-red-500 hover:underline">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile Cards */}
+            <div className="sm:hidden space-y-3">
+              {filtered.map((p) => {
+                const status = p.published ? "Published" : "Draft"
+                const date = new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                return (
+                  <div key={p.id} className="bg-white border border-mist-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <FileText size={16} className="text-mist-400 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-mist-900">{p.title}</p>
+                        <p className="text-xs text-mist-400 mt-1">{date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] px-2 py-0.5 rounded ${status === "Published" ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>{status}</span>
+                      <div className="flex gap-3">
+                        <button onClick={() => router.push(`/admin/blog/new?edit=${p.id}`)} className="text-xs text-black font-medium hover:underline">Edit</button>
+                        <button onClick={() => handleDelete(p.id, p.title)} className="text-xs text-red-500 hover:underline">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )
       })()}
     </div>

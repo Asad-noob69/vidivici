@@ -136,7 +136,7 @@ export default function AdminConversationsPage() {
       <Toaster position="top-right" />
 
       {/* Two-pane layout on desktop, single-column on mobile */}
-      <div className="flex flex-col lg:flex-row lg:gap-0 lg:bg-white lg:border lg:border-mist-200 lg:rounded-2xl lg:overflow-hidden" style={{ height: "calc(100vh - 120px)" }}>
+      <div className="flex flex-col lg:flex-row lg:gap-0 lg:bg-white lg:border lg:border-mist-200 lg:rounded-2xl lg:overflow-hidden" style={{ height: "calc(100dvh - 120px)", minHeight: "400px" }}>
 
         {/* Sessions list — hidden on mobile when detail is open */}
         <div className={`lg:w-80 lg:flex-shrink-0 lg:border-r lg:border-mist-200 flex flex-col min-h-0 ${selected ? "hidden lg:flex" : "flex"}`}>
@@ -151,7 +151,7 @@ export default function AdminConversationsPage() {
           </div>
 
           {/* Session list */}
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="flex-1 overflow-y-auto p-2" style={{ WebkitOverflowScrolling: "touch" }}>
             {loading ? (
               <div className="p-4 text-sm text-mist-500 text-center">Loading...</div>
             ) : filteredSessions.length === 0 ? (
@@ -227,7 +227,7 @@ export default function AdminConversationsPage() {
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ WebkitOverflowScrolling: "touch" }}>
                 {selected.messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     {(msg.role === "assistant" || msg.role === "admin") && (

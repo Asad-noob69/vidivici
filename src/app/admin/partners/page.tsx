@@ -104,12 +104,12 @@ export default function AdminPartnersPage() {
               >
                 <button
                   onClick={() => setExpanded(expanded === inq.id ? null : inq.id)}
-                  className="w-full p-5 text-left flex items-center gap-4"
+                  className="w-full p-4 sm:p-5 text-left flex items-start sm:items-center gap-3 sm:gap-4"
                 >
-                  {!inq.isRead && <div className="w-2 h-2 bg-black rounded-full flex-shrink-0" />}
+                  {!inq.isRead && <div className="w-2 h-2 bg-black rounded-full flex-shrink-0 mt-1.5 sm:mt-0" />}
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-1">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-medium text-mist-900">{inq.name}</p>
                         {extraData.listingType && (
                           <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
@@ -122,7 +122,7 @@ export default function AdminPartnersPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-mist-400 ml-4 flex-shrink-0">{formatDate(inq.createdAt)}</span>
+                      <span className="text-xs text-mist-400 flex-shrink-0">{formatDate(inq.createdAt)}</span>
                     </div>
                     <p className="text-xs text-mist-500 truncate">
                       {inq.subject || "Partner Application"} {extraData.location ? `— ${extraData.location}` : ""}

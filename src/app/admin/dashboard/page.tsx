@@ -120,7 +120,7 @@ export default function AdminDashboard() {
                     <td className="px-4 sm:px-6 py-4 text-sm text-mist-500">{b.car.brand.name} {b.car.name}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-mist-500 hidden md:table-cell">{formatDate(b.startDate)}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm font-medium text-mist-900">${b.totalPrice.toLocaleString()}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                         b.status === "CONFIRMED" ? "bg-blue-50 text-blue-600" :
                         b.status === "ACTIVE" ? "bg-green-50 text-green-600" :

@@ -116,16 +116,16 @@ export default function AdminFAQsPage() {
       ) : (
         <div className="space-y-3">
           {faqs.map((faq) => (
-            <div key={faq.id} className="bg-white border border-mist-200 rounded-xl p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
+            <div key={faq.id} className="bg-white border border-mist-200 rounded-xl p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs bg-mist-100 text-mist-900 px-2 py-0.5 rounded font-medium">#{faq.order}</span>
+                    <span className="text-xs bg-mist-100 text-mist-900 px-2 py-0.5 rounded font-medium flex-shrink-0">#{faq.order}</span>
                     <h3 className="text-sm font-semibold text-mist-900">{faq.question}</h3>
                   </div>
                   <p className="text-sm text-mist-500">{faq.answer}</p>
                 </div>
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 flex-shrink-0">
                   <button onClick={() => handleEdit(faq)} className="text-xs text-black font-medium hover:underline">Edit</button>
                   <button onClick={() => handleDelete(faq.id)} className="text-xs text-red-500 hover:underline">Delete</button>
                 </div>
