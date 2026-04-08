@@ -48,6 +48,10 @@ export async function GET(
         customerPhone: eventBooking.phone,
         startDate: eventBooking.bookingDate,
         endDate: eventBooking.bookingDate,
+        partnerName: eventBooking.partnerName,
+        partnerStatus: eventBooking.partnerStatus,
+        bookingFlow: eventBooking.bookingFlow,
+        activityLog: eventBooking.activityLog,
       })
     }
 
@@ -65,7 +69,8 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     const { bookingType, status, paymentStatus, documentStatus, contractStatus, adminNotes, notes,
-      startDate, endDate, startTime, endTime, pickupLocation, dropoffLocation, totalPrice, guests } = body
+      startDate, endDate, startTime, endTime, pickupLocation, dropoffLocation, totalPrice, guests,
+      partnerName, partnerStatus, bookingFlow, activityLog } = body
 
     const updateData: any = {}
     if (status) updateData.status = status
@@ -137,6 +142,11 @@ export async function PUT(
       if (contractStatus) eventUpdate.contractStatus = contractStatus
       if (adminNotes !== undefined) eventUpdate.adminNotes = adminNotes
       if (notes !== undefined) eventUpdate.specialRequests = notes
+      if (partnerName !== undefined) eventUpdate.partnerName = partnerName
+      if (partnerStatus !== undefined) eventUpdate.partnerStatus = partnerStatus
+      if (bookingFlow !== undefined) eventUpdate.bookingFlow = bookingFlow
+      if (activityLog !== undefined) eventUpdate.activityLog = activityLog
+      if (totalPrice !== undefined) eventUpdate.totalPrice = totalPrice
       const booking = await prisma.eventBooking.update({
         where: { id },
         data: eventUpdate,

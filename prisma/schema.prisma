@@ -13,7 +13,7 @@ model User {
   id            String     @id @default(cuid())
   name          String?
   email         String     @unique
-  password      String
+  password      String?
   role          Role       @default(USER)
   phone         String?
   image         String?
@@ -411,5 +411,23 @@ model EventBooking {
   documents             String?  @db.Text
   source                String   @default("website")
   isRead                Boolean  @default(false)
+  partnerName           String?
+  partnerStatus         String   @default("none")
+  bookingFlow           String   @default("pending_review")
+  activityLog           String?  @db.Text
   createdAt             DateTime @default(now())
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountPercent Float
+  maxUses       Int       @default(1)
+  usedCount     Int       @default(0)
+  scope         String    @default("all_cars")
+  scopeItemId   String?
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

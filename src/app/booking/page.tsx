@@ -85,7 +85,8 @@ function calcCarPricing(
   driverHours: number,
   driverDays: number,
   needDriver: boolean,
-  driverAvailability: "full" | "select"
+  driverAvailability: "full" | "select",
+  couponPercent = 0
 ) {
   const bookingDeposit = 2000
   const securityHold = 5000
@@ -93,27 +94,33 @@ function calcCarPricing(
   const discountPercent = getDiscount(days)
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const driverTotal = needDriver ? driverDays * driverHours * 45 : 0
-  const preTax = subtotal - discountAmount + driverTotal
+  const afterDiscount = subtotal - discountAmount + driverTotal
+  const couponAmount = couponPercent > 0 ? Math.round(afterDiscount * (couponPercent / 100)) : 0
+  const preTax = afterDiscount - couponAmount
   const tax = Math.round(preTax * 0.085)
   const rentalTotal = preTax + tax
   const total = rentalTotal + securityHold
   const payNowTotal = bookingDeposit + securityHold
   const dueAtPickup = Math.max(0, rentalTotal - bookingDeposit)
-  return { subtotal, discountPercent, discountAmount, driverTotal, tax, bookingDeposit, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
+  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, bookingDeposit, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
-function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean) {
+function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0) {
   const nightsTotal = villa.pricePerNight * nights
   const airportTransferFee = airportTransfer ? 500 : 0
   const subtotal = nightsTotal + villa.cleaningFee + airportTransferFee
-  const tax = Math.round(subtotal * 0.14)
-  const total = subtotal + tax + villa.securityDeposit
+  const couponAmount = couponPercent > 0 ? Math.round(subtotal * (couponPercent / 100)) : 0
+  const afterCoupon = subtotal - couponAmount
+  const tax = Math.round(afterCoupon * 0.14)
+  const total = afterCoupon + tax + villa.securityDeposit
   const payNow = villa.securityDeposit
   const dueAtPickup = Math.max(0, total - payNow)
   return {
     nightsTotal,
     airportTransferFee,
     cleaningFee: villa.cleaningFee,
+    couponAmount,
+    couponPercent,
     tax,
     securityDeposit: villa.securityDeposit,
     payNow,
@@ -302,6 +309,13 @@ function ReservationContent() {
   const [returnAddress, setReturnAddress] = useState("")
   const [isOneWay, setIsOneWay] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("paypal")
+
+  /* ---- Coupon state ---- */
+  const [couponCode, setCouponCode] = useState("")
+  const [couponDiscount, setCouponDiscount] = useState(0)
+  const [couponApplied, setCouponApplied] = useState("")
+  const [couponError, setCouponError] = useState("")
+  const [couponLoading, setCouponLoading] = useState(false)
 
   /* ---- Credit card form state ---- */
   const [cardName, setCardName] = useState("")
@@ -589,13 +603,13 @@ function ReservationContent() {
   const actualDriverDays = driverAvailability === "full" ? days : driverDays
 
   const carPricing = useMemo(
-    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability) : null),
-    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability]
+    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount) : null),
+    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount]
   )
 
   const villaPricing = useMemo(
-    () => (selectedVilla && days > 0 ? calcVillaPricing(selectedVilla, days, villaAirportTransfer) : null),
-    [selectedVilla, days, villaAirportTransfer]
+    () => (selectedVilla && days > 0 ? calcVillaPricing(selectedVilla, days, villaAirportTransfer, couponDiscount) : null),
+    [selectedVilla, days, villaAirportTransfer, couponDiscount]
   )
 
   /* ---- Select car from dropdown ---- */
@@ -674,6 +688,7 @@ function ReservationContent() {
       }
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed to create booking")
+      if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
       setBookingId((data.id || "").slice(-6).toUpperCase())
       setStep(3)
     } catch (err: any) {
@@ -685,6 +700,42 @@ function ReservationContent() {
 
   const vehicleName = mode === "car" ? (selectedCar?.name || "Car") : (selectedVilla?.name || "Villa")
   const hasVehicle = mode === "car" ? !!selectedCar : !!selectedVilla
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return
+    setCouponLoading(true)
+    setCouponError("")
+    try {
+      const scope = mode === "car" ? "car" : "villa"
+      const itemId = mode === "car" ? selectedCar?.id : selectedVilla?.id
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode.trim(), scope, itemId }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.valid) {
+        setCouponError(data.error || "Invalid coupon code")
+        setCouponDiscount(0)
+        setCouponApplied("")
+        return
+      }
+      setCouponDiscount(data.discountPercent)
+      setCouponApplied(data.code)
+      setCouponError("")
+    } catch {
+      setCouponError("Failed to validate coupon")
+    } finally {
+      setCouponLoading(false)
+    }
+  }
+
+  const removeCoupon = () => {
+    setCouponCode("")
+    setCouponDiscount(0)
+    setCouponApplied("")
+    setCouponError("")
+  }
   // Auto-set fixed villa check-in/out times
   useEffect(() => {
     if (mode === "villa") {
@@ -900,6 +951,42 @@ function ReservationContent() {
             {step === 2 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-bold text-mist-900">Card Info</h2>
+
+                {/* Coupon Code */}
+                <div className="rounded-xl border border-mist-200 p-4">
+                  <label className="text-sm font-medium text-mist-700 block mb-2">Promo Code</label>
+                  {couponApplied ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+                      <div>
+                        <span className="text-sm font-semibold text-green-700">{couponApplied}</span>
+                        <span className="text-xs text-green-600 ml-2">{couponDiscount}% OFF applied</span>
+                      </div>
+                      <button type="button" onClick={removeCoupon} className="text-green-600 hover:text-green-800 text-sm font-medium">Remove</button>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="Enter promo code"
+                          className="flex-1 rounded-lg border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-700 placeholder:text-mist-300 focus:outline-none focus:border-mist-400 uppercase tracking-wide"
+                        />
+                        <button
+                          type="button"
+                          onClick={applyCoupon}
+                          disabled={couponLoading || !couponCode.trim()}
+                          className="px-4 py-2.5 rounded-lg bg-mist-900 text-white text-sm font-medium hover:bg-mist-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {couponLoading ? "..." : "Apply"}
+                        </button>
+                      </div>
+                      {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-4">
                   <div className="rounded-xl border border-mist-200 overflow-hidden">
                     {/* Credit Card Option */}
@@ -1060,12 +1147,10 @@ function ReservationContent() {
                     <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                   </p>
                   <p className="text-xs text-mist-400 leading-relaxed">
-                    {paymentMethod === "card"
-                      ? (mode === "car"
-                        ? "A $2,000 booking deposit will be charged to your card. A $5,000 security hold will be placed and released after the rental. The remaining balance is due at pickup."
-                        : "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team.")
-                      : (mode === "car"
-                        ? "A $2,000 booking deposit will be captured via PayPal. A $5,000 security hold will be authorized and released after the rental. The remaining balance is due at pickup."
+                    {mode === "car"
+                      ? "A hold of up to your reservation charge including deposit up to $5,000 will be placed on your card. No charge will be issued until confirmation of your reservation."
+                      : (paymentMethod === "card"
+                        ? "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team."
                         : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.")}
                   </p>
 
@@ -1086,6 +1171,7 @@ function ReservationContent() {
                       }}
                       totalPrice={carPricing.payNowTotal}
                       onSuccess={(id) => {
+                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
                         setBookingId(id.slice(-6).toUpperCase())
                         setStep(3)
                       }}
@@ -1118,6 +1204,7 @@ function ReservationContent() {
                       }}
                       totalPrice={villaPricing.total}
                       onSuccess={(id) => {
+                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
                         setBookingId(id.slice(-6).toUpperCase())
                         setStep(3)
                       }}
@@ -2224,6 +2311,12 @@ function CarSummaryCard({
               <span className="text-mist-900">${pricing.driverTotal.toLocaleString()}</span>
             </div>
           )}
+          {pricing.couponAmount > 0 && (
+            <div className="flex justify-between text-green-600">
+              <span>Promo Code <span className="text-xs">({pricing.couponPercent}% OFF)</span></span>
+              <span>-${pricing.couponAmount.toLocaleString()}</span>
+            </div>
+          )}
           <div className="flex justify-between text-mist-500">
             <span>Tax <span className="text-xs">(8.5%)</span></span>
             <span className="text-mist-900">${pricing.tax.toLocaleString()}</span>
@@ -2348,6 +2441,12 @@ function VillaSummaryCard({
             <div className="flex justify-between text-mist-500">
               <span>Cleaning Fee</span>
               <span className="text-mist-900">${pricing.cleaningFee.toLocaleString()}</span>
+            </div>
+          )}
+          {pricing.couponAmount > 0 && (
+            <div className="flex justify-between text-green-600">
+              <span>Promo Code <span className="text-xs">({pricing.couponPercent}% OFF)</span></span>
+              <span>-${pricing.couponAmount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between text-mist-500">

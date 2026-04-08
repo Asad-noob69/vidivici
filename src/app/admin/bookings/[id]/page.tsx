@@ -62,9 +62,19 @@ interface BookingDetail {
   customerName?: string
   customerEmail?: string
   customerPhone?: string
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
   guestsTotal?: string
   budget?: string
   clubVenue?: string
+  addOns?: string
+  /* Event partner fields */
+  partnerName?: string
+  partnerStatus?: string
+  bookingFlow?: string
+  activityLog?: string
 }
 
 const FLOW_STEPS = [
@@ -356,6 +366,18 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     PENDING: "bg-yellow-100 text-yellow-800",
     VERIFIED: "bg-green-100 text-green-800",
     REJECTED: "bg-red-100 text-red-800",
+  }
+
+  if (booking.bookingType === "event") {
+    return (
+      <EventBookingDetail
+        booking={booking}
+        adminNotes={adminNotes}
+        setAdminNotes={setAdminNotes}
+        fetchBooking={fetchBooking}
+        id={id}
+      />
+    )
   }
 
   return (
@@ -906,6 +928,600 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </select>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  Event Booking Detail                                               */
+/* ================================================================== */
+
+const EVENT_FLOW_STEPS = [
+  { key: "pending_review", label: "Pending Review" },
+  { key: "pending_partner_confirmation", label: "Sent to Partner" },
+  { key: "confirmed", label: "Partner Confirmed" },
+  { key: "fee_captured", label: "Fee Captured" },
+  { key: "completed", label: "Completed" },
+]
+
+function getEventFlowIndex(flow: string): number {
+  const idx = EVENT_FLOW_STEPS.findIndex(s => s.key === flow)
+  return idx >= 0 ? idx : 0
+}
+
+const PARTNER_STATUS_COLORS: Record<string, string> = {
+  none: "bg-mist-100 text-mist-500",
+  waiting: "bg-yellow-100 text-yellow-700",
+  confirmed: "bg-green-100 text-green-700",
+  declined: "bg-red-100 text-red-700",
+}
+
+function EventBookingDetail({
+  booking, adminNotes, setAdminNotes, fetchBooking, id,
+}: {
+  booking: BookingDetail
+  adminNotes: string
+  setAdminNotes: (v: string) => void
+  fetchBooking: () => Promise<void>
+  id: string
+}) {
+  const [actionLoading, setActionLoading] = useState("")
+  const [partnerInput, setPartnerInput] = useState(booking.partnerName || "")
+  const [showMessaging, setShowMessaging] = useState(false)
+  const [messageText, setMessageText] = useState("")
+  const [emailSubject, setEmailSubject] = useState("")
+  const [generatingMessage, setGeneratingMessage] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
+
+  const custName = booking.customerName || `${booking.firstName || ""}${booking.lastName ? ` ${booking.lastName}` : ""}`.trim() || "N/A"
+  const custEmail = booking.customerEmail || booking.email || ""
+  const custPhone = booking.customerPhone || booking.phone || ""
+  const bNum = booking.bookingNumber || `EVT-${booking.id.slice(-4).toUpperCase()}`
+  const currentFlow = booking.bookingFlow || "pending_review"
+  const currentStep = getEventFlowIndex(currentFlow)
+  const pStatus = booking.partnerStatus || "none"
+
+  const formatDate = (d: string) => d ? new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }) : "—"
+
+  const statusColors: Record<string, string> = {
+    PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    CONFIRMED: "bg-blue-50 text-blue-700 border-blue-200",
+    ACTIVE: "bg-green-50 text-green-700 border-green-200",
+    COMPLETED: "bg-mist-100 text-mist-700 border-mist-200",
+    CANCELLED: "bg-red-50 text-red-700 border-red-200",
+  }
+
+  const updateEvent = async (fields: Record<string, unknown>) => {
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingType: "event", ...fields }),
+      })
+      if (!res.ok) throw new Error()
+      toast.success("Updated")
+      await fetchBooking()
+    } catch {
+      toast.error("Failed to update")
+    }
+  }
+
+  const addLogEntry = (entry: string) => {
+    const ts = new Date().toISOString()
+    const existing = booking.activityLog || ""
+    return (existing ? existing + "\n" : "") + `[${ts}] ${entry}`
+  }
+
+  const sendToPartner = async () => {
+    if (!partnerInput.trim()) { toast.error("Enter a partner name first"); return }
+    setActionLoading("partner")
+    await updateEvent({
+      partnerName: partnerInput.trim(),
+      partnerStatus: "waiting",
+      bookingFlow: "pending_partner_confirmation",
+      activityLog: addLogEntry(`Sent to partner: ${partnerInput.trim()}`),
+    })
+    setActionLoading("")
+  }
+
+  const markPartnerConfirmed = async () => {
+    setActionLoading("partner_confirm")
+    await updateEvent({
+      partnerStatus: "confirmed",
+      bookingFlow: "confirmed",
+      status: "CONFIRMED",
+      activityLog: addLogEntry(`Partner confirmed: ${booking.partnerName}`),
+    })
+    setActionLoading("")
+  }
+
+  const markPartnerDeclined = async () => {
+    setActionLoading("partner_decline")
+    await updateEvent({
+      partnerStatus: "declined",
+      bookingFlow: "pending_review",
+      activityLog: addLogEntry(`Partner declined: ${booking.partnerName}`),
+    })
+    setActionLoading("")
+  }
+
+  const captureEventFee = async () => {
+    setActionLoading("capture")
+    try {
+      const res = await fetch("/api/paypal/capture-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: booking.id, bookingType: "event" }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Failed to capture")
+      }
+      await updateEvent({
+        bookingFlow: "fee_captured",
+        activityLog: addLogEntry("$100 service fee captured"),
+      })
+      toast.success("Fee captured")
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setActionLoading("")
+    }
+  }
+
+  const voidEventFee = async () => {
+    if (!booking.paypalAuthorizationId) { toast.error("No authorization to void"); return }
+    setActionLoading("void")
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingType: "event", status: "CANCELLED" }),
+      })
+      if (!res.ok) throw new Error()
+      await updateEvent({
+        bookingFlow: "rejected",
+        activityLog: addLogEntry("Authorization voided, booking cancelled"),
+      })
+      toast.success("Authorization voided")
+    } catch {
+      toast.error("Failed to void")
+    } finally {
+      setActionLoading("")
+    }
+  }
+
+  const markCompleted = async () => {
+    setActionLoading("complete")
+    await updateEvent({
+      status: "COMPLETED",
+      bookingFlow: "completed",
+      activityLog: addLogEntry("Booking marked complete"),
+    })
+    setActionLoading("")
+  }
+
+  const saveAdminNotes = () => updateEvent({ adminNotes })
+
+  const generateMessage = async () => {
+    setGeneratingMessage(true)
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}/generate-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageType: "confirmation" }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || "Failed")
+      const data = await res.json()
+      setMessageText(data.message)
+      setEmailSubject(data.emailSubject)
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setGeneratingMessage(false)
+    }
+  }
+
+  const sendEmailToCustomer = async () => {
+    if (!custEmail) { toast.error("No customer email"); return }
+    setSendingEmail(true)
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}/send-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: custEmail, subject: emailSubject, message: messageText }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || "Failed")
+      toast.success("Email sent")
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
+  const openWhatsApp = () => {
+    const phone = custPhone.replace(/[^0-9]/g, "")
+    if (!phone) { toast.error("No phone number"); return }
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(messageText)}`, "_blank")
+  }
+
+  // Parse activity log
+  const logEntries = (booking.activityLog || "").split("\n").filter(Boolean).reverse()
+
+  return (
+    <div>
+      <Toaster position="top-right" />
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Link href="/admin/bookings" className="text-mist-400 hover:text-mist-700 text-sm">&larr; Bookings</Link>
+          </div>
+          <h1 className="text-2xl font-bold text-mist-900">Event Booking Details</h1>
+          <p className="text-sm text-mist-500">#{bNum} &middot; Created {formatDate(booking.createdAt)}</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`text-xs px-3 py-1.5 rounded-full border font-medium ${statusColors[booking.status] || statusColors.PENDING}`}>
+            {booking.status.charAt(0) + booking.status.slice(1).toLowerCase()}
+          </span>
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${PARTNER_STATUS_COLORS[pStatus]}`}>
+            Partner: {pStatus.charAt(0).toUpperCase() + pStatus.slice(1)}
+          </span>
+        </div>
+      </div>
+
+      {/* Flow Stepper */}
+      {booking.status !== "CANCELLED" && (
+        <div className="bg-white border border-mist-200 rounded-xl p-4 sm:p-5 mb-6 overflow-x-auto">
+          <h3 className="text-sm font-semibold text-mist-700 mb-4">Booking Flow</h3>
+          <div className="flex items-center gap-0 min-w-[500px]">
+            {EVENT_FLOW_STEPS.map((step, i) => (
+              <div key={step.key} className="flex items-center flex-1">
+                <div className="flex flex-col items-center flex-1">
+                  <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold
+                    ${i <= currentStep ? "bg-emerald-500 text-white" : "bg-mist-200 text-mist-400"}`}>
+                    {i < currentStep ? "✓" : i + 1}
+                  </div>
+                  <span className={`text-[9px] sm:text-[10px] mt-1.5 text-center leading-tight ${i <= currentStep ? "text-emerald-600 font-medium" : "text-mist-400"}`}>
+                    {step.label}
+                  </span>
+                </div>
+                {i < EVENT_FLOW_STEPS.length - 1 && (
+                  <div className={`h-0.5 flex-1 -mt-4 ${i < currentStep ? "bg-emerald-400" : "bg-mist-200"}`} />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
+        {currentFlow === "pending_review" && (
+          <button
+            onClick={sendToPartner}
+            disabled={actionLoading === "partner" || !partnerInput.trim()}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded disabled:opacity-50"
+          >
+            {actionLoading === "partner" ? "Sending..." : "Send to Partner"}
+          </button>
+        )}
+        {pStatus === "waiting" && (
+          <>
+            <button
+              onClick={markPartnerConfirmed}
+              disabled={actionLoading === "partner_confirm"}
+              className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded disabled:opacity-50"
+            >
+              {actionLoading === "partner_confirm" ? "..." : "✓ Partner Confirmed"}
+            </button>
+            <button
+              onClick={markPartnerDeclined}
+              disabled={actionLoading === "partner_decline"}
+              className="bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium px-4 py-2 rounded border border-red-200 disabled:opacity-50"
+            >
+              {actionLoading === "partner_decline" ? "..." : "✗ Partner Declined"}
+            </button>
+          </>
+        )}
+        {(currentFlow === "confirmed" || (currentFlow === "fee_captured" && booking.paymentStatus !== "PAID")) && booking.paymentStatus === "AUTHORIZED" && (
+          <button
+            onClick={captureEventFee}
+            disabled={actionLoading === "capture"}
+            className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded disabled:opacity-50"
+          >
+            {actionLoading === "capture" ? "Capturing..." : "$ Capture $100 Fee"}
+          </button>
+        )}
+        {booking.paymentStatus === "AUTHORIZED" && booking.status !== "CANCELLED" && (
+          <button
+            onClick={voidEventFee}
+            disabled={actionLoading === "void"}
+            className="bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium px-4 py-2 rounded border border-red-200 disabled:opacity-50"
+          >
+            {actionLoading === "void" ? "Voiding..." : "Void Authorization"}
+          </button>
+        )}
+        {(currentFlow === "fee_captured" || (booking.paymentStatus === "PAID" && currentFlow !== "completed")) && (
+          <button
+            onClick={markCompleted}
+            disabled={actionLoading === "complete"}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded disabled:opacity-50"
+          >
+            {actionLoading === "complete" ? "..." : "✓ Mark Completed"}
+          </button>
+        )}
+        {booking.status !== "CANCELLED" && currentFlow !== "completed" && (
+          <button
+            onClick={() => updateEvent({ status: "CANCELLED", bookingFlow: "rejected", activityLog: addLogEntry("Booking cancelled by admin") })}
+            className="bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium px-4 py-2 rounded border border-red-200"
+          >
+            Cancel Booking
+          </button>
+        )}
+        <button
+          onClick={() => { setShowMessaging(!showMessaging); if (!showMessaging && !messageText) generateMessage() }}
+          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-medium px-4 py-2 rounded border border-emerald-200 flex items-center gap-2"
+        >
+          <MessageSquare size={14} /> Send Message
+        </button>
+      </div>
+
+      {/* Messaging Panel */}
+      {showMessaging && (
+        <div className="bg-white border border-mist-200 rounded-xl p-4 sm:p-5 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-mist-900 flex items-center gap-2"><MessageSquare size={16} /> Message Customer</h3>
+            <button onClick={() => setShowMessaging(false)} className="text-mist-400 hover:text-mist-600"><X size={18} /></button>
+          </div>
+          <button
+            onClick={generateMessage}
+            disabled={generatingMessage}
+            className="text-xs font-medium px-4 py-2 rounded bg-mist-900 text-white hover:bg-mist-800 disabled:opacity-40 mb-4"
+          >
+            {generatingMessage ? "Generating with AI..." : "✨ Generate Message"}
+          </button>
+          {messageText && (
+            <div className="mb-3">
+              <label className="text-xs text-mist-500 block mb-1">Email Subject</label>
+              <input
+                type="text"
+                value={emailSubject}
+                onChange={e => setEmailSubject(e.target.value)}
+                className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+              />
+            </div>
+          )}
+          <div className="mb-4">
+            <label className="text-xs text-mist-500 block mb-1">Message</label>
+            <textarea
+              rows={6}
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder={generatingMessage ? "Generating..." : "Type or generate a message..."}
+              className="w-full bg-mist-50 border border-mist-200 text-sm text-mist-700 px-3 py-3 rounded focus:border-black focus:outline-none resize-y"
+            />
+          </div>
+          {messageText && (
+            <div className="flex flex-wrap gap-3">
+              <button onClick={sendEmailToCustomer} disabled={sendingEmail}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50">
+                <Mail size={14} /> {sendingEmail ? "Sending..." : "Send via Email"}
+              </button>
+              <button onClick={openWhatsApp}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded bg-green-600 hover:bg-green-700 text-white">
+                <Send size={14} /> Send via WhatsApp
+              </button>
+              <span className="text-xs text-mist-400 self-center">To: {custEmail} / {custPhone || "—"}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Main 3-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Column 1: Customer + Booking Info */}
+        <div className="space-y-6">
+          {/* Customer Info */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-4">Customer Info</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3"><User size={16} className="text-mist-400" /><span className="text-sm text-mist-900 font-medium">{custName}</span></div>
+              <div className="flex items-center gap-3"><Mail size={16} className="text-mist-400" /><span className="text-sm text-mist-600">{custEmail}</span></div>
+              {custPhone && <div className="flex items-center gap-3"><Phone size={16} className="text-mist-400" /><span className="text-sm text-mist-600">{custPhone}</span></div>}
+            </div>
+          </div>
+
+          {/* Booking Info */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-4">Booking Info</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-mist-500">Type:</span>
+                <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded text-xs font-medium">Event</span>
+              </div>
+              <p className="font-medium text-mist-900">{booking.itemName}</p>
+              <p className="text-mist-500">#{bNum}</p>
+              <div className="flex items-center gap-2"><Calendar size={14} className="text-mist-400" /><span className="text-mist-700">Event Date: {formatDate(booking.startDate)}</span></div>
+              {booking.guestsTotal && <div className="text-mist-600"><span className="font-medium">Total Guests:</span> {booking.guestsTotal}</div>}
+              {booking.clubVenue && <div className="text-mist-600"><span className="font-medium">Club/Venue:</span> {booking.clubVenue}</div>}
+              {booking.budget && <div className="text-mist-600"><span className="font-medium">Budget:</span> {booking.budget}</div>}
+              {booking.addOns && <div className="text-mist-600"><span className="font-medium">Add-Ons:</span> {booking.addOns}</div>}
+              {(booking.specialRequests || booking.notes) && (
+                <div>
+                  <p className="font-medium text-mist-600 mb-1">Special Requests:</p>
+                  <p className="text-mist-500 bg-mist-50 p-3 rounded text-xs">{booking.specialRequests || booking.notes}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Column 2: Partner + Fee + Admin Notes */}
+        <div className="space-y-6">
+          {/* Partner Info */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-4">Partner Management</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-mist-500 block mb-1">Partner / Vendor Name</label>
+                <input
+                  type="text"
+                  value={partnerInput}
+                  onChange={e => setPartnerInput(e.target.value)}
+                  placeholder="e.g. DJ Mike, Catering Co..."
+                  className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-mist-500">Status:</span>
+                <span className={`text-xs px-2 py-0.5 rounded font-medium ${PARTNER_STATUS_COLORS[pStatus]}`}>
+                  {pStatus.charAt(0).toUpperCase() + pStatus.slice(1)}
+                </span>
+              </div>
+              {booking.partnerName && booking.partnerName !== partnerInput && (
+                <button
+                  onClick={() => updateEvent({ partnerName: partnerInput.trim() })}
+                  className="text-xs bg-mist-900 text-white px-3 py-1.5 rounded hover:bg-mist-800"
+                >
+                  Update Partner Name
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Service Fee */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-4">Service Fee</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-mist-600">Event Service Fee</span>
+                <span className="font-semibold text-mist-900">$100.00</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-mist-500">Payment:</span>
+                <span className={`font-medium px-2 py-0.5 rounded text-xs ${
+                  booking.paymentStatus === "PAID" ? "bg-green-100 text-green-700"
+                  : booking.paymentStatus === "AUTHORIZED" ? "bg-blue-100 text-blue-700"
+                  : booking.paymentStatus === "REFUNDED" ? "bg-mist-100 text-mist-600"
+                  : "bg-yellow-100 text-yellow-700"
+                }`}>
+                  {booking.paymentStatus === "AUTHORIZED" ? "Authorized (Held)"
+                    : booking.paymentStatus === "PAID" ? "Captured"
+                    : booking.paymentStatus === "REFUNDED" ? "Refunded"
+                    : "Unpaid"}
+                </span>
+              </div>
+              {booking.paypalOrderId && (
+                <p className="text-xs text-mist-400">PayPal: {booking.paypalOrderId.slice(0, 20)}...</p>
+              )}
+            </div>
+          </div>
+
+          {/* Admin Notes */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-3">Admin Notes</h3>
+            <textarea
+              rows={4}
+              value={adminNotes}
+              onChange={e => setAdminNotes(e.target.value)}
+              className="w-full bg-mist-50 border border-mist-200 text-mist-700 text-sm px-3 py-2 rounded focus:border-black focus:outline-none resize-none"
+              placeholder="Internal notes..."
+            />
+            <button onClick={saveAdminNotes} className="mt-2 text-xs bg-black text-white px-3 py-1.5 rounded hover:bg-mist-800">Save Notes</button>
+          </div>
+
+          {/* Update Controls */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-3">Manual Overrides</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-mist-500 block mb-1">Booking Status</label>
+                <select value={booking.status} onChange={e => updateEvent({ status: e.target.value })}
+                  className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none">
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-mist-500 block mb-1">Payment Status</label>
+                <select value={booking.paymentStatus} onChange={e => updateEvent({ paymentStatus: e.target.value })}
+                  className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none">
+                  <option value="UNPAID">Unpaid</option>
+                  <option value="AUTHORIZED">Authorized</option>
+                  <option value="PAID">Paid</option>
+                  <option value="REFUNDED">Refunded</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-mist-500 block mb-1">Booking Flow</label>
+                <select value={currentFlow} onChange={e => updateEvent({ bookingFlow: e.target.value })}
+                  className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none">
+                  <option value="pending_review">Pending Review</option>
+                  <option value="pending_partner_confirmation">Pending Partner Confirmation</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="fee_captured">Fee Captured</option>
+                  <option value="completed">Completed</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 3: Service Fee Summary + Activity Log */}
+        <div className="space-y-6">
+          {/* Quick Summary Card */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-3">Summary</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-mist-500">Event</span><span className="font-medium text-mist-900">{booking.itemName}</span></div>
+              <div className="flex justify-between"><span className="text-mist-500">Customer</span><span className="font-medium text-mist-900">{custName}</span></div>
+              <div className="flex justify-between"><span className="text-mist-500">Date</span><span className="text-mist-700">{formatDate(booking.startDate)}</span></div>
+              {booking.guestsTotal && <div className="flex justify-between"><span className="text-mist-500">Guests</span><span className="text-mist-700">{booking.guestsTotal}</span></div>}
+              <hr className="border-mist-100" />
+              <div className="flex justify-between font-bold text-base">
+                <span>Service Fee</span>
+                <span>${(booking.totalPrice || 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Activity Log */}
+          <div className="bg-white border border-mist-200 rounded-xl p-5">
+            <h3 className="font-semibold text-mist-900 mb-4">Activity Log</h3>
+            {logEntries.length > 0 ? (
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {logEntries.map((entry, i) => {
+                  const match = entry.match(/^\[(.+?)\]\s(.+)$/)
+                  const ts = match ? new Date(match[1]).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : ""
+                  const msg = match ? match[2] : entry
+                  return (
+                    <div key={i} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                        {i < logEntries.length - 1 && <div className="w-px flex-1 bg-mist-200 mt-1" />}
+                      </div>
+                      <div className="pb-2">
+                        <p className="text-sm text-mist-700">{msg}</p>
+                        {ts && <p className="text-[10px] text-mist-400">{ts}</p>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-mist-400">No activity recorded yet.</p>
+            )}
           </div>
         </div>
       </div>
