@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
+import { useRouter } from "next/navigation"
 import {
   ChevronLeft,
   ChevronRight,
@@ -263,6 +263,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
 }
 
 export function VenueBookingForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -277,9 +278,6 @@ export function VenueBookingForm() {
   });
 
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
 
   const toggleAddOn = (addon: string) => {
     setForm((f) => ({
@@ -295,8 +293,9 @@ export function VenueBookingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
-    setPaymentError("");
-    setShowPayment(true);
+    setSubmitting(true);
+    sessionStorage.setItem("vipBookingData", JSON.stringify(form));
+    router.push("/events/vip-booking");
   };
 
   // Reusable input class (matches ContactForm exactly)
@@ -337,18 +336,6 @@ export function VenueBookingForm() {
 
         {/* Right Panel - Form */}
         <div className="flex-1">
-          {submitted ? (
-            <div className="h-full flex flex-col items-center justify-center text-center py-12 2xl:py-20">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-2xl 2xl:text-4xl font-bold text-mist-900 mb-2">Request Submitted!</h3>
-              <p className="text-mist-500 2xl:text-2xl">Our VIP concierge will contact you within 24 hours.</p>
-            </div>
-          ) : (
-            <>
               <h2 className="text-3xl md:text-4xl 2xl:text-6xl font-bold text-mist-900 mb-8 2xl:mb-12 tracking-tight">
                 VIP Venue Booking
               </h2>
@@ -503,37 +490,9 @@ export function VenueBookingForm() {
                   disabled={submitting || !isFormValid}
                   className="w-full bg-mist-900 text-white font-medium py-4 2xl:py-6 rounded-3xl hover:bg-mist-800 transition-colors disabled:opacity-50 mt-2 text-base 2xl:text-2xl"
                 >
-                  {showPayment ? "Review & Pay $100 Booking Fee Below ↓" : "Continue to Payment"}
+                  Submit Booking Request
                 </button>
               </form>
-
-              {showPayment && (
-                <div className="mt-6 p-5 border border-mist-200 rounded-2xl bg-mist-50">
-                  <div className="mb-4 text-center">
-                    <h4 className="text-lg font-semibold text-mist-900">Booking Fee: $100.00</h4>
-                    <p className="text-xs text-mist-500 mt-1">This is a non-refundable booking fee to confirm your event reservation.</p>
-                  </div>
-                  {paymentError && <p className="text-sm text-red-500 text-center mb-3">{paymentError}</p>}
-                  <EventPayPalButton
-                    bookingData={{
-                      firstName: form.firstName,
-                      lastName: form.lastName,
-                      email: form.email,
-                      phone: form.phone,
-                      clubVenue: form.clubVenue,
-                      bookingDate: form.bookingDate,
-                      guestsTotal: form.guestsTotal,
-                      budget: form.budget,
-                      addOns: form.addOns.join(", "),
-                      specialRequests: form.specialRequests,
-                    }}
-                    onSuccess={() => setSubmitted(true)}
-                    onError={(msg) => setPaymentError(msg)}
-                  />
-                </div>
-              )}
-            </>
-          )}
         </div>
       </div>
     </section>
@@ -562,62 +521,6 @@ function ContactInfo({ icon, label, value }: { icon: React.ReactNode; label: str
     </div>
   );
 }
-
-function EventPayPalButton({ bookingData, onSuccess, onError }: {
-  bookingData: Record<string, any>
-  onSuccess: () => void
-  onError: (msg: string) => void
-}) {
-  const [processing, setProcessing] = useState(false)
-  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
-
-  if (!clientId) return <p className="text-red-400 text-sm text-center">PayPal is not configured.</p>
-
-  return (
-    <PayPalScriptProvider options={{ clientId, currency: "USD", intent: "capture" }}>
-      <PayPalButtons
-        style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-        disabled={processing}
-        createOrder={async () => {
-          setProcessing(true)
-          try {
-            const res = await fetch("/api/paypal/create-order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ totalPrice: 100, currency: "USD", bookingRef: "event", intent: "CAPTURE" }),
-            })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || "Failed to create order")
-            return data.orderId
-          } catch (err: any) {
-            setProcessing(false)
-            onError(err.message)
-            throw err
-          }
-        }}
-        onApprove={async (data) => {
-          try {
-            const res = await fetch("/api/paypal/capture-event", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId: data.orderID, bookingData }),
-            })
-            const result = await res.json()
-            if (!res.ok) throw new Error(result.error || "Payment failed")
-            onSuccess()
-          } catch (err: any) {
-            onError(err.message)
-          } finally {
-            setProcessing(false)
-          }
-        }}
-        onError={(err) => { setProcessing(false); onError(String(err)) }}
-        onCancel={() => setProcessing(false)}
-      />
-    </PayPalScriptProvider>
-  )
-}
-
 
 export default function EventDetailClient({ event, relatedEvents }: { event: EventDetail; relatedEvents: RelatedEvent[] }) {
   const [currentImage, setCurrentImage] = useState(0)
