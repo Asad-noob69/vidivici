@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { capturePayPalOrder } from "@/lib/paypal"
 import { prisma } from "@/lib/prisma"
 import { notifyAdmin } from "@/lib/email"
+import { verifyTurnstile } from "@/lib/turnstile"
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,11 @@ export async function POST(request: NextRequest) {
 
     if (!orderId || !bookingData) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
+
+    const valid = await verifyTurnstile(bookingData.turnstileToken)
+    if (!valid) {
+      return NextResponse.json({ error: "Bot verification failed" }, { status: 403 })
     }
 
     // Capture the order immediately (non-refundable $100)

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { notifyAdmin } from "@/lib/email"
+import { verifyTurnstile } from "@/lib/turnstile"
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { type, villaName, villaSlug, firstName, lastName, email, phone, ...rest } = body
+    const { type, villaName, villaSlug, firstName, lastName, email, phone, turnstileToken, ...rest } = body
+
+    const valid = await verifyTurnstile(turnstileToken)
+    if (!valid) {
+      return NextResponse.json({ error: "Bot verification failed" }, { status: 403 })
+    }
 
     if (!firstName || !email || !type || !villaSlug) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })

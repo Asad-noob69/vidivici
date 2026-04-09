@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Phone, Mail, MapPin, Clock, ChevronDown } from "lucide-react";
+import Turnstile from "@/components/Turnstile";
 
 const inquiryTypes = [
   "Car Rental",
@@ -39,6 +40,7 @@ export default function ContactForm() {
   };
 
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,6 +58,7 @@ export default function ContactForm() {
           phone: form.phone,
           subject: form.inquiryType || "General Inquiry",
           message: form.message,
+          turnstileToken,
         }),
       });
       if (!res.ok) throw new Error();
@@ -209,10 +212,14 @@ export default function ContactForm() {
                 />
               </Field>
 
+              {/* Turnstile */}
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-mist-900 text-white font-normal py-4 2xl:py-6 rounded-xl 2xl:rounded-2xl text-sm 2xl:text-xl hover:bg-mist-800 transition-all duration-200 mt-2 active:scale-[0.99]"
+                disabled={!turnstileToken}
               >
                 {isSubmitted ? "Message Sent!" : "Send"}
               </button>

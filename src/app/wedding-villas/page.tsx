@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Banner from "@/components/ui/Banner"
+import Turnstile from "@/components/Turnstile"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
@@ -324,6 +325,7 @@ function WeddingBookingInquiry() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   const toggleAddOn = (addon: string) => {
     setForm((f) => ({
@@ -355,6 +357,7 @@ function WeddingBookingInquiry() {
             guestCount: parseInt(form.guestCount) || 50,
             addOns: form.addOns.join(", "),
           },
+          turnstileToken,
         }),
       })
       if (res.ok) setSubmitted(true)
@@ -550,9 +553,13 @@ function WeddingBookingInquiry() {
                   className="w-full border border-mist-300 rounded-xl px-4 py-3 2xl:px-8 2xl:py-6 text-sm text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white resize-none" />
               </div>
 
+              {/* Turnstile */}
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               {/* Submit */}
               <button onClick={handleSubmit}
-                className="w-full bg-mist-900 text-white cursor-pointer font-semibold py-4 2xl:py-8 rounded-xl hover:bg-mist-800 transition-colors duration-200 mt-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                className="w-full bg-mist-900 text-white cursor-pointer font-semibold py-4 2xl:py-8 rounded-xl hover:bg-mist-800 transition-colors duration-200 mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                disabled={submitting || !turnstileToken}>
                 {submitting ? "Sending..." : "Send"}
               </button>
 

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY
@@ -7,11 +6,6 @@ const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const { id } = await params
     const body = await request.json()
     const { messageType, alternativeVehicle } = body

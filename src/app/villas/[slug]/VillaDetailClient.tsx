@@ -11,6 +11,7 @@ import FAQ from "@/components/home/FAQ"
 import HomeVillaSection from "@/components/home/Villa"
 import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
 import CarGallery from "@/components/cars/CarGallery" // adjust path as needed
+import Turnstile from "@/components/Turnstile"
 
 interface VillaImage {
   url: string
@@ -158,6 +159,8 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
   const [productionSubmitting, setProductionSubmitting] = useState(false)
   const [productionSuccess, setProductionSuccess] = useState(false)
   const [mobileSuccessModal, setMobileSuccessModal] = useState<null | "event" | "production">(null)
+  const [eventTurnstileToken, setEventTurnstileToken] = useState("")
+  const [productionTurnstileToken, setProductionTurnstileToken] = useState("")
 
   const handleCheckInDateChange = (value: string) => {
     setCheckInDate(value)
@@ -185,6 +188,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
           villaSlug: villa.slug,
           ...eventForm,
           addOns: eventForm.addOns.join(", "),
+          turnstileToken: eventTurnstileToken,
         }),
       })
       if (!res.ok) throw new Error()
@@ -215,6 +219,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
           villaName: villa.name,
           villaSlug: villa.slug,
           ...productionForm,
+          turnstileToken: productionTurnstileToken,
         }),
       })
       if (!res.ok) throw new Error()
@@ -881,10 +886,13 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       />
                     </div>
 
+                    {/* Turnstile */}
+                    <Turnstile onVerify={setEventTurnstileToken} onExpire={() => setEventTurnstileToken("")} />
+
                     {/* Request Quote Button */}
                     <button
                       onClick={handleEventSubmit}
-                      disabled={eventSubmitting}
+                      disabled={eventSubmitting || !eventTurnstileToken}
                       className="w-full bg-neutral-500 hover:bg-mist-700 transition text-white py-3.5 2xl:py-5 rounded-md font-semibold text-sm 2xl:text-lg tracking-wide disabled:opacity-60"
                     >
                       {eventSubmitting ? "Submitting..." : "Request Quote"}
@@ -1006,10 +1014,13 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                       />
                     </div>
 
+                    {/* Turnstile */}
+                    <Turnstile onVerify={setProductionTurnstileToken} onExpire={() => setProductionTurnstileToken("")} />
+
                     {/* Request Quote Button */}
                     <button
                       onClick={handleProductionSubmit}
-                      disabled={productionSubmitting}
+                      disabled={productionSubmitting || !productionTurnstileToken}
                       className="w-full bg-neutral-500 hover:bg-mist-700 transition text-white py-3.5 2xl:py-5 rounded-md font-semibold text-sm 2xl:text-lg tracking-wide disabled:opacity-60"
                     >
                       {productionSubmitting ? "Submitting..." : "Request Quote"}

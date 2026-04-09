@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState, useEffect, useCallback } from "react"
+import Turnstile from "@/components/Turnstile"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Banner from "@/components/ui/Banner"
@@ -352,6 +353,7 @@ function ProductionInquiryForm() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   const handleSubmit = async () => {
     if (!form.firstName || !form.email || !form.projectType || !form.shootDates) return
@@ -373,6 +375,7 @@ function ProductionInquiryForm() {
             shootDates: form.shootDates,
             crewSize: form.crewSize,
           },
+          turnstileToken,
         }),
       })
       if (res.ok) setSubmitted(true)
@@ -542,8 +545,11 @@ function ProductionInquiryForm() {
                   className="w-full border border-mist-300 rounded-xl px-4 py-3 2xl:px-8 2xl:py-6 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 focus:outline-none focus:border-mist-400 transition-colors duration-200 bg-white resize-none" />
               </div>
 
+              {/* Turnstile */}
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               {/* Submit */}
-              <button onClick={handleSubmit} disabled={submitting}
+              <button onClick={handleSubmit} disabled={submitting || !turnstileToken}
                 className="w-full bg-mist-900 text-white cursor-pointer font-semibold py-4 2xl:py-6 rounded-xl 2xl:rounded-2xl hover:bg-mist-800 transition-colors duration-200 mt-2 disabled:opacity-40 disabled:cursor-not-allowed text-base 2xl:text-2xl">
                 {submitting ? "Sending..." : "Send"}
               </button>

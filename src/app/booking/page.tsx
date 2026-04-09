@@ -15,6 +15,7 @@ import {
   MapPin,
 } from "lucide-react"
 import PayPalBookingButton from "@/components/booking/PayPalBookingButton"
+import Turnstile from "@/components/Turnstile"
 import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
 import TimeSelectDropdown from "@/components/ui/TimeSelectDropdown"
 
@@ -327,6 +328,7 @@ function ReservationContent() {
   const [cardZip, setCardZip] = useState("")
   const [placingOrder, setPlacingOrder] = useState(false)
   const [cardError, setCardError] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   const today = new Date().toISOString().split("T")[0]
 
@@ -1146,6 +1148,9 @@ function ReservationContent() {
                     <Link href="/terms" className="text-blue-600 hover:underline">Terms &amp; Conditions</Link> &{" "}
                     <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                   </p>
+
+                  <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
                   <p className="text-xs text-mist-400 leading-relaxed">
                     {mode === "car"
                       ? "A hold of up to your reservation charge including deposit up to $5,000 will be placed on your card. No charge will be issued until confirmation of your reservation."
