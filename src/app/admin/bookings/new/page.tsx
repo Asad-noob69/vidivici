@@ -265,19 +265,19 @@ export default function NewBookingPage() {
                   <div>
                     <label className="text-xs text-mist-500 block mb-1">Driver&apos;s License</label>
                     <input type="file" accept="image/*,.pdf" onChange={e => setDlFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                      className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
                   </div>
                   <div>
                     <label className="text-xs text-mist-500 block mb-1">Insurance Policy</label>
                     <input type="file" accept="image/*,.pdf" onChange={e => setInsuranceFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                      className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
                   </div>
                 </>
               )}
               <div>
                 <label className="text-xs text-mist-500 block mb-1">Passport / ID</label>
                 <input type="file" accept="image/*,.pdf" onChange={e => setPassportFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                  className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
               </div>
             </div>
             <p className="text-xs text-mist-400 mt-3">Uploaded documents will be attached to the customer&apos;s profile for verification.</p>

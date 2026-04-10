@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
-import { Search, Plus, Car } from "lucide-react"
+import { Search, Plus, Car, ArrowLeft } from "lucide-react"
 
 interface Car {
   id: string
@@ -62,7 +62,12 @@ export default function AdminCarsPage() {
     <div>
       <Toaster position="top-right" />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-mist-900">Manage Cars</h1>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/dashboard" className="p-1.5 rounded-lg hover:bg-mist-100 text-mist-500 hover:text-mist-900 transition-colors">
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-2xl font-bold text-mist-900">Manage Cars</h1>
+        </div>
         <Link href="/admin/cars/new" className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-mist-800 transition-colors">
           <Plus size={14} /> Add New Car
         </Link>

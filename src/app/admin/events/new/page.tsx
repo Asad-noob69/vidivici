@@ -489,9 +489,6 @@ function EventForm() {
                         <span className="text-xs text-mist-400">Uploading...</span>
                       )}
                     </div>
-                    {experienceImages[idx] && (
-                      <p className="text-xs text-mist-500 truncate">{experienceImages[idx]}</p>
-                    )}
                   </div>
                 ))}
               </div>
@@ -535,9 +532,6 @@ function EventForm() {
                       />
                       {uploadingShowcaseIndex === idx && (
                         <span className="text-xs text-mist-400">Uploading...</span>
-                      )}
-                      {card.imageUrl && (
-                        <p className="text-xs text-mist-500 truncate mt-1">{card.imageUrl}</p>
                       )}
                     </div>
                     <button
