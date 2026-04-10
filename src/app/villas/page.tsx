@@ -20,6 +20,7 @@ interface VillaFromAPI {
   guests: number
   sqft: number
   pricePerNight: number
+  originalPrice?: number | null
   images: { url: string; isPrimary: boolean }[]
 }
 
@@ -616,6 +617,9 @@ function VillaListCard({ villa, wishlisted: initialWishlisted }: { villa: VillaF
           </Link>
           <div className="flex flex-col items-end">
             <span className="text-base 2xl:text-2xl font-semibold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
+            {villa.originalPrice && (
+              <span className="text-[10px] 2xl:text-sm text-mist-400 line-through">${villa.originalPrice.toLocaleString()}</span>
+            )}
             <span className="text-[10px] 2xl:text-base text-mist-400">/night</span>
           </div>
         </div>

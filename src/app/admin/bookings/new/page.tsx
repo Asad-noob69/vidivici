@@ -18,6 +18,8 @@ export default function NewBookingPage() {
   const [villas, setVillas] = useState<VillaOption[]>([])
   const [events, setEvents] = useState<EventOption[]>([])
   const [loading, setLoading] = useState(true)
+  const [carTaxPercent, setCarTaxPercent] = useState(8.5)
+  const [villaTaxPercent, setVillaTaxPercent] = useState(14)
 
   const [dlFile, setDlFile] = useState<File | null>(null)
   const [insuranceFile, setInsuranceFile] = useState<File | null>(null)
@@ -41,6 +43,10 @@ export default function NewBookingPage() {
       fetch("/api/cars?limit=200&all=true").then(r => r.json()).then(d => setCars(d.cars || [])),
       fetch("/api/villas?limit=200").then(r => r.json()).then(d => setVillas(Array.isArray(d) ? d : d.villas || [])),
       fetch("/api/events?limit=200").then(r => r.json()).then(d => setEvents(Array.isArray(d) ? d : d.events || [])),
+      fetch("/api/settings").then(r => r.ok ? r.json() : {}).then((s: any) => {
+        if (s.carTaxPercent) setCarTaxPercent(parseFloat(s.carTaxPercent))
+        if (s.villaTaxPercent) setVillaTaxPercent(parseFloat(s.villaTaxPercent))
+      }),
     ]).catch(() => toast.error("Failed to load data")).finally(() => setLoading(false))
   }, [])
 
@@ -56,7 +62,7 @@ export default function NewBookingPage() {
           const deliveryFee = parseFloat(form.deliveryFee) || 0
           const discount = parseFloat(form.discount) || 0
           const subtotal = base - discount + driverCost + deliveryFee
-          const tax = Math.round(subtotal * 0.085)
+          const tax = Math.round(subtotal * (carTaxPercent / 100))
           setForm(p => ({ ...p, basePrice: base.toString(), driverCost: driverCost.toString(), tax: tax.toString(), totalPrice: (subtotal + tax).toString() }))
         }
       }
@@ -67,7 +73,7 @@ export default function NewBookingPage() {
         const nights = Math.max(1, Math.ceil((new Date(form.checkOut).getTime() - new Date(form.checkIn).getTime()) / 86400000))
         const base = villa.pricePerNight * nights
         const subtotal = base + villa.cleaningFee
-        const tax = Math.round(subtotal * 0.14)
+        const tax = Math.round(subtotal * (villaTaxPercent / 100))
         const total = subtotal + tax + villa.securityDeposit
         setForm(p => ({ ...p, basePrice: base.toString(), tax: tax.toString(), totalPrice: total.toString() }))
       }
@@ -259,19 +265,19 @@ export default function NewBookingPage() {
                   <div>
                     <label className="text-xs text-mist-500 block mb-1">Driver&apos;s License</label>
                     <input type="file" accept="image/*,.pdf" onChange={e => setDlFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                      className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
                   </div>
                   <div>
                     <label className="text-xs text-mist-500 block mb-1">Insurance Policy</label>
                     <input type="file" accept="image/*,.pdf" onChange={e => setInsuranceFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                      className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
                   </div>
                 </>
               )}
               <div>
                 <label className="text-xs text-mist-500 block mb-1">Passport / ID</label>
                 <input type="file" accept="image/*,.pdf" onChange={e => setPassportFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-mist-600 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
+                  className="w-full text-transparent text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-mist-100 file:text-mist-700 hover:file:bg-mist-200" />
               </div>
             </div>
             <p className="text-xs text-mist-400 mt-3">Uploaded documents will be attached to the customer&apos;s profile for verification.</p>

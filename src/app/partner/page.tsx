@@ -4,6 +4,7 @@ import { useState } from "react";
 import FAQ from "@/components/home/FAQ";
 import Banner from "@/components/ui/Banner";
 import toast, { Toaster } from "react-hot-toast";
+import Turnstile from "@/components/Turnstile";
 import HowItWorks from "@/components/ui/HowItWorks";
 import {
     Eye, SlidersHorizontal, ShieldCheck,
@@ -70,6 +71,7 @@ export default function PartnerPage() {
     const inputCls = "w-full border border-mist-200 rounded-xl bg-mist-100 px-4 py-2.5 text-sm text-mist-950 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors ";
     const [pForm, setPForm] = useState({ fullName: "", email: "", phone: "", company: "", listingType: "", location: "", capacity: "", rates: "", blackoutDates: "", insurance: "", website: "", description: "", agreed: false });
     const [pSubmitting, setPSubmitting] = useState(false);
+    const [turnstileToken, setTurnstileToken] = useState("");
 
     const handlePartnerSubmit = async () => {
         if (!pForm.fullName || !pForm.email) { toast.error("Name and email are required"); return; }
@@ -89,6 +91,7 @@ export default function PartnerPage() {
                     subject: `Partner Application - ${pForm.listingType || "General"}`,
                     message: pForm.description,
                     data: { company: pForm.company, listingType: pForm.listingType, location: pForm.location, capacity: pForm.capacity, rates: pForm.rates, blackoutDates: pForm.blackoutDates, insurance: pForm.insurance, website: pForm.website },
+                    turnstileToken,
                 }),
             });
             if (!res.ok) throw new Error();
@@ -375,8 +378,11 @@ export default function PartnerPage() {
                                 <span className="text-[12.5px] 2xl:text-lg text-mist-500">I agree to be contacted about my application.</span>
                             </label>
 
+                            {/* Turnstile */}
+                            <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
                             {/* Submit */}
-                            <button onClick={handlePartnerSubmit} disabled={pSubmitting} className="w-full bg-mist-900 text-white text-[14px] 2xl:text-2xl font-semibold py-4 2xl:py-8 rounded-xl 2xl:rounded-2xl hover:bg-mist-700 transition-colors duration-200 mt-1 disabled:opacity-50">
+                            <button onClick={handlePartnerSubmit} disabled={pSubmitting || !turnstileToken} className="w-full bg-mist-900 text-white text-[14px] 2xl:text-2xl font-semibold py-4 2xl:py-8 rounded-xl 2xl:rounded-2xl hover:bg-mist-700 transition-colors duration-200 mt-1 disabled:opacity-50">
                                 {pSubmitting ? "Submitting..." : "Submit Application"}
                             </button>
 

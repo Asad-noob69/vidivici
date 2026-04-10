@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
 import { Phone, Mail, MapPin, Clock, ChevronDown } from "lucide-react"
+import Turnstile from "@/components/Turnstile"
 
 const BUDGET_OPTIONS = [
   "Under $1,000",
@@ -266,6 +267,7 @@ export default function MultiStepBookingForm({
   const [paymentError, setPaymentError] = useState("")
   const [loaded, setLoaded] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   // New payment UI state (UI only — does not affect existing PayPal logic)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("paypal")
@@ -340,7 +342,7 @@ export default function MultiStepBookingForm({
   const handleInfoSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!isFormValid) return
-    sessionStorage.setItem("vipBookingData", JSON.stringify(form))
+    sessionStorage.setItem("vipBookingData", JSON.stringify({ ...form, turnstileToken }))
     setStep(2)
   }
 
@@ -608,9 +610,11 @@ export default function MultiStepBookingForm({
                 />
               </Field>
 
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               <button
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isFormValid || !turnstileToken}
                 className="w-full bg-mist-900 text-white font-medium py-4 2xl:py-6 rounded-xl 2xl:rounded-2xl hover:bg-mist-800 transition-colors disabled:opacity-50 mt-2 text-base 2xl:text-2xl"
               >
                 Next

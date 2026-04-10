@@ -142,6 +142,12 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const [generatingMessage, setGeneratingMessage] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
 
+  /* ---- Quick coupon state (for alternative offer) ---- */
+  const [quickCouponCode, setQuickCouponCode] = useState("")
+  const [quickCouponDiscount, setQuickCouponDiscount] = useState("10")
+  const [creatingCoupon, setCreatingCoupon] = useState(false)
+  const [createdCoupon, setCreatedCoupon] = useState<{ code: string; discountPercent: number } | null>(null)
+
   const fetchBooking = async () => {
     try {
       const res = await fetch(`/api/admin/bookings/${id}`)
@@ -306,6 +312,44 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
       toast.error(err.message)
     } finally {
       setGeneratingMessage(false)
+    }
+  }
+
+  const autoGenerateCouponCode = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    const rand = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("")
+    return `VIDI${rand}`
+  }
+
+  const createQuickCoupon = async () => {
+    const code = quickCouponCode.trim() || autoGenerateCouponCode()
+    const discount = parseFloat(quickCouponDiscount)
+    if (!discount || discount <= 0 || discount > 100) {
+      toast.error("Discount must be between 1 and 100")
+      return
+    }
+    setCreatingCoupon(true)
+    try {
+      const scope = booking?.bookingType === "villa" ? "all_villas" : "all_cars"
+      const res = await fetch("/api/admin/coupons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          discountPercent: discount,
+          maxUses: 1,
+          scope,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Failed to create coupon")
+      setCreatedCoupon({ code: data.code, discountPercent: data.discountPercent })
+      setQuickCouponCode("")
+      toast.success(`Coupon ${data.code} created`)
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setCreatingCoupon(false)
     }
   }
 
@@ -550,15 +594,70 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Alternative Vehicle Input */}
           {messageType === "alternative" && (
-            <div className="mb-4">
-              <label className="text-xs text-mist-500 block mb-1">Alternative Vehicle / Villa Name</label>
-              <input
-                type="text"
-                value={alternativeVehicle}
-                onChange={e => setAlternativeVehicle(e.target.value)}
-                placeholder="e.g. Range Rover Sport, Malibu Beach Villa..."
-                className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
-              />
+            <div className="mb-4 space-y-4">
+              <div>
+                <label className="text-xs text-mist-500 block mb-1">Alternative Vehicle / Villa Name</label>
+                <input
+                  type="text"
+                  value={alternativeVehicle}
+                  onChange={e => setAlternativeVehicle(e.target.value)}
+                  placeholder="e.g. Range Rover Sport, Malibu Beach Villa..."
+                  className="w-full bg-white border border-mist-200 text-sm px-3 py-2 rounded focus:border-black focus:outline-none"
+                />
+              </div>
+
+              {/* Quick Coupon for Alternative Offer */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-amber-800 mb-3">Create Discount Coupon for Customer</h4>
+                {createdCoupon ? (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-green-700 font-medium">✓ Coupon created:</span>
+                    <span className="font-mono font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded">{createdCoupon.code}</span>
+                    <span className="text-green-600">({createdCoupon.discountPercent}% off)</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex-1 min-w-[140px]">
+                      <label className="text-xs text-amber-700 block mb-1">Coupon Code</label>
+                      <div className="flex gap-1.5">
+                        <input
+                          type="text"
+                          value={quickCouponCode}
+                          onChange={e => setQuickCouponCode(e.target.value.toUpperCase())}
+                          placeholder="Auto-generate"
+                          className="flex-1 bg-white border border-amber-200 text-sm px-2.5 py-1.5 rounded focus:border-amber-400 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setQuickCouponCode(autoGenerateCouponCode())}
+                          className="px-2 py-1.5 bg-white border border-amber-200 text-amber-600 rounded text-xs hover:bg-amber-100"
+                        >
+                          Generate
+                        </button>
+                      </div>
+                    </div>
+                    <div className="w-24">
+                      <label className="text-xs text-amber-700 block mb-1">Discount %</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={quickCouponDiscount}
+                        onChange={e => setQuickCouponDiscount(e.target.value)}
+                        className="w-full bg-white border border-amber-200 text-sm px-2.5 py-1.5 rounded focus:border-amber-400 focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={createQuickCoupon}
+                      disabled={creatingCoupon}
+                      className="px-4 py-1.5 bg-amber-600 text-white text-xs font-medium rounded hover:bg-amber-700 disabled:opacity-50"
+                    >
+                      {creatingCoupon ? "Creating..." : "Create Coupon"}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

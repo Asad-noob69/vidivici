@@ -147,9 +147,6 @@ function NewBlogPostForm() {
         </div>
         <div>
           <label className="text-xs text-mist-400 block mb-1">Cover Image</label>
-          {form.coverImage && (
-            <p className="text-xs text-mist-500 mb-1">Current: {form.coverImage}</p>
-          )}
           <input type="file" accept="image/*" ref={fileInputRef} className="text-sm text-mist-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer">

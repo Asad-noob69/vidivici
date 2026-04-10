@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
 import { ChevronDown } from "lucide-react"
+import Turnstile from "@/components/Turnstile"
 
 const BUDGET_OPTIONS = [
   "Under $1,000",
@@ -255,6 +256,7 @@ export default function VipBookingPage() {
   const [form, setForm] = useState<BookingForm>(defaultForm)
   const [paymentError, setPaymentError] = useState("")
   const [loaded, setLoaded] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   useEffect(() => {
     try {
@@ -296,7 +298,7 @@ export default function VipBookingPage() {
     e.preventDefault()
     if (!isFormValid) return
     // Save updated form data back to sessionStorage
-    sessionStorage.setItem("vipBookingData", JSON.stringify(form))
+    sessionStorage.setItem("vipBookingData", JSON.stringify({ ...form, turnstileToken }))
     setStep(2)
   }
 
@@ -538,9 +540,11 @@ export default function VipBookingPage() {
                 />
               </Field>
 
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               <button
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isFormValid || !turnstileToken}
                 className="w-full bg-mist-900 text-white font-medium py-4 rounded-3xl hover:bg-mist-800 transition-colors disabled:opacity-50 mt-2 text-base"
               >
                 Next

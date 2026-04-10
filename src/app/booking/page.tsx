@@ -15,6 +15,7 @@ import {
   MapPin,
 } from "lucide-react"
 import PayPalBookingButton from "@/components/booking/PayPalBookingButton"
+import Turnstile from "@/components/Turnstile"
 import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
 import TimeSelectDropdown from "@/components/ui/TimeSelectDropdown"
 
@@ -86,7 +87,8 @@ function calcCarPricing(
   driverDays: number,
   needDriver: boolean,
   driverAvailability: "full" | "select",
-  couponPercent = 0
+  couponPercent = 0,
+  carTaxPercent = 8.5
 ) {
   const bookingDeposit = 2000
   const securityHold = 5000
@@ -97,7 +99,7 @@ function calcCarPricing(
   const afterDiscount = subtotal - discountAmount + driverTotal
   const couponAmount = couponPercent > 0 ? Math.round(afterDiscount * (couponPercent / 100)) : 0
   const preTax = afterDiscount - couponAmount
-  const tax = Math.round(preTax * 0.085)
+  const tax = Math.round(preTax * (carTaxPercent / 100))
   const rentalTotal = preTax + tax
   const total = rentalTotal + securityHold
   const payNowTotal = bookingDeposit + securityHold
@@ -105,13 +107,13 @@ function calcCarPricing(
   return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, bookingDeposit, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
-function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0) {
+function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0, villaTaxPercent = 14) {
   const nightsTotal = villa.pricePerNight * nights
   const airportTransferFee = airportTransfer ? 500 : 0
   const subtotal = nightsTotal + villa.cleaningFee + airportTransferFee
   const couponAmount = couponPercent > 0 ? Math.round(subtotal * (couponPercent / 100)) : 0
   const afterCoupon = subtotal - couponAmount
-  const tax = Math.round(afterCoupon * 0.14)
+  const tax = Math.round(afterCoupon * (villaTaxPercent / 100))
   const total = afterCoupon + tax + villa.securityDeposit
   const payNow = villa.securityDeposit
   const dueAtPickup = Math.max(0, total - payNow)
@@ -317,6 +319,10 @@ function ReservationContent() {
   const [couponError, setCouponError] = useState("")
   const [couponLoading, setCouponLoading] = useState(false)
 
+  /* ---- Tax rates (from settings) ---- */
+  const [carTaxPercent, setCarTaxPercent] = useState(8.5)
+  const [villaTaxPercent, setVillaTaxPercent] = useState(14)
+
   /* ---- Credit card form state ---- */
   const [cardName, setCardName] = useState("")
   const [cardNumber, setCardNumber] = useState("")
@@ -327,6 +333,7 @@ function ReservationContent() {
   const [cardZip, setCardZip] = useState("")
   const [placingOrder, setPlacingOrder] = useState(false)
   const [cardError, setCardError] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   const today = new Date().toISOString().split("T")[0]
 
@@ -390,13 +397,20 @@ function ReservationContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session])
 
-  /* ---- Fetch brands on mount ---- */
+  /* ---- Fetch brands + settings on mount ---- */
   useEffect(() => {
     fetch("/api/brands")
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
         const b = Array.isArray(data) ? data : []
         setBrands(b.map((x: any) => ({ id: x.id, name: x.name, slug: x.slug })))
+      })
+      .catch(() => { })
+    fetch("/api/settings")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((s: any) => {
+        if (s.carTaxPercent) setCarTaxPercent(parseFloat(s.carTaxPercent))
+        if (s.villaTaxPercent) setVillaTaxPercent(parseFloat(s.villaTaxPercent))
       })
       .catch(() => { })
   }, [])
@@ -603,13 +617,13 @@ function ReservationContent() {
   const actualDriverDays = driverAvailability === "full" ? days : driverDays
 
   const carPricing = useMemo(
-    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount) : null),
-    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount]
+    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent) : null),
+    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent]
   )
 
   const villaPricing = useMemo(
-    () => (selectedVilla && days > 0 ? calcVillaPricing(selectedVilla, days, villaAirportTransfer, couponDiscount) : null),
-    [selectedVilla, days, villaAirportTransfer, couponDiscount]
+    () => (selectedVilla && days > 0 ? calcVillaPricing(selectedVilla, days, villaAirportTransfer, couponDiscount, villaTaxPercent) : null),
+    [selectedVilla, days, villaAirportTransfer, couponDiscount, villaTaxPercent]
   )
 
   /* ---- Select car from dropdown ---- */
@@ -1146,6 +1160,9 @@ function ReservationContent() {
                     <Link href="/terms" className="text-blue-600 hover:underline">Terms &amp; Conditions</Link> &{" "}
                     <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                   </p>
+
+                  <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
                   <p className="text-xs text-mist-400 leading-relaxed">
                     {mode === "car"
                       ? "A hold of up to your reservation charge including deposit up to $5,000 will be placed on your card. No charge will be issued until confirmation of your reservation."
