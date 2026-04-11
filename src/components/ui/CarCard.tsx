@@ -73,7 +73,7 @@ export default function CarCard({ car, discountBadgeText = undefined }) {
           <div className="flex flex-col items-end">
             <span className="text-base 2xl:text-xl font-semibold text-mist-900">${car.pricePerDay}</span>
             <span className="text-[10px] 2xl:text-sm text-mist-400">
-            <span className="text-[10px] 2xl:text-sm text-mist-400 line-through">${car.originalPrice}</span> / day
+              {car.originalPrice && <span className="line-through">${car.originalPrice}</span>}{car.originalPrice && " "} / day
             </span>
           </div>
         </div>

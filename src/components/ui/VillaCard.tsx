@@ -80,7 +80,7 @@ export default function VillaCard({
           <div className="flex flex-col items-end">
             <span className="text-base 2xl:text-xl font-semibold text-mist-900">${price}</span>
             <span className="text-[10px] 2xl:text-sm text-mist-400">
-            <span className="text-[10px] 2xl:text-sm text-mist-400 line-through">${oldPrice}</span> / night
+              <span className="line-through">${oldPrice}</span> / night
             </span>
           </div>
         </div>

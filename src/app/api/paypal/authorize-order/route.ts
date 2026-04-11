@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { authorizePayPalOrder, capturePayPalAuthorization } from "@/lib/paypal"
+import { authorizePayPalOrder } from "@/lib/paypal"
 import { notifyAdmin } from "@/lib/email"
 import { DEFAULT_VILLA_TAX } from "@/lib/utils"
 
@@ -45,20 +45,9 @@ export async function POST(request: NextRequest) {
       else if (days >= 7) discount = 0.15
       const totalPrice = car.pricePerDay * days * (1 - discount)
 
-      // Immediately capture the $2,000 booking deposit (partial capture)
-      const bookingDeposit = 2000
-      let depositCaptureId: string | null = null
-      try {
-        const captureResult = await capturePayPalAuthorization(
-          authorizationId,
-          { currency_code: "USD", value: bookingDeposit.toFixed(2) },
-          false // not final capture — keep $5K auth for security hold
-        )
-        depositCaptureId = captureResult.id || null
-      } catch (captureErr: any) {
-        console.error("Deposit capture failed:", captureErr)
-        // Authorization still valid; proceed with booking creation
-      }
+      // Authorization hold only — no charges at booking time
+      // $5,000 hold includes $2,000 refundable deposit
+      const securityHold = 5000
 
       booking = await prisma.booking.create({
         data: {
@@ -72,18 +61,16 @@ export async function POST(request: NextRequest) {
           isOneWay: bookingData.isOneWay || false,
           notes: bookingData.notes || null,
           totalPrice,
-          basePrice: bookingDeposit,
+          basePrice: securityHold,
           paymentStatus: "AUTHORIZED",
           paypalOrderId: orderId,
           paypalAuthorizationId: authorizationId,
-          paymentIntentId: depositCaptureId,
         },
         include: { car: { include: { brand: true } }, user: true },
       })
 
       const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
       const carName = `${booking.car.brand?.name ?? ""} ${booking.car.name}`.trim()
-      const securityHold = 5000
       await notifyAdmin(
         `New Car Booking #${booking.id} — ${carName}`,
         `<h2>New Car Booking Received</h2>
@@ -94,9 +81,8 @@ export async function POST(request: NextRequest) {
         <p><strong>Return:</strong> ${end.toDateString()}</p>
         <p><strong>Duration:</strong> ${days} day${days !== 1 ? "s" : ""}</p>
         <p><strong>Rental Total:</strong> $${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        <p><strong>Booking Deposit:</strong> $${bookingDeposit.toLocaleString()} (Captured${depositCaptureId ? "" : " — FAILED"})</p>
-        <p><strong>Security Hold:</strong> $${securityHold.toLocaleString()} (Authorized)</p>
-        <p><strong>Due at Pickup:</strong> $${Math.max(0, totalPrice - bookingDeposit).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        <p><strong>Authorization Hold:</strong> $${securityHold.toLocaleString()} (includes $2,000 refundable deposit — no charges made)</p>
+        <p><strong>Due at Delivery:</strong> $${Math.max(0, totalPrice - securityHold).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (if total exceeds $5,000)</p>
         <p><a href="${baseUrl}/admin/bookings/${booking.id}">View Booking in Admin</a></p>`
       ).catch(console.error)
     } else if (bookingType === "villa") {

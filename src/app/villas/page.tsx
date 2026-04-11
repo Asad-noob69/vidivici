@@ -617,10 +617,9 @@ function VillaListCard({ villa, wishlisted: initialWishlisted }: { villa: VillaF
           </Link>
           <div className="flex flex-col items-end">
             <span className="text-base 2xl:text-2xl font-semibold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
-            {villa.originalPrice && (
-              <span className="text-[10px] 2xl:text-sm text-mist-400 line-through">${villa.originalPrice.toLocaleString()}</span>
-            )}
-            <span className="text-[10px] 2xl:text-base text-mist-400">/night</span>
+            <span className="text-[10px] 2xl:text-base text-mist-400">
+              {villa.originalPrice && <span className="line-through">${villa.originalPrice.toLocaleString()}</span>}{villa.originalPrice && " "} /night
+            </span>
           </div>
         </div>
       </div>

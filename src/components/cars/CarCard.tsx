@@ -108,11 +108,9 @@ export default function CarCard({ id, name, slug, brand, pricePerDay, originalPr
           </Link>
           <div className="flex flex-col items-end">
             <span className="text-base 2xl:text-3xl font-semibold text-mist-900">${pricePerDay}</span>
-            {originalPrice ? (
-              <span className="text-[10px] 2xl:text-lg text-mist-400 line-through">${originalPrice} / day</span>
-            ) : (
-              <span className="text-[10px] 2xl:text-lg text-mist-400">/ day</span>
-            )}
+            <span className="text-[10px] 2xl:text-lg text-mist-400">
+              {originalPrice && <span className="line-through">${originalPrice}</span>}{originalPrice && " "} / day
+            </span>
           </div>
         </div>
       </div>

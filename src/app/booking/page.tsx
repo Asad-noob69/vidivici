@@ -90,7 +90,6 @@ function calcCarPricing(
   couponPercent = 0,
   carTaxPercent = 8.5
 ) {
-  const bookingDeposit = 2000
   const securityHold = 5000
   const subtotal = pricePerDay * days
   const discountPercent = getDiscount(days)
@@ -101,13 +100,14 @@ function calcCarPricing(
   const preTax = afterDiscount - couponAmount
   const tax = Math.round(preTax * (carTaxPercent / 100))
   const rentalTotal = preTax + tax
-  const total = rentalTotal + securityHold
-  const payNowTotal = bookingDeposit + securityHold
-  const dueAtPickup = Math.max(0, rentalTotal - bookingDeposit)
-  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, bookingDeposit, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
+  const total = rentalTotal + 2000 // rental + $2,000 refundable deposit
+  const payNowTotal = securityHold // $5,000 authorization hold (no charge)
+  const dueAtPickup = Math.max(0, total - securityHold)
+  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
 function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0, villaTaxPercent = 14) {
+  const villaDeposit = 5000
   const nightsTotal = villa.pricePerNight * nights
   const airportTransferFee = airportTransfer ? 500 : 0
   const subtotal = nightsTotal + villa.cleaningFee + airportTransferFee
@@ -115,7 +115,7 @@ function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boo
   const afterCoupon = subtotal - couponAmount
   const tax = Math.round(afterCoupon * (villaTaxPercent / 100))
   const total = afterCoupon + tax + villa.securityDeposit
-  const payNow = villa.securityDeposit
+  const payNow = villaDeposit
   const dueAtPickup = Math.max(0, total - payNow)
   return {
     nightsTotal,
@@ -125,6 +125,7 @@ function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boo
     couponPercent,
     tax,
     securityDeposit: villa.securityDeposit,
+    villaDeposit,
     payNow,
     dueAtPickup,
     total,
@@ -1165,7 +1166,7 @@ function ReservationContent() {
 
                   <p className="text-xs text-mist-400 leading-relaxed">
                     {mode === "car"
-                      ? "A hold of up to your reservation charge including deposit up to $5,000 will be placed on your card. No charge will be issued until confirmation of your reservation."
+                      ? "A temporary authorization hold of up to $5,000 will be placed on your card (this includes the $2,000 refundable deposit). No charges will be made at the time of booking. Any remaining balance above $5,000 will be due before or at vehicle delivery."
                       : (paymentMethod === "card"
                         ? "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team."
                         : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.")}
@@ -1219,7 +1220,7 @@ function ReservationContent() {
                             : "Add-ons: None",
                         ].join("\n"),
                       }}
-                      totalPrice={villaPricing.total}
+                      totalPrice={villaPricing.payNow}
                       onSuccess={(id) => {
                         if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
                         setBookingId(id.slice(-6).toUpperCase())
@@ -1257,6 +1258,7 @@ function ReservationContent() {
                 email={email}
                 phone={phone}
                 session={session}
+                carTaxPercent={carTaxPercent}
               />
             )}
             {mode === "villa" && selectedVilla && (
@@ -1279,6 +1281,7 @@ function ReservationContent() {
                 villaPrivateChef={villaPrivateChef}
                 villaSecurityService={villaSecurityService}
                 villaIdDocumentName={villaIdDocumentName}
+                villaTaxPercent={villaTaxPercent}
               />
             )}
           </div>
@@ -2246,14 +2249,14 @@ function CarSummaryCard({
   needDriver, driverHours, actualDriverDays,
   driverLicenseUrl, insuranceUrl,
   firstName, lastName, email, phone,
-  session,
+  session, carTaxPercent,
 }: {
   car: CarData; startDate: string; endDate: string; startTime: string; endTime: string
   days: number; pricing: ReturnType<typeof calcCarPricing> | null
   needDriver: boolean; driverHours: number; actualDriverDays: number
   driverLicenseUrl: string; insuranceUrl: string
   firstName: string; lastName: string; email: string; phone: string
-  session: any
+  session: any; carTaxPercent: number
 }) {
   const formatDate = (d: string, t: string) => {
     if (!d) return "—"
@@ -2313,19 +2316,19 @@ function CarSummaryCard({
       {pricing && days > 0 && (
         <div className="space-y-2 text-sm border-t border-mist-100 pt-3">
           <div className="flex justify-between text-mist-500">
-            <span>Car Total <span className="text-xs">({`$${car.pricePerDay} × ${days}d`})</span></span>
-            <span className="text-mist-900">${pricing.subtotal.toLocaleString()}</span>
+            <span>Car Total <span className="text-xs">({`$${car.pricePerDay.toLocaleString()} × ${days}d`})</span></span>
+            <span className="text-mist-900 font-medium">${pricing.subtotal.toLocaleString()}</span>
           </div>
           {pricing.discountPercent > 0 && (
-            <div className="flex justify-between text-green-600">
-              <span>Long-Term Discount <span className="text-xs">({days}d – {pricing.discountPercent}% OFF)</span></span>
-              <span>-${pricing.discountAmount.toLocaleString()}</span>
+            <div className="flex justify-between text-mist-500">
+              <span>Long-Term Discount <span className="text-xs">({days} days – {pricing.discountPercent}% OFF)</span></span>
+              <span className="text-mist-900 font-medium">-${pricing.discountAmount.toLocaleString()}</span>
             </div>
           )}
           {pricing.driverTotal > 0 && (
             <div className="flex justify-between text-mist-500">
-              <span>Driver Total <span className="text-xs">({driverHours}hr × $45 × {actualDriverDays}d)</span></span>
-              <span className="text-mist-900">${pricing.driverTotal.toLocaleString()}</span>
+              <span>Driver Total <span className="text-xs">({driverHours} hrs x $45/hr × {actualDriverDays} days)</span></span>
+              <span className="text-mist-900 font-medium">${pricing.driverTotal.toLocaleString()}</span>
             </div>
           )}
           {pricing.couponAmount > 0 && (
@@ -2335,39 +2338,45 @@ function CarSummaryCard({
             </div>
           )}
           <div className="flex justify-between text-mist-500">
-            <span>Tax <span className="text-xs">(8.5%)</span></span>
-            <span className="text-mist-900">${pricing.tax.toLocaleString()}</span>
+            <span>Tax <span className="text-xs">({carTaxPercent}%)</span></span>
+            <span className="text-mist-900 font-medium">${pricing.tax.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Security Deposit <span className="text-xs">(Fully Refundable)</span></span>
+            <span className="text-mist-900 font-medium">$2,000</span>
           </div>
           <div className="flex justify-between text-mist-500">
             <span>Delivery Fee</span>
-            <span className="text-mist-900">TBD</span>
+            <span className="text-mist-900 font-medium">TBD</span>
           </div>
           <div className="flex justify-between text-mist-500">
             <span>Return Fee</span>
-            <span className="text-mist-900">TBD</span>
+            <span className="text-mist-900 font-medium">TBD</span>
+          </div>
+          <hr className="border-mist-100" />
+          <div className="flex justify-between items-center text-mist-500">
+            <span className="flex items-center gap-1.5">Place Hold <span className="text-xs">(No Charge)</span></span>
+            <span className="text-blue-600 font-medium flex items-center gap-1">
+              ${pricing.securityHold.toLocaleString()}
+              <span className="relative group">
+                <Info size={13} className="text-mist-400 cursor-pointer hover:text-mist-600" />
+                <span className="hidden group-hover:block absolute bottom-full right-0 mb-2 w-72 p-3 bg-mist-900 text-white text-[11px] leading-relaxed rounded-lg shadow-lg z-50">
+                  A temporary hold of $5,000 will be placed on your card. This includes the $2,000 refundable deposit. No money will be charged at this stage.<br /><br />
+                  If your total reservation exceeds $5,000, the remaining balance will be due before or at delivery via card or wire transfer.<br /><br />
+                  After the rental, the final amount will be calculated based on your booking and any additional usage. The $2,000 deposit will be refunded if no extra charges apply.
+                </span>
+              </span>
+            </span>
+          </div>
+          <div className="flex justify-between text-mist-500">
+            <span>Due at Pickup</span>
+            <span className="text-mist-900 font-medium">${pricing.dueAtPickup.toLocaleString()}</span>
           </div>
           <hr className="border-mist-100" />
           <div className="flex justify-between font-bold text-mist-900 text-base pt-1">
-            <span>Rental Total</span>
-            <span>${pricing.rentalTotal.toLocaleString()}</span>
+            <span>Total Charges</span>
+            <span>${pricing.total.toLocaleString()}</span>
           </div>
-          <hr className="border-mist-100" />
-          <p className="text-[10px] font-semibold text-mist-700 uppercase tracking-wider pt-1">Payment Breakdown</p>
-          <div className="flex justify-between text-mist-500">
-            <span>Booking Deposit <span className="text-xs">(Captured Now)</span></span>
-            <span className="text-blue-600 font-medium">${pricing.bookingDeposit.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-mist-500">
-            <span>Security Hold <span className="text-xs">(Authorized)</span></span>
-            <span className="text-amber-600 font-medium">${pricing.securityHold.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-mist-500">
-            <span>Due at Pickup <span className="text-xs">(Card/Wire)</span></span>
-            <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
-          </div>
-          <p className="text-[10px] text-mist-400 leading-snug pt-1">
-            $2,000 deposit is charged immediately. $5,000 security hold is authorized but not charged — it will be released after the rental with no issues.
-          </p>
         </div>
       )}
     </div>
@@ -2381,13 +2390,13 @@ function VillaSummaryCard({
   villa, startDate, endDate, startTime, endTime, days, guestCount, pricing, step, session,
   firstName, lastName, email, phone,
   villaAirportTransfer, villaPrivateChef, villaSecurityService,
-  villaIdDocumentName,
+  villaIdDocumentName, villaTaxPercent,
 }: {
   villa: VillaData; startDate: string; endDate: string; startTime: string; endTime: string; days: number; guestCount: number
   pricing: ReturnType<typeof calcVillaPricing> | null; step: number; session: any
   firstName: string; lastName: string; email: string; phone: string
   villaAirportTransfer: boolean; villaPrivateChef: boolean; villaSecurityService: boolean
-  villaIdDocumentName: string
+  villaIdDocumentName: string; villaTaxPercent: number
 }) {
   const formatDate = (d: string) => {
     if (!d) return "—"
@@ -2422,12 +2431,14 @@ function VillaSummaryCard({
         <p><span className="text-mist-700 font-medium">Upload ID / Passport:</span> {villaIdDocumentName || "—"}</p>
       </div>
 
-      <div className="text-xs text-mist-400 border-t border-mist-100 pt-3 space-y-1">
-        <p className="font-medium text-mist-600">Cancellation Policy</p>
-        <p>Full refund until 361 days before arrival.</p>
-        <p>10% charge from 61 to 360 days before arrival.</p>
-        <p>50% charge from 31 to 60 days before arrival.</p>
-        <p>100% charge from 0 to 30 days before arrival.</p>
+      <div className="text-xs text-mist-400 border-t border-mist-100 pt-3">
+        <p className="font-medium text-mist-600 mb-2">Cancellation Policy</p>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Full refund until 361 days before arrival.</li>
+          <li>10% charge from 61 to 360 days before arrival.</li>
+          <li>50% charge from 31 to 60 days before arrival.</li>
+          <li>100% charge from 0 to 30 days before arrival.</li>
+        </ul>
       </div>
 
       {pricing && days > 0 && (
@@ -2467,7 +2478,7 @@ function VillaSummaryCard({
             </div>
           )}
           <div className="flex justify-between text-mist-500">
-            <span>Tax <span className="text-xs">(14%)</span></span>
+            <span>Tax <span className="text-xs">({villaTaxPercent}%)</span></span>
             <span className="text-mist-900">${pricing.tax.toLocaleString()}</span>
           </div>
           {pricing.securityDeposit > 0 && (
@@ -2477,12 +2488,13 @@ function VillaSummaryCard({
             </div>
           )}
           <hr className="border-mist-100" />
+          <p className="text-[10px] font-semibold text-mist-700 uppercase tracking-wider pt-1">Payment Breakdown</p>
           <div className="flex justify-between text-mist-500">
-            <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
-            <span className="text-blue-600">${pricing.payNow.toLocaleString()}</span>
+            <span>Booking Deposit <span className="text-xs">(Authorize Hold)</span></span>
+            <span className="text-blue-600 font-medium">${pricing.villaDeposit.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-mist-500">
-            <span>Due at Pickup</span>
+            <span>Due at Check-in</span>
             <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
           </div>
           <hr className="border-mist-100" />

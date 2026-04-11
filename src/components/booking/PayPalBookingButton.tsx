@@ -45,7 +45,7 @@ export default function PayPalBookingButton({
     <div className="space-y-3">
       <p className="text-xs text-mist-400 text-center">
         {bookingType === "car" ? (
-          <>A <strong>$2,000 booking deposit</strong> will be captured immediately. A <strong>$5,000 security hold</strong> will be authorized on your card and released after the rental.</>
+          <>A temporary <strong>$5,000 hold</strong> will be placed on your card (includes $2,000 refundable deposit). <strong>No charges</strong> will be made at the time of booking.</>
         ) : (
           <>Your payment will be authorized but <strong>not charged</strong> until your booking is confirmed and contract is signed.</>
         )}
