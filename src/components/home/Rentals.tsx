@@ -115,7 +115,7 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
   };
 
   return (
-    <section className="bg-white w-full mt-24 2xl:mt-48 overflow-hidden">
+    <section className=" w-full mt-24 2xl:mt-48 overflow-hidden">
 
       {/* Header */}
       {showHeader && (
