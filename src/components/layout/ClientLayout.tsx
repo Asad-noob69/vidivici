@@ -72,8 +72,8 @@ const isBlogSlugPage =
     return (
       <SessionProvider>
         <header className="sticky top-0 z-50 bg-white border-b border-mist-200">
-          <div className="h-20 flex items-center justify-center">
-            <Link href="/" className="relative w-10 h-10">
+          <div className="h-20 2xl:h-28 flex items-center justify-center">
+            <Link href="/" className="relative w-10 h-10 2xl:w-16 2xl:h-16">
               <Image src="/Logo 2.png" alt="Vidi Vici" fill className="object-contain" />
             </Link>
           </div>

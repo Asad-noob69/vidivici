@@ -88,19 +88,14 @@ function calcCarPricing(
   needDriver: boolean,
   driverAvailability: "full" | "select",
   couponPercent = 0,
-  carTaxPercent = 9.5,
-  extraHours = 0
+  carTaxPercent = 8.5
 ) {
   const securityHold = 5000
   const subtotal = pricePerDay * days
   const discountPercent = getDiscount(days)
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const driverTotal = needDriver ? driverDays * driverHours * 45 : 0
-  const freeHours = extraHours > 0 ? 1 : 0
-  const billableExtraHours = Math.max(0, extraHours - freeHours)
-  const effectiveDailyRate = days > 0 ? (subtotal - discountAmount) / days : pricePerDay
-  const extraTimeCost = Math.round(billableExtraHours * effectiveDailyRate * 0.25)
-  const afterDiscount = subtotal - discountAmount + driverTotal + extraTimeCost
+  const afterDiscount = subtotal - discountAmount + driverTotal
   const couponAmount = couponPercent > 0 ? Math.round(afterDiscount * (couponPercent / 100)) : 0
   const preTax = afterDiscount - couponAmount
   const tax = Math.round(preTax * (carTaxPercent / 100))
@@ -108,7 +103,7 @@ function calcCarPricing(
   const total = rentalTotal + 2000 // rental + $2,000 refundable deposit
   const payNowTotal = securityHold // $5,000 authorization hold (no charge)
   const dueAtPickup = Math.max(0, total - securityHold)
-  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, extraHours, freeHours, extraTimeCost, tax, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
+  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
 function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0, villaTaxPercent = 14) {
@@ -326,7 +321,7 @@ function ReservationContent() {
   const [couponLoading, setCouponLoading] = useState(false)
 
   /* ---- Tax rates (from settings) ---- */
-  const [carTaxPercent, setCarTaxPercent] = useState(9.5)
+  const [carTaxPercent, setCarTaxPercent] = useState(8.5)
   const [villaTaxPercent, setVillaTaxPercent] = useState(14)
 
   /* ---- Credit card form state ---- */
@@ -622,17 +617,9 @@ function ReservationContent() {
 
   const actualDriverDays = driverAvailability === "full" ? days : driverDays
 
-  const carExtraHours = useMemo(() => {
-    if (mode !== "car" || !startTime || !endTime) return 0
-    const [sh, sm] = startTime.split(":").map(Number)
-    const [eh, em] = endTime.split(":").map(Number)
-    const diffMin = (eh * 60 + em) - (sh * 60 + sm)
-    return diffMin > 0 ? Math.ceil(diffMin / 60) : 0
-  }, [mode, startTime, endTime])
-
   const carPricing = useMemo(
-    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent, carExtraHours) : null),
-    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent, carExtraHours]
+    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent) : null),
+    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent]
   )
 
   const villaPricing = useMemo(
@@ -783,7 +770,7 @@ function ReservationContent() {
 
   return (
     <div className="bg-white min-h-screen pt-24 pb-16">
-      <div className="px-6 sm:px-16 lg:px-20 2xl:px-56 ">
+      <div className="sm:px-16 lg:px-20 px-6 2xl:px-56">
         {step > 1 && (
           <div className="mb-10">
             <button
@@ -1487,6 +1474,7 @@ function CarSelectStep({
               onChange={setStartTime}
               options={TIME_OPTIONS}
               disabled={!startDate}
+              desktop
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -1503,6 +1491,7 @@ function CarSelectStep({
               onChange={setEndTime}
               options={TIME_OPTIONS}
               disabled={!endDate}
+              desktop
             />
           </div>
         </div>
@@ -1894,14 +1883,22 @@ function VillaSelectStep({
   )
 
   const handleStartDateChange = (value: string) => {
-    setStartDate(value)
-    if (!value) setStartTime("")
+  setStartDate(value)
+  if (value) {
+    setStartTime("15:00") // Auto-set to 3:00 PM
+  } else {
+    setStartTime("")
   }
+}
 
-  const handleEndDateChange = (value: string) => {
-    setEndDate(value)
-    if (!value) setEndTime("")
+const handleEndDateChange = (value: string) => {
+  setEndDate(value)
+  if (value) {
+    setEndTime("11:00") // Auto-set to 11:00 AM
+  } else {
+    setEndTime("")
   }
+}
 
   useEffect(() => {
     if (!autoScrollToCustomerInfo || !showCustomerInfo || didAutoScrollRef.current) return
@@ -1977,22 +1974,56 @@ function VillaSelectStep({
 
       {/* Stay Details */}
       <div>
-        <h2 className="text-lg font-semibold text-mist-900 mb-4">Stay Details</h2>
-        <div className="space-y-3">
-          <div>
+        <h2 className="text-lg 2xl:text-2xl font-semibold text-mist-900 mb-4 2xl:mb-6">Stay Details</h2>
+        <div className="space-y-3 2xl:space-y-4 border-t border-mist-300 pt-6 2xl:pt-8">
+          {/* Check-in date + time */}
+          <div className="grid grid-cols-2 gap-3 2xl:gap-5">
             <DateTriggerField
-              label="Check-in* (3:00 PM)"
+              label="Check-in*"
               value={startDate}
               onClick={() => setCalendarOpen(true)}
+              desktopLabel
             />
+           <div className="relative">
+  <input
+    type={startTime ? "time" : "text"}
+    onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
+    onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
+    onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
+    value={startTime}
+    onChange={(e) => setStartTime(e.target.value)}
+    placeholder=" "
+    disabled={!startDate}
+    className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
+  />
+  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
+  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
+</div>
           </div>
 
-          <div>
+          {/* Check-out date + time */}
+          <div className="grid grid-cols-2 gap-3 2xl:gap-5">
             <DateTriggerField
-              label="Check-out* (11:00 AM)"
+              label="Check-out*"
               value={endDate}
               onClick={() => setCalendarOpen(true)}
+              desktopLabel
             />
+           <div className="relative">
+  <input
+    type={startTime ? "time" : "text"}
+    onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
+    onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
+    onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
+    value={endTime}
+    onChange={(e) => setStartTime(e.target.value)}
+    placeholder=" "
+    disabled={!startDate}
+    className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
+  />
+  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
+  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
+</div>
           </div>
         </div>
 
@@ -2016,56 +2047,56 @@ function VillaSelectStep({
           <select
             value={guestCount}
             onChange={(e) => setGuestCount(Number(e.target.value))}
-            className="w-full appearance-none border border-neutral-300 rounded-md px-3 py-2.5 text-sm text-mist-700 bg-white focus:border-neutral-400 focus:outline-none pr-8"
+            className="w-full appearance-none border border-neutral-300 rounded-md px-3 2xl:px-5 pr-8 2xl:pr-10 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 bg-white focus:border-neutral-400 focus:outline-none"
           >
             {Array.from({ length: selectedVilla?.guests || 20 }, (_, i) => i + 1).map((count) => (
-              <option key={count} value={count}>Number of Guests: {count}</option>
+              <option key={count} value={count} className="text-sm 2xl:text-base">Number of Guests: {count}</option>
             ))}
           </select>
-          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none" />
+          <ChevronDown size={14} className="absolute right-3 2xl:right-4 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none 2xl:w-5 2xl:h-5" />
         </div>
       </div>
 
       {/* Add-Ons */}
       <div>
-        <h2 className="text-lg font-semibold text-mist-900 mb-1">Add-Ons <span className="text-xs italic text-mist-500 font-normal">(optional)</span></h2>
-        <div className="space-y-3 mt-4">
-          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
-            <div className="flex items-center gap-2.5">
+        <h2 className="text-lg 2xl:text-2xl font-semibold text-mist-900 mb-1 2xl:mb-2">Add-Ons <span className="text-xs 2xl:text-sm italic text-mist-500 font-normal">(optional)</span></h2>
+        <div className="space-y-3 2xl:space-y-4 mt-4">
+          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 2xl:px-4 py-3 2xl:py-4 cursor-pointer hover:border-mist-400 transition">
+            <div className="flex items-center gap-2.5 2xl:gap-3">
               <input
                 type="radio"
                 checked={villaAirportTransfer}
                 onClick={() => setVillaAirportTransfer((prev) => !prev)}
                 onChange={() => { }}
-                className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                className="w-5 h-5 2xl:w-6 2xl:h-6 rounded-full accent-blue-600 cursor-pointer"
               />
-              <span className="text-sm text-mist-700">Airport Transfer (Luxury SUV)</span>
+              <span className="text-sm 2xl:text-lg text-mist-700">Airport Transfer (Luxury SUV)</span>
             </div>
           </label>
 
-          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
-            <div className="flex items-center gap-2.5">
+          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 2xl:px-4 py-3 2xl:py-4 cursor-pointer hover:border-mist-400 transition">
+            <div className="flex items-center gap-2.5 2xl:gap-3">
               <input
                 type="radio"
                 checked={villaPrivateChef}
                 onClick={() => setVillaPrivateChef((prev) => !prev)}
                 onChange={() => { }}
-                className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                className="w-5 h-5 2xl:w-6 2xl:h-6 rounded-full accent-blue-600 cursor-pointer"
               />
-              <span className="text-sm text-mist-700">Private Chef</span>
+              <span className="text-sm 2xl:text-lg text-mist-700">Private Chef</span>
             </div>
           </label>
 
-          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 py-3 cursor-pointer hover:border-mist-400 transition">
-            <div className="flex items-center gap-2.5">
+          <label className="flex items-center justify-between border border-mist-200 rounded-md px-3 2xl:px-4 py-3 2xl:py-4 cursor-pointer hover:border-mist-400 transition">
+            <div className="flex items-center gap-2.5 2xl:gap-3">
               <input
                 type="radio"
                 checked={villaSecurityService}
                 onClick={() => setVillaSecurityService((prev) => !prev)}
                 onChange={() => { }}
-                className="w-5 h-5 rounded-full accent-blue-600 cursor-pointer"
+                className="w-5 h-5 2xl:w-6 2xl:h-6 rounded-full accent-blue-600 cursor-pointer"
               />
-              <span className="text-sm text-mist-700">Security Service</span>
+              <span className="text-sm 2xl:text-lg text-mist-700">Security Service</span>
             </div>
           </label>
         </div>
@@ -2328,12 +2359,6 @@ function CarSummaryCard({
               <span className="text-mist-900 font-medium">${pricing.driverTotal.toLocaleString()}</span>
             </div>
           )}
-          {pricing.extraTimeCost > 0 && (
-            <div className="flex justify-between text-mist-500">
-              <span>Extra Time <span className="text-xs">({pricing.extraHours}h, {pricing.freeHours} free)</span></span>
-              <span className="text-mist-900 font-medium">${pricing.extraTimeCost.toLocaleString()}</span>
-            </div>
-          )}
           {pricing.couponAmount > 0 && (
             <div className="flex justify-between text-green-600">
               <span>Promo Code <span className="text-xs">({pricing.couponPercent}% OFF)</span></span>
@@ -2493,11 +2518,15 @@ function VillaSummaryCard({
           <hr className="border-mist-100" />
           <p className="text-[10px] font-semibold text-mist-700 uppercase tracking-wider pt-1">Payment Breakdown</p>
           <div className="flex justify-between text-mist-500">
-            <span>Booking Deposit <span className="text-xs">(Authorize Hold)</span></span>
+            <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
             <span className="text-blue-600 font-medium">${pricing.villaDeposit.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-mist-500">
-            <span>Due at Check-in</span>
+            <div className="flex flex-col gap-0.5">
+            <span className="text-mist-500">Remaining Balance</span>
+          <span className="text-mist-500 text-xs">(Payable via wire tranfer after confirmation)</span>
+
+            </div>
             <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>
           </div>
           <hr className="border-mist-100" />

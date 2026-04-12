@@ -600,18 +600,45 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const driverTotal: number =
     needDriver ? actualDriverDays * driverHours * 45 : 0
 
-  // Extra time: when return time differs from pickup time
+  // Extra time: Calculate based on 24-hour cycle
+  // If end time is exactly 24 hours from start: no extra charge
+  // If 1 hour extra: flat $255 charge
+  // If more than 1 hour extra: first 1 hour free, remaining hours at 25% of daily rate
   const extraHours = (() => {
-    if (!startTime || !endTime) return 0
+    if (!startTime || !endTime || days === 0) return 0
     const [sh, sm] = startTime.split(":").map(Number)
     const [eh, em] = endTime.split(":").map(Number)
-    const diffMin = (eh * 60 + em) - (sh * 60 + sm)
-    return diffMin > 0 ? Math.ceil(diffMin / 60) : 0
+    const startMinutes = sh * 60 + sm
+    const endMinutes = eh * 60 + em
+    const diffMinutes = endMinutes - startMinutes
+    
+    // If times are equal, it's exactly 24 hours (or multiple) - no extra charge
+    if (diffMinutes === 0) return 0
+    
+    // If end time is later than start time, that's extra time beyond 24h cycle
+    if (diffMinutes > 0) {
+      return Math.ceil(diffMinutes / 60)
+    }
+    
+    // If end time is earlier, no extra time (within 24h cycle)
+    return 0
   })()
-  const freeHours = extraHours > 0 ? 1 : 0
-  const billableExtraHours = Math.max(0, extraHours - freeHours)
-  const effectiveDailyRate = days > 0 ? (subtotal - discountAmount) / days : car.pricePerDay
-  const extraTimeCost = Math.round(billableExtraHours * effectiveDailyRate * 0.25)
+  
+  // Calculate extra time cost
+  let extraTimeCost = 0
+  let freeHours = 0
+  let billableExtraHours = 0
+  
+  if (extraHours === 1) {
+    // Exactly 1 hour extra: flat $255 charge
+    extraTimeCost = 255
+  } else if (extraHours > 1) {
+    // More than 1 hour: first 1 hour free, remaining chargeable at 25% of daily rate
+    freeHours = 1
+    billableExtraHours = extraHours - freeHours
+    const effectiveDailyRate = days > 0 ? (subtotal - discountAmount) / days : car.pricePerDay
+    extraTimeCost = Math.round(billableExtraHours * effectiveDailyRate * 0.25)
+  }
 
   const taxRate = carTaxPercent / 100
   const preTax = subtotal - discountAmount + driverTotal + extraTimeCost
@@ -968,7 +995,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                           onChange={(e) => setDriverHours(Number(e.target.value))}
                           className="w-full accent-mist-500"
                         />
-                        <div className="flex justify-between text-[10px] text-mist-400">
+                        <div className="flex justify-between text-[10px] 2xl:text-sm text-mist-400">
                           <span>5 hr</span>
                           <span className="font-medium text-mist-600">{driverHours} hr</span>
                           <span>15 hr</span>
@@ -1055,7 +1082,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                         )}
                         {extraTimeCost > 0 && (
                           <div className="flex justify-between text-mist-500 text-sm 2xl:text-lg">
-                            <span>Extra Time ({extraHours}h, {freeHours} free)</span>
+                            <span>Extra Time <span className="text-xs">({extraHours}h, {freeHours} free)</span></span>
                             <span className="text-mist-900 font-medium">${extraTimeCost.toLocaleString()}</span>
                           </div>
                         )}
@@ -1327,7 +1354,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                     )}
                     {extraTimeCost > 0 && (
                       <div className="flex justify-between text-mist-500 text-sm">
-                        <span>Extra Time ({extraHours}h, {freeHours} free)</span>
+                        <span>Extra Time <span className="text-xs">({extraHours}h, {freeHours} free)</span></span>
                         <span className="text-mist-900 font-medium">${extraTimeCost.toLocaleString()}</span>
                       </div>
                     )}

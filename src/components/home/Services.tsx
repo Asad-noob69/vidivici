@@ -5,7 +5,7 @@ const services = [
     title: "Exotic Cars",
     description:
       "Unleash the thrill of the world's most powerful machines. From Lamborghinis to Rolls-Royces, your dream car is ready to be delivered to your door.",
-    image: "/pic1.png",
+    image: "/pic3.png",
     href: "/cars",
   },
   {
@@ -19,7 +19,7 @@ const services = [
     title: "Nightlife & Events",
     description:
       "Step into a world of exclusivity. From elite club access to personalized concierge services — we open the doors to unforgettable nights.",
-    image: "/pic3.png",
+    image: "/pic1.png",
     href: "/events",
   },
 ];

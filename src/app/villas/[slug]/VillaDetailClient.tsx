@@ -116,15 +116,15 @@ const dateInputStyles = `
 const temporalInputClass = "ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 text-sm text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent"
 
 function getTemporalInputClass(desktop = false) {
-  return `${temporalInputClass} ${desktop ? "2xl:px-5 2xl:text-lg" : ""} h-11 2xl:h-13 pt-5 pb-1 2xl:pt-6 2xl:pb-2 peer`
+  return `${temporalInputClass} ${desktop ? "2xl:px-6 2xl:text-xl" : ""} h-11 2xl:h-16 pt-5 pb-1 2xl:pt-7 2xl:pb-2 peer`
 }
 
 function getTemporalTopLabelClass(hasValue: boolean, desktop = false) {
-  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1 ${desktop ? "2xl:top-1.5" : ""} text-[10px] ${desktop ? "2xl:text-xs" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
+  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-6" : ""} top-1 ${desktop ? "2xl:top-2" : ""} text-[10px] ${desktop ? "2xl:text-sm" : ""} text-mist-400 transition-opacity duration-150 ${hasValue ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`
 }
 
 function getTemporalCenterLabelClass(hasValue: boolean, desktop = false) {
-  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-5" : ""} top-1/2 -translate-y-1/2 text-sm ${desktop ? "2xl:text-lg" : ""} text-mist-300 transition-opacity duration-150 ${hasValue ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`
+  return `pointer-events-none absolute left-3 ${desktop ? "2xl:left-6" : ""} top-1/2 -translate-y-1/2 text-sm ${desktop ? "2xl:text-xl" : ""} text-mist-300 transition-opacity duration-150 ${hasValue ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`
 }
 
 export default function VillaDetailClient({ villa, relatedVillas }: { villa: Villa; relatedVillas: RelatedVilla[] }) {
@@ -170,12 +170,20 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
 
   const handleCheckInDateChange = (value: string) => {
     setCheckInDate(value)
-    if (!value) setCheckInTime("")
+    if (value) {
+      setCheckInTime("15:00") // Auto-set to 3:00 PM
+    } else {
+      setCheckInTime("")
+    }
   }
 
   const handleCheckOutDateChange = (value: string) => {
     setCheckOutDate(value)
-    if (!value) setCheckOutTime("")
+    if (value) {
+      setCheckOutTime("11:00") // Auto-set to 11:00 AM
+    } else {
+      setCheckOutTime("")
+    }
   }
 
   const handleEventSubmit = async () => {
