@@ -563,7 +563,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const [discountsOpen, setDiscountsOpen] = useState(true);
   const [showMore, setShowMore] = useState(false);
   const [bookedRanges, setBookedRanges] = useState<{ start: string; end: string }[]>([])
-  const [carTaxPercent, setCarTaxPercent] = useState(8.5)
+  const [carTaxPercent, setCarTaxPercent] = useState(9.5)
   const today = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
@@ -704,7 +704,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                   <div className="flex items-center gap-2.5">
                     <DollarSign size={30} className="text-mist-400 bg-white p-2 rounded-md flex-shrink-0" />
                     <p className="text-sm 2xl:text-lg text-mist-500">
-                      <span className="font-semibold">Tax:</span> 8.5%
+                      <span className="font-semibold">Tax:</span> 9.5%
                     </p>
                   </div>
                 </div>
@@ -1306,7 +1306,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                       </div>
                     )}
                     <div className="flex justify-between text-mist-500 text-sm">
-                      <span>Tax · 8.5%</span>
+                      <span>Tax · 9.5%</span>
                       <span className="text-mist-900 font-medium">${tax.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-mist-500 text-sm">
