@@ -372,8 +372,8 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                   <div className="flex items-center gap-2.5">
                     <CreditCard size={30} className="text-mist-400 bg-white p-2 rounded-md flex-shrink-0" />
                     <p className="text-sm 2xl:text-lg text-mist-500">
-                      <span className="font-semibold">Security Deposit:</span>
-                      ${villa.securityDeposit.toLocaleString()}
+                      <span className="font-semibold">Security Deposit:</span>{" "}
+                      ${(villa.securityDeposit && villa.securityDeposit !== 0 ? villa.securityDeposit : 5000).toLocaleString()}
 
                     </p>
                   </div>
@@ -386,7 +386,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                   <div className="flex items-center gap-2.5">
                     <Sparkles size={30} className="text-mist-400 bg-white p-2 rounded-md flex-shrink-0" />
                     <p className="text-sm 2xl:text-lg text-mist-500">
-                      <span className="font-semibold">Cleaning Fee:</span> ${villa.cleaningFee && villa.cleaningFee !== 0 ? villa.cleaningFee : "950"}
+                      <span className="font-semibold">Cleaning Fee:</span> {" "} ${(villa.cleaningFee && villa.cleaningFee !== 0 ? villa.cleaningFee : 950).toLocaleString()}
                     </p>
                   </div>
                 </div>
