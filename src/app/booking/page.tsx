@@ -88,34 +88,14 @@ function calcCarPricing(
   needDriver: boolean,
   driverAvailability: "full" | "select",
   couponPercent = 0,
-  carTaxPercent = 8.5,
-  startTime = "",
-  endTime = ""
+  carTaxPercent = 9.5
 ) {
   const securityHold = 5000
   const subtotal = pricePerDay * days
   const discountPercent = getDiscount(days)
   const discountAmount = Math.round(subtotal * (discountPercent / 100))
   const driverTotal = needDriver ? driverDays * driverHours * 45 : 0
-
-  // Extra hours: when return time is later than pickup time, charge 25% of
-  // the discounted daily rate per extra hour, first hour complimentary.
-  let extraHours = 0
-  let extraHoursCharge = 0
-  if (startTime && endTime) {
-    const [sh, sm] = startTime.split(":").map(Number)
-    const [eh, em] = endTime.split(":").map(Number)
-    const startMin = sh * 60 + (sm || 0)
-    const endMin = eh * 60 + (em || 0)
-    if (endMin > startMin) {
-      extraHours = Math.ceil((endMin - startMin) / 60)
-      const chargeableHours = Math.max(0, extraHours - 1)
-      const discountedDailyRate = pricePerDay * (1 - discountPercent / 100)
-      extraHoursCharge = Math.round(chargeableHours * discountedDailyRate * 0.25)
-    }
-  }
-
-  const afterDiscount = subtotal - discountAmount + driverTotal + extraHoursCharge
+  const afterDiscount = subtotal - discountAmount + driverTotal
   const couponAmount = couponPercent > 0 ? Math.round(afterDiscount * (couponPercent / 100)) : 0
   const preTax = afterDiscount - couponAmount
   const tax = Math.round(preTax * (carTaxPercent / 100))
@@ -123,10 +103,13 @@ function calcCarPricing(
   const total = rentalTotal + 2000 // rental + $2,000 refundable deposit
   const payNowTotal = securityHold // $5,000 authorization hold (no charge)
   const dueAtPickup = Math.max(0, total - securityHold)
-  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, extraHours, extraHoursCharge, tax, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
+  return { subtotal, discountPercent, discountAmount, couponAmount, couponPercent, driverTotal, tax, securityHold, payNowTotal, dueAtPickup, total, rentalTotal }
 }
 
 function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boolean, couponPercent = 0, villaTaxPercent = 14) {
+  const cleaningFee = (villa.cleaningFee && villa.cleaningFee !== 0) ? villa.cleaningFee : 950
+  const securityDeposit = (villa.securityDeposit && villa.securityDeposit !== 0) ? villa.securityDeposit : 5000
+  
   const villaDeposit = 5000
   const nightsTotal = villa.pricePerNight * nights
   const airportTransferFee = airportTransfer ? 500 : 0
@@ -140,11 +123,11 @@ function calcVillaPricing(villa: VillaData, nights: number, airportTransfer: boo
   return {
     nightsTotal,
     airportTransferFee,
-    cleaningFee: villa.cleaningFee,
+    cleaningFee,
     couponAmount,
     couponPercent,
     tax,
-    securityDeposit: villa.securityDeposit,
+    securityDeposit,
     villaDeposit,
     payNow,
     dueAtPickup,
@@ -341,7 +324,7 @@ function ReservationContent() {
   const [couponLoading, setCouponLoading] = useState(false)
 
   /* ---- Tax rates (from settings) ---- */
-  const [carTaxPercent, setCarTaxPercent] = useState(8.5)
+  const [carTaxPercent, setCarTaxPercent] = useState(9.5)
   const [villaTaxPercent, setVillaTaxPercent] = useState(14)
 
   /* ---- Credit card form state ---- */
@@ -638,8 +621,8 @@ function ReservationContent() {
   const actualDriverDays = driverAvailability === "full" ? days : driverDays
 
   const carPricing = useMemo(
-    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent, startTime, endTime) : null),
-    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent, startTime, endTime]
+    () => (selectedCar ? calcCarPricing(selectedCar.pricePerDay, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent) : null),
+    [selectedCar, days, driverHours, actualDriverDays, needDriver, driverAvailability, couponDiscount, carTaxPercent]
   )
 
   const villaPricing = useMemo(
@@ -723,7 +706,7 @@ function ReservationContent() {
       }
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed to create booking")
-      if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
+      if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => { })
       setBookingId((data.id || "").slice(-6).toUpperCase())
       setStep(3)
     } catch (err: any) {
@@ -1184,20 +1167,13 @@ function ReservationContent() {
 
                   <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
 
-                  {mode === "car" ? (
-                    <ul className="text-xs text-mist-400 leading-relaxed list-disc list-inside space-y-1">
-                      <li>A temporary authorization hold of up to $5,000 will be placed on your card (this includes the $2,000 refundable deposit).</li>
-                      <li>No charges will be made at the time of booking.</li>
-                      <li>Any remaining balance above $5,000 will be due before or at vehicle delivery (card or wire transfer).</li>
-                      <li>After the rental, the final amount will be charged and the $2,000 deposit will be released if no additional charges apply.</li>
-                    </ul>
-                  ) : (
-                    <p className="text-xs text-mist-400 leading-relaxed">
-                      {paymentMethod === "card"
+                  <p className="text-xs text-mist-400 leading-relaxed">
+                    {mode === "car"
+                      ? "A temporary authorization hold of up to $5,000 will be placed on your card (this includes the $2,000 refundable deposit). No charges will be made at the time of booking. Any remaining balance above $5,000 will be due before or at vehicle delivery."
+                      : (paymentMethod === "card"
                         ? "We will temporarily reserve the funds on your credit card with a pre-authorization. Your credit card will only be charged after the reservation gets confirmed by the Sales Team."
-                        : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed."}
-                    </p>
-                  )}
+                        : "We will temporarily authorize the funds via PayPal. Your payment will only be charged after the reservation is confirmed by our team and the contract is signed.")}
+                  </p>
 
                   {paymentMethod === "paypal" && mode === "car" && selectedCar && (
                     <PayPalBookingButton
@@ -1216,7 +1192,7 @@ function ReservationContent() {
                       }}
                       totalPrice={carPricing.payNowTotal}
                       onSuccess={(id) => {
-                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
+                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => { })
                         setBookingId(id.slice(-6).toUpperCase())
                         setStep(3)
                       }}
@@ -1249,7 +1225,7 @@ function ReservationContent() {
                       }}
                       totalPrice={villaPricing.payNow}
                       onSuccess={(id) => {
-                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => {})
+                        if (couponApplied) fetch("/api/coupons/use", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponApplied }) }).catch(() => { })
                         setBookingId(id.slice(-6).toUpperCase())
                         setStep(3)
                       }}
@@ -1286,6 +1262,10 @@ function ReservationContent() {
                 phone={phone}
                 session={session}
                 carTaxPercent={carTaxPercent}
+                deliveryType={deliveryType}        // ADD THIS
+                deliveryAddress={deliveryAddress}  // ADD THIS
+                returnAddress={returnAddress}      // ADD THIS
+                isOneWay={isOneWay}
               />
             )}
             {mode === "villa" && selectedVilla && (
@@ -1910,22 +1890,22 @@ function VillaSelectStep({
   )
 
   const handleStartDateChange = (value: string) => {
-  setStartDate(value)
-  if (value) {
-    setStartTime("15:00") // Auto-set to 3:00 PM
-  } else {
-    setStartTime("")
+    setStartDate(value)
+    if (value) {
+      setStartTime("15:00") // Auto-set to 3:00 PM
+    } else {
+      setStartTime("")
+    }
   }
-}
 
-const handleEndDateChange = (value: string) => {
-  setEndDate(value)
-  if (value) {
-    setEndTime("11:00") // Auto-set to 11:00 AM
-  } else {
-    setEndTime("")
+  const handleEndDateChange = (value: string) => {
+    setEndDate(value)
+    if (value) {
+      setEndTime("11:00") // Auto-set to 11:00 AM
+    } else {
+      setEndTime("")
+    }
   }
-}
 
   useEffect(() => {
     if (!autoScrollToCustomerInfo || !showCustomerInfo || didAutoScrollRef.current) return
@@ -2011,21 +1991,21 @@ const handleEndDateChange = (value: string) => {
               onClick={() => setCalendarOpen(true)}
               desktopLabel
             />
-           <div className="relative">
-  <input
-    type={startTime ? "time" : "text"}
-    onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-    onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-    onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
-    value={startTime}
-    onChange={(e) => setStartTime(e.target.value)}
-    placeholder=" "
-    disabled={!startDate}
-    className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
-  />
-  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
-  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
-</div>
+            <div className="relative">
+              <input
+                type={startTime ? "time" : "text"}
+                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
+                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
+                onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                placeholder=" "
+                disabled={!startDate}
+                className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
+              />
+              <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
+              <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
+            </div>
           </div>
 
           {/* Check-out date + time */}
@@ -2036,21 +2016,21 @@ const handleEndDateChange = (value: string) => {
               onClick={() => setCalendarOpen(true)}
               desktopLabel
             />
-           <div className="relative">
-  <input
-    type={startTime ? "time" : "text"}
-    onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
-    onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
-    onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
-    value={endTime}
-    onChange={(e) => setStartTime(e.target.value)}
-    placeholder=" "
-    disabled={!startDate}
-    className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
-  />
-  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
-  <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
-</div>
+            <div className="relative">
+              <input
+                type={startTime ? "time" : "text"}
+                onPointerDown={(e) => switchTemporalInputType(e.currentTarget, "time")}
+                onFocus={(e) => switchTemporalInputType(e.currentTarget, "time")}
+                onBlur={(e) => { if (!startTime) e.currentTarget.type = "text" }}
+                value={endTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                placeholder=" "
+                disabled={!startDate}
+                className="ios-temporal-input w-full max-w-full min-w-0 box-border bg-white border border-mist-300 rounded-md px-3 2xl:px-6 text-sm 2xl:text-xl text-mist-700 focus:outline-none focus:border-mist-400 placeholder:text-transparent h-11 2xl:h-16 flex items-end pb-1 2xl:pb-2 pt-5 2xl:pt-6 peer"
+              />
+              <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1 2xl:top-2 text-[10px] 2xl:text-sm text-mist-400 transition-opacity duration-150 ${startTime ? "opacity-100" : "opacity-0 peer-focus:opacity-100"}`}>Time*</span>
+              <span className={`pointer-events-none absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 text-sm 2xl:text-xl text-mist-300 transition-opacity duration-150 ${startTime ? "opacity-0" : "opacity-100 peer-focus:opacity-0"}`}>Time*</span>
+            </div>
           </div>
         </div>
 
@@ -2076,8 +2056,11 @@ const handleEndDateChange = (value: string) => {
             onChange={(e) => setGuestCount(Number(e.target.value))}
             className="w-full appearance-none border border-neutral-300 rounded-md px-3 2xl:px-5 pr-8 2xl:pr-10 py-2.5 2xl:py-4 text-sm 2xl:text-lg text-mist-700 bg-white focus:border-neutral-400 focus:outline-none"
           >
-            {Array.from({ length: selectedVilla?.guests || 20 }, (_, i) => i + 1).map((count) => (
-              <option key={count} value={count} className="text-sm 2xl:text-base">Number of Guests: {count}</option>
+             <option value="" disabled>Number of Guests</option>
+            {Array.from({ length: selectedVilla?.guests }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {i + 1} Guest{i > 0 ? "s" : ""}
+              </option>
             ))}
           </select>
           <ChevronDown size={14} className="absolute right-3 2xl:right-4 top-1/2 -translate-y-1/2 text-mist-400 pointer-events-none 2xl:w-5 2xl:h-5" />
@@ -2305,6 +2288,10 @@ function CarSummaryCard({
   driverLicenseUrl, insuranceUrl,
   firstName, lastName, email, phone,
   session, carTaxPercent,
+  deliveryType,
+  deliveryAddress,
+  returnAddress,
+  isOneWay,
 }: {
   car: CarData; startDate: string; endDate: string; startTime: string; endTime: string
   days: number; pricing: ReturnType<typeof calcCarPricing> | null
@@ -2312,12 +2299,63 @@ function CarSummaryCard({
   driverLicenseUrl: string; insuranceUrl: string
   firstName: string; lastName: string; email: string; phone: string
   session: any; carTaxPercent: number
+  deliveryType: "pickup" | "delivery"
+  deliveryAddress: string
+  returnAddress: string
+  isOneWay: boolean
 }) {
+  const [showHoldInfo, setShowHoldInfo] = useState(false)
+  const [showOneWayInfo, setShowOneWayInfo] = useState(false)
   const formatDate = (d: string, t: string) => {
     if (!d) return "—"
     const date = new Date(d + "T" + (t || "10:00"))
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) +
       " at " + date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+  }
+
+  // Calculate extra hours based on 24-hour cycle
+  const extraHours = (() => {
+    if (!startTime || !endTime || days === 0) return 0
+
+    const [sh, sm] = startTime.split(":").map(Number)
+    const [eh, em] = endTime.split(":").map(Number)
+    const startMinutes = sh * 60 + sm
+    const endMinutes = eh * 60 + em
+
+    // If end time is later than start time, customer kept car extra hours
+    if (endMinutes > startMinutes) {
+      // Calculate precise hours (including partial hours)
+      const diffMinutes = endMinutes - startMinutes
+      return Math.ceil(diffMinutes / 30) / 2 // Round to nearest 0.5 hour
+    }
+
+    return 0
+  })()
+
+  // Calculate extra time cost with progressive pricing
+  let extraTimeCost = 0
+  let freeHours = 0
+  let billableHours = 0
+
+  if (extraHours > 0 && pricing) {
+    if (extraHours <= 1) {
+      // 1 hour or less = completely free, don't charge anything
+      freeHours = extraHours
+      billableHours = 0
+      extraTimeCost = 0
+    } else {
+      // More than 1 hour: first hour free, rest charged at 25% per hour
+      freeHours = 1
+      billableHours = extraHours - 1
+
+      // 25% of the FINAL daily price after discount
+      const finalDailyRate = days > 0
+        ? (pricing.subtotal - pricing.discountAmount) / days
+        : car.pricePerDay
+
+      // Each billable hour = 25% of daily rate
+      extraTimeCost = Math.round(billableHours * finalDailyRate * 0.25)
+    }
   }
 
   return (
@@ -2380,12 +2418,6 @@ function CarSummaryCard({
               <span className="text-mist-900 font-medium">-${pricing.discountAmount.toLocaleString()}</span>
             </div>
           )}
-          {pricing.extraHoursCharge > 0 && (
-            <div className="flex justify-between text-mist-500">
-              <span>Extra Hours <span className="text-xs">({pricing.extraHours - 1} hr{pricing.extraHours - 1 > 1 ? "s" : ""} × 25% daily rate)</span></span>
-              <span className="text-mist-900 font-medium">${pricing.extraHoursCharge.toLocaleString()}</span>
-            </div>
-          )}
           {pricing.driverTotal > 0 && (
             <div className="flex justify-between text-mist-500">
               <span>Driver Total <span className="text-xs">({driverHours} hrs x $45/hr × {actualDriverDays} days)</span></span>
@@ -2406,29 +2438,83 @@ function CarSummaryCard({
             <span>Security Deposit <span className="text-xs">(Fully Refundable)</span></span>
             <span className="text-mist-900 font-medium">$2,000</span>
           </div>
-          <div className="flex justify-between text-mist-500">
-            <span>Delivery Fee</span>
-            <span className="text-mist-900 font-medium">TBD</span>
-          </div>
-          <div className="flex justify-between text-mist-500">
-            <span>Return Fee</span>
-            <span className="text-mist-900 font-medium">TBD</span>
-          </div>
+          {extraTimeCost > 0 && (
+            <div className="flex justify-between text-mist-500">
+              <span>Extra Time <span className="text-xs">({extraHours}h, {freeHours} free)</span></span>
+              <span className="text-mist-900 font-medium">${extraTimeCost.toLocaleString()}</span>
+            </div>
+          )}
+          {deliveryType === "delivery" && deliveryAddress && (
+            <div className="flex justify-between text-mist-500">
+              <span>Delivery Fee</span>
+              <span className="text-mist-900 font-medium">TBD</span>
+            </div>
+          )}
+
+          {/* Show return fee for delivery mode (return to same address) OR one-way mode (return to different address) */}
+          {deliveryType === "delivery" && !isOneWay && deliveryAddress && (
+            <div className="flex justify-between text-mist-500">
+              <span>Return Fee </span>
+              <span className="text-mist-900 font-medium">TBD</span>
+            </div>
+          )}
+
+          {isOneWay && returnAddress && (
+            <div className="flex justify-between text-mist-500">
+              <span>Return Fee </span>
+              <span className="text-mist-900 font-medium">TBD</span>
+            </div>
+          )}
+
           <hr className="border-mist-100" />
           <div className="flex justify-between items-center text-mist-500">
-            <span className="flex items-center gap-1.5">Place Hold <span className="text-xs">(No Charge)</span></span>
+            <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
             <span className="text-blue-600 font-medium flex items-center gap-1">
               ${pricing.securityHold.toLocaleString()}
-              <span className="relative group">
-                <Info size={13} className="text-mist-400 cursor-pointer hover:text-mist-600" />
-                <span className="hidden group-hover:block absolute bottom-full right-0 mb-2 w-72 p-3 bg-mist-900 text-white text-[11px] leading-relaxed rounded-lg shadow-lg z-50">
-                  A temporary hold of $5,000 will be placed on your card. This includes the $2,000 refundable deposit. No money will be charged at this stage.<br /><br />
-                  If your total reservation exceeds $5,000, the remaining balance will be due before or at delivery via card or wire transfer.<br /><br />
-                  After the rental, the final amount will be calculated based on your booking and any additional usage. The $2,000 deposit will be refunded if no extra charges apply.
-                </span>
+              <span className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowHoldInfo(true)}
+                  className="inline-flex items-center justify-center text-mist-400 hover:text-mist-600 transition-colors"
+                  aria-label="Security hold information"
+                >
+                  <Info size={13} />
+                </button>
               </span>
             </span>
           </div>
+
+          {/* Security Hold Info Modal */}
+          {/* Security Hold Info Modal - REPLACE the showOneWayInfo modal with this */}
+          {showHoldInfo && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <h3 className="text-base font-semibold text-mist-900">About Security Hold</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowHoldInfo(false)}
+                    className="rounded-md px-2 py-1 text-sm text-mist-400 hover:bg-mist-100 hover:text-mist-700"
+                    aria-label="Close"
+                  >
+                    x
+                  </button>
+                </div>
+                <p className="text-sm leading-relaxed text-mist-600">
+                  A temporary authorization hold will be placed on your payment method.
+                  This is not a charge - the funds will be released after your rental is completed
+                  and the vehicle is returned in acceptable condition.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowHoldInfo(false)}
+                  className="mt-5 w-full rounded-md bg-mist-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-mist-700"
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          )}
           <div className="flex justify-between text-mist-500">
             <span>Due at Pickup</span>
             <span className="text-mist-900 font-medium">${pricing.dueAtPickup.toLocaleString()}</span>
@@ -2494,11 +2580,11 @@ function VillaSummaryCard({
 
       <div className="text-xs text-mist-400 border-t border-mist-100 pt-3">
         <p className="font-medium text-mist-600 mb-2">Cancellation Policy</p>
-        <ul className="space-y-1">
-          <li>• Full refund: 361+ days before arrival</li>
-          <li>• 10% charge: 61–360 days before arrival</li>
-          <li>• 50% charge: 31–60 days before arrival</li>
-          <li>• 100% charge: 0–30 days before arrival</li>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Full refund until 361 days before arrival.</li>
+          <li>10% charge from 61 to 360 days before arrival.</li>
+          <li>50% charge from 31 to 60 days before arrival.</li>
+          <li>100% charge from 0 to 30 days before arrival.</li>
         </ul>
       </div>
 
@@ -2526,16 +2612,16 @@ function VillaSummaryCard({
               <span className="text-mist-900">TBD</span>
             </div>
           )}
-          {pricing.cleaningFee > 0 && (
-            <div className="flex justify-between text-mist-500">
-              <span>Cleaning Fee</span>
-              <span className="text-mist-900">${pricing.cleaningFee.toLocaleString()}</span>
-            </div>
-          )}
           {pricing.couponAmount > 0 && (
             <div className="flex justify-between text-green-600">
               <span>Promo Code <span className="text-xs">({pricing.couponPercent}% OFF)</span></span>
               <span>-${pricing.couponAmount.toLocaleString()}</span>
+            </div>
+          )}
+          {pricing.cleaningFee > 0 && (
+            <div className="flex justify-between text-mist-500">
+              <span>Cleaning Fee</span>
+              <span className="text-mist-900">${pricing.cleaningFee.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between text-mist-500">
@@ -2549,15 +2635,14 @@ function VillaSummaryCard({
             </div>
           )}
           <hr className="border-mist-100" />
-          <p className="text-[10px] font-semibold text-mist-700 uppercase tracking-wider pt-1">Payment Breakdown</p>
           <div className="flex justify-between text-mist-500">
             <span>Pay Now <span className="text-xs">(Authorize Hold)</span></span>
             <span className="text-blue-600 font-medium">${pricing.villaDeposit.toLocaleString()}</span>
           </div>
-          <div className="flex justify-between text-mist-500">
+          <div className="flex justify-between items-center text-mist-500">
             <div className="flex flex-col gap-0.5">
-            <span className="text-mist-500">Remaining Balance</span>
-          <span className="text-mist-500 text-xs">(Payable via wire transfer after confirmation)</span>
+              <span className="text-mist-500">Remaining Balance</span>
+              <span className="text-mist-500 text-xs">(Payable via wire tranfer after confirmation)</span>
 
             </div>
             <span className="text-mist-900">${pricing.dueAtPickup.toLocaleString()}</span>

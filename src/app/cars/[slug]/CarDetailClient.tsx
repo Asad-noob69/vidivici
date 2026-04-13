@@ -413,7 +413,7 @@ import FAQ from "@/components/home/FAQ"
 import Contact from "@/components/home/Contact"
 import DateRangeCalendarPopup, { DateTriggerField } from "@/components/ui/FloatingDatePickerField"
 import TimeSelectDropdown from "@/components/ui/TimeSelectDropdown"
-import { MapPin, Shield, Clock, DollarSign, Share2, Bookmark, Minus, Plus, ArrowUpRight} from "lucide-react"
+import { MapPin, Shield, Clock, DollarSign, Share2, Bookmark, Minus, Plus, ArrowUpRight } from "lucide-react"
 import {
   AlertCircle,
   Users, Zap, Gauge, Activity, Settings2, Fuel, Calendar, Route,
@@ -570,11 +570,11 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
     fetch(`/api/cars/${car.id}/availability`)
       .then((r) => (r.ok ? r.json() : { bookedRanges: [] }))
       .then((data) => setBookedRanges(data.bookedRanges || []))
-      .catch(() => {})
+      .catch(() => { })
     fetch("/api/settings")
       .then((r) => (r.ok ? r.json() : {}))
       .then((s: any) => { if (s.carTaxPercent) setCarTaxPercent(parseFloat(s.carTaxPercent)) })
-      .catch(() => {})
+      .catch(() => { })
   }, [car.id])
 
   const days: number =
@@ -600,45 +600,55 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const driverTotal: number =
     needDriver ? actualDriverDays * driverHours * 45 : 0
 
-  // Extra time: Calculate based on 24-hour cycle
-  // If end time is exactly 24 hours from start: no extra charge
-  // If 1 hour extra: flat $255 charge
-  // If more than 1 hour extra: first 1 hour free, remaining hours at 25% of daily rate
+  // Calculate extra hours (rounded up to nearest 0.5 or full hour)
   const extraHours = (() => {
     if (!startTime || !endTime || days === 0) return 0
+
     const [sh, sm] = startTime.split(":").map(Number)
     const [eh, em] = endTime.split(":").map(Number)
     const startMinutes = sh * 60 + sm
     const endMinutes = eh * 60 + em
-    const diffMinutes = endMinutes - startMinutes
-    
-    // If times are equal, it's exactly 24 hours (or multiple) - no extra charge
-    if (diffMinutes === 0) return 0
-    
-    // If end time is later than start time, that's extra time beyond 24h cycle
-    if (diffMinutes > 0) {
-      return Math.ceil(diffMinutes / 60)
+
+    // If end time is later than start time, calculate extra hours
+    if (endMinutes > startMinutes) {
+      const diffMinutes = endMinutes - startMinutes
+      // Round up to nearest hour (or keep precise if you want 1.5, 2.5 etc)
+      return Math.ceil(diffMinutes / 60 * 2) / 2 // This gives 1, 1.5, 2, 2.5, etc.
+      // OR if you want full hours only: return Math.ceil(diffMinutes / 60)
     }
-    
-    // If end time is earlier, no extra time (within 24h cycle)
+
     return 0
   })()
-  
+
   // Calculate extra time cost
   let extraTimeCost = 0
+  let chargeableHours = 0
   let freeHours = 0
-  let billableExtraHours = 0
-  
-  if (extraHours === 1) {
-    // Exactly 1 hour extra: flat $255 charge
-    extraTimeCost = 255
-  } else if (extraHours > 1) {
-    // More than 1 hour: first 1 hour free, remaining chargeable at 25% of daily rate
-    freeHours = 1
-    billableExtraHours = extraHours - freeHours
-    const effectiveDailyRate = days > 0 ? (subtotal - discountAmount) / days : car.pricePerDay
-    extraTimeCost = Math.round(billableExtraHours * effectiveDailyRate * 0.25)
+
+  if (extraHours > 0) {
+    if (extraHours <= 1) {
+      // 1 hour or less = completely free, don't charge anything
+      freeHours = extraHours
+      chargeableHours = 0
+      extraTimeCost = 0
+    } else {
+      // More than 1 hour: first hour free, rest charged at 25% per hour
+      freeHours = 1
+      chargeableHours = extraHours - 1 // This gives 0.5, 1, 1.5, 2, etc.
+
+      // 25% of final daily price after discount, per chargeable hour
+      const finalDailyRate = days > 0
+        ? (car.pricePerDay * (1 - discountPercent / 100))
+        : car.pricePerDay
+
+      // Each chargeable hour = 25% of daily rate
+      // 0.5 hr = 12.5%, 1 hr = 25%, 1.5 hr = 37.5%, 2 hr = 50%, etc.
+      const percentageOfDay = chargeableHours * 0.25 // 25% per hour
+      extraTimeCost = Math.round(finalDailyRate * percentageOfDay)
+    }
   }
+
+
 
   const taxRate = carTaxPercent / 100
   const preTax = subtotal - discountAmount + driverTotal + extraTimeCost
@@ -758,7 +768,7 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
                   <div className="flex items-start gap-2">
                     <span className="text-mist-400 mt-0.5">•</span>
                     <p className="text-sm 2xl:text-lg text-mist-500">
-                      <span className="font-semibold">Rental Duration:</span> {car.minRentalDays}+ days min
+                      <span className="font-semibold">Rental Duration:</span> 24 hours
                     </p>
                   </div>
                   <div className="flex items-start gap-2">
@@ -1393,9 +1403,9 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
           You may also like
         </h2>
         <button className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base 2xl:text-xl 2xl:py-4 2xl:px-6 text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
-            View all
-            <ArrowUpRight size={15} />
-          </button>
+          View all
+          <ArrowUpRight size={15} />
+        </button>
       </div>
       <RelatedCars showHeader={false} discountBadgeText={undefined} />
       <WhyChooseUs />
