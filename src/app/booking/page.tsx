@@ -2448,7 +2448,19 @@ function CarSummaryCard({
           {extraTimeCost > 0 && (
             <div className="flex justify-between text-mist-500">
               <span>Extra Time <span className="text-[12.75px]">({extraHours > 4 ? "Full Day Applied" : `${extraHours}h, ${freeHours} free`})</span></span>
-              <span className="text-mist-900 font-medium">${extraTimeCost.toLocaleString()}</span>
+              <span className="text-mist-900 font-medium flex items-center gap-1">${extraTimeCost.toLocaleString()}
+                <span className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowHoldInfo(true)}
+                  className="inline-flex items-center justify-center text-mist-400 hover:text-mist-600 transition-colors"
+                  aria-label="Security hold information"
+                >
+                  <Info size={13} />
+                </button>
+              </span>
+              </span>
+              
             </div>
           )}
           {deliveryType === "delivery" && deliveryAddress && (

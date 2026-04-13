@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Banner from "@/components/ui/Banner";
 import FAQ from "@/components/home/FAQ";
 import Turnstile from "@/components/Turnstile";
+import CountryPicker, { Country, DEFAULT_COUNTRY } from "@/components/ui/Countrypicker";
 
 interface ContactDetail {
   icon: ReactNode;
@@ -68,6 +69,7 @@ export default function ContactPage() {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", adults: "", kids: "", budget: "", tripNeed: "House" as TripNeed, startDate: "", endDate: "", notes: "" });
   const [startDateFocused, setStartDateFocused] = useState(false);
   const [endDateFocused, setEndDateFocused] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -113,7 +115,7 @@ export default function ContactPage() {
     }
   };
 
-  const inputCls = "w-full border border-mist-200 text-base 2xl:text-xl py-3 2xl:py-5 rounded-xl 2xl:rounded-2xl px-4 2xl:px-8text-mist-900 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors bg-white";
+  const inputCls = "w-full border border-mist-200 text-sm 2xl:text-xl py-3 2xl:py-5 rounded-xl 2xl:rounded-2xl px-4 2xl:px-8text-mist-900 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors bg-white";
 
   return (
     <div className="w-full">
@@ -185,17 +187,18 @@ export default function ContactPage() {
                   <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Enter your email" className={inputCls} />
                 </Field>
                 <Field label="Phone">
-                  <div className="flex items-center border border-mist-200 rounded-xl 2xl:rounded-2xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
-                    <span className="px-4 py-3 2xl:px-6 2xl:py-5 text-sm 2xl:text-xl border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
-                      🇺🇸
-                    </span>
+                  <div className="flex items-stretch border border-mist-300 rounded-xl 2xl:rounded-2xl focus-within:border-mist-400 transition-colors duration-200 bg-white overflow-visible">
+                                    <CountryPicker
+                                      value={selectedCountry}
+                                      onChange={setSelectedCountry}
+                                    />
                     <input
                       name="phone"
                       type="tel"
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="Enter your phone number"
-                      className="text-base 2xl:text-xl py-3 2xl:py-5 px-4 2xl:px-8 text-mist-900 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors bg-white"
+                      className="text-sm 2xl:text-xl py-3 2xl:py-5 px-4 2xl:px-8 text-mist-900 placeholder-mist-300 outline-none focus:border-mist-400 transition-colors bg-white"
                       required
                     />
                   </div>

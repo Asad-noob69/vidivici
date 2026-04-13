@@ -8,6 +8,7 @@ import Banner from "@/components/ui/Banner"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
+import CountryPicker, { Country, DEFAULT_COUNTRY } from "@/components/ui/Countrypicker";
 import {
   SlidersHorizontal,
   BedDouble,
@@ -94,7 +95,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
     input.focus()
     if (typeof (input as HTMLInputElement & { showPicker?: () => void }).showPicker === "function") {
       try {
-        ;(input as HTMLInputElement & { showPicker: () => void }).showPicker()
+        ; (input as HTMLInputElement & { showPicker: () => void }).showPicker()
       } catch {
         // Fallback to focus when showPicker is unavailable.
       }
@@ -135,47 +136,47 @@ function StatPill({ icon, label, value }: { icon: React.ReactNode; label: string
 function VillaListCard({ villa, wishlisted: initialWishlisted }: { villa: VillaFromAPI; wishlisted?: boolean }) {
   const [fav, setFav] = useState(false)
   const [wishlisted, setWishlisted] = useState(initialWishlisted || false)
-   const [toggling, setToggling] = useState(false)
+  const [toggling, setToggling] = useState(false)
   const image = villa.images?.[0]?.url
-  
-    const toggleWishlist = async (e: React.MouseEvent) => {
-      e.stopPropagation()
-      e.preventDefault()
-      if (!villa.id || toggling) return
-      setToggling(true)
-      try {
-        const res = await fetch("/api/wishlist", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ villaId: villa.id }),
-        })
-        if (res.ok) {
-          const data = await res.json()
-          setWishlisted(data.wishlisted)
-        } else if (res.status === 401) {
-          window.location.href = "/login"
-        }
-      } catch {} finally {
-        setToggling(false)
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!villa.id || toggling) return
+    setToggling(true)
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ villaId: villa.id }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWishlisted(data.wishlisted)
+      } else if (res.status === 401) {
+        window.location.href = "/login"
       }
+    } catch { } finally {
+      setToggling(false)
     }
-  
-    const formatSqft = (sqft: number) => {
-      return sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
-    }
+  }
+
+  const formatSqft = (sqft: number) => {
+    return sqft >= 1000 ? `${(sqft / 1000).toFixed(1)}k` : sqft.toString()
+  }
 
   return (
- <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 group cursor-pointer">
+    <div className="relative flex flex-col bg-white rounded-3xl 2xl:rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 group cursor-pointer">
 
       {/* Image - Height slightly decreased for 2xl */}
       <div className="relative h-56 2xl:h-[300px] overflow-hidden p-3 2xl:p-4">
         <Link href={`/villas/${villa.slug}`} className="block w-full h-full">
           {image ? (
-            <img 
-              src={image} 
-              alt={villa.name} 
-              loading="lazy" 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-3xl" 
+            <img
+              src={image}
+              alt={villa.name}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl 2xl:rounded-3xl"
             />
           ) : (
             <div className="w-full h-full bg-mist-100 flex items-center justify-center text-mist-400 text-sm rounded-2xl 2xl:rounded-3xl">No Image</div>
@@ -184,11 +185,10 @@ function VillaListCard({ villa, wishlisted: initialWishlisted }: { villa: VillaF
         <button
           onClick={toggleWishlist}
           disabled={toggling}
-          className={`absolute top-5 right-5 w-8 h-8 2xl:w-11 2xl:h-11 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${
-            wishlisted
+          className={`absolute top-5 right-5 w-8 h-8 2xl:w-11 2xl:h-11 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-200 ${wishlisted
               ? "bg-mist-700 text-red-500"
               : "bg-mist-700 text-mist-100 hover:bg-white hover:text-red-400"
-          }`}
+            }`}
         >
           <Heart size={13} className="2xl:w-3.5 2xl:h-3.5" fill={wishlisted ? "currentColor" : "none"} strokeWidth={2} />
         </button>
@@ -403,6 +403,7 @@ function ProductionInquiryForm() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
 
   const handleSubmit = async () => {
     if (!form.firstName || !form.email || !form.projectType || !form.shootDates) return
@@ -547,8 +548,11 @@ function ProductionInquiryForm() {
                 </div>
                 <div className="flex flex-col gap-2 2xl:gap-4">
                   <label className="text-xs 2xl:text-sm font-semibold text-mist-700 uppercase tracking-wide">Phone</label>
-                  <div className="flex items-center border border-mist-300 rounded-xl 2xl:rounded-2xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
-                    <span className="px-4 py-3 2xl:px-6 2xl:py-5 text-sm 2xl:text-xl border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">🇺🇸</span>
+                  <div className="flex items-stretch border border-mist-300 rounded-xl 2xl:rounded-2xl focus-within:border-mist-400 transition-colors duration-200 bg-white overflow-visible">
+                    <CountryPicker
+                      value={selectedCountry}
+                      onChange={setSelectedCountry}
+                    />
                     <input type="tel" placeholder="Enter your phone number" value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className="flex-1 px-4 py-3 2xl:px-6 2xl:py-5 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 outline-none bg-white" />
@@ -754,7 +758,7 @@ function FilmTVContent() {
                     <X size={18} />
                   </button>
                 </div>
-                  <FilmFilters />
+                <FilmFilters />
               </div>
             </div>
           )}
@@ -792,8 +796,8 @@ function FilmTVContent() {
                       key={p}
                       onClick={() => goToPage(p)}
                       className={`w-10 h-10 2xl:w-12 2xl:h-12 rounded-lg 2xl:rounded-xl font-semibold text-sm 2xl:text-lg transition-colors ${p === currentPage
-                          ? "bg-mist-900 text-white"
-                          : "bg-mist-100 text-mist-500 hover:bg-mist-200"
+                        ? "bg-mist-900 text-white"
+                        : "bg-mist-100 text-mist-500 hover:bg-mist-200"
                         }`}
                     >
                       {p}
@@ -853,7 +857,7 @@ function FilmTVContent() {
       {/* Testimonials */}
       <Reviews />
 
-        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
+      <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
         <div className="">
           <div className="relative bg-mist-100 rounded-3xl 2xl:rounded-[40px] px-8 2xl:px-16 py-16 2xl:py-24 text-center overflow-hidden">
             <img
@@ -876,7 +880,7 @@ function FilmTVContent() {
 
             {/* Content */}
             <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 leading-tight mb-4 2xl:mb-8">
-             Ready to book your next <br/> shoot location?
+              Ready to book your next <br /> shoot location?
             </h2>
             <p className="text-sm 2xl:text-xl text-mist-500 max-w-sm 2xl:max-w-3xl mx-auto leading-relaxed mb-8 2xl:mb-12">
               Tell us about your celebration and let our team help you create an unforgettable experience.

@@ -8,6 +8,7 @@ import Turnstile from "@/components/Turnstile"
 import WhyChooseUs from "@/components/home/WhyChooseUs"
 import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
+import CountryPicker, { Country, DEFAULT_COUNTRY } from "@/components/ui/Countrypicker";
 import {
   Heart,
   BedDouble,
@@ -326,6 +327,7 @@ function WeddingBookingInquiry() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY)
 
   const toggleAddOn = (addon: string) => {
     setForm((f) => ({
@@ -484,14 +486,15 @@ function WeddingBookingInquiry() {
                 </div>
                 <div className="flex flex-col gap-2 2xl:gap-4">
                   <label className="text-xs font-semibold text-mist-700 uppercase tracking-wide">Phone</label>
-                  <div className="flex items-center border border-mist-300 rounded-xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
-                    <span className="px-4 py-3 2xl:px-8 2xl:py-6 text-lg border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
-                      🇺🇸
-                    </span>
-                    <input type="tel" placeholder="Enter your phone number" value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="flex-1 px-4 py-3 2xl:px-8 2xl:py-6 text-sm text-mist-900 placeholder-mist-400 outline-none bg-white" />
-                  </div>
+                   <div className="flex items-stretch border border-mist-300 rounded-xl 2xl:rounded-2xl focus-within:border-mist-400 transition-colors duration-200 bg-white overflow-visible">
+                                      <CountryPicker
+                                        value={selectedCountry}
+                                        onChange={setSelectedCountry}
+                                      />
+                                      <input type="tel" placeholder="Enter your phone number" value={form.phone}
+                                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                                        className="flex-1 px-4 py-3 2xl:px-6 2xl:py-5 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 outline-none bg-white" />
+                                    </div>
                 </div>
               </div>
 
