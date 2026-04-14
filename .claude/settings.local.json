@@ -9,7 +9,8 @@
       "Bash(npx next:*)",
       "Bash(ls /home/developer1/Car/falcon-car-rental/src/app/ -d */  2>/dev/null; ls /home/developer1/Car/falcon-car-rental/src/app/*.tsx 2>/dev/null)",
       "Read(//home/developer1/Car/**)",
-      "Bash(zip -r falcon-car-rental.zip falcon-car-rental -x \"falcon-car-rental/node_modules/*\" \"falcon-car-rental/.next/*\")"
+      "Bash(zip -r falcon-car-rental.zip falcon-car-rental -x \"falcon-car-rental/node_modules/*\" \"falcon-car-rental/.next/*\")",
+      "Bash(npx tsc:*)"
     ]
   }
 }
