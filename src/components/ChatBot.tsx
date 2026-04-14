@@ -117,6 +117,9 @@ export default function ChatBot() {
     setLoading(true)
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 second timeout
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,7 +129,10 @@ export default function ChatBot() {
           visitorId,
           userId,
         }),
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}))
@@ -150,10 +156,15 @@ export default function ChatBot() {
       if (data.paused) {
         pollForAdmin()
       }
-    } catch {
+    } catch (err: any) {
+      const isTimeout = err.name === 'AbortError'
+      const message = isTimeout
+        ? "The conversation is taking longer than usual. Let me try to help you with a simpler approach - what specifically are you looking for?"
+        : "Sorry, I'm having trouble connecting right now. Please try again in a moment."
+
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I'm having trouble connecting right now. Please try again in a moment." },
+        { role: "assistant", content: message },
       ])
     } finally {
       setLoading(false)

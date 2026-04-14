@@ -61,9 +61,11 @@ IMPORTANT BOOKING RULES:
 Critical output rules (NEVER break these — violating these WILL cause errors):
 - NEVER include raw function calls, tool invocations, or JSON in your text response. Tools are called silently in the background — the customer never sees them.
 - NEVER output anything like <function=...>, [function=...], {"tool":...}, <tool_call>, or similar syntax in your message text. This WILL crash the system.
+- NEVER write text that looks like code or function calls. Only write natural conversation.
 - When you want to call a tool, use ONLY the proper tool_calls mechanism. Never write function calls as text.
 - Only write natural, conversational text to the customer.
 - If a tool call fails or you can't complete an action, explain politely what happened and ask the customer to try again or provide more details.
+- Never mention technical terms like "tools", "functions", "API calls", or system errors. Keep responses customer-friendly.
 
 Important rules:
 - Always format links as markdown: [Item Name](/type/slug)
@@ -560,20 +562,35 @@ export async function POST(request: NextRequest) {
       messages: groqMessages,
       tools,
       tool_choice: "auto",
-      temperature: 0.6,
-      max_tokens: 1024,
+      temperature: 0.5,
+      max_tokens: 2048,
     }
 
     let data = await callGroq(groqBody)
 
-    // If Groq returns a tool_use_failed error, retry with tools but lower temperature
+    // If Groq returns a tool_use_failed error, try multiple recovery strategies
     if (data?.error?.code === "tool_use_failed") {
-      console.warn("Groq tool_use_failed, retrying with lower temperature")
-      data = await callGroq({ ...groqBody, temperature: 0.3 })
-      // If it fails again, retry without tools as last resort
+      console.warn("Groq tool_use_failed, trying recovery strategies...")
+
+      // Strategy 1: Lower temperature significantly
+      data = await callGroq({ ...groqBody, temperature: 0.2 })
+
       if (data?.error?.code === "tool_use_failed") {
-        console.warn("Groq tool_use_failed again, retrying without tools")
-        data = await callGroq({ ...groqBody, tools: undefined, tool_choice: undefined, temperature: 0.5 })
+        console.warn("Still failing, trying with different model settings...")
+        // Strategy 2: Lower temperature + reduce max_tokens
+        data = await callGroq({ ...groqBody, temperature: 0.1, max_tokens: 1024 })
+      }
+
+      if (data?.error?.code === "tool_use_failed") {
+        console.warn("Still failing, trying without tools as last resort")
+        // Strategy 3: Remove tools entirely (last resort)
+        data = await callGroq({
+          ...groqBody,
+          tools: undefined,
+          tool_choice: undefined,
+          temperature: 0.4,
+          max_tokens: 1024
+        })
       }
     }
 
@@ -618,8 +635,8 @@ export async function POST(request: NextRequest) {
         messages: groqMessages,
         tools,
         tool_choice: "auto",
-        temperature: 0.6,
-        max_tokens: 1024,
+        temperature: 0.5,
+        max_tokens: 2048,
       })
 
       if (!followUpData || !followUpData.choices?.[0]?.message) break
@@ -631,17 +648,27 @@ export async function POST(request: NextRequest) {
     // Strip any leaked tool-call syntax the model may have included in its text
     const sanitizeContent = (text: string) =>
       text
-        .replace(/<function=[^>]*>[\s\S]*?<\/function>/g, "")
-        .replace(/<function=[^>]*>[^<]*/g, "")
-        .replace(/\[function=[^\]]*\]/g, "")
-        .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "")
-        .replace(/```json\s*\{[\s\S]*?"tool"[\s\S]*?```/g, "")
+        .replace(/<function=[^>]*>[\s\S]*?<\/function>/gi, "")
+        .replace(/<function=[^>]*>[^<]*/gi, "")
+        .replace(/\[function=[^\]]*\]/gi, "")
+        .replace(/<tool_call>[\s\S]*?<\/tool_call>/gi, "")
+        .replace(/```json\s*\{[\s\S]*?"tool"[\s\S]*?```/gi, "")
+        .replace(/\{[^}]*"tool"[^}]*\}/gi, "")
         .trim()
 
     let aiContent = sanitizeContent(assistantMessage.content || "")
-    // If sanitization removed everything, provide a helpful fallback
+
+    // If sanitization removed everything or original content was empty, provide contextual fallback
     if (!aiContent) {
-      aiContent = "I apologize for the technical difficulty. Could you please repeat your request? I'm here to help you with luxury cars, villas, and events at VIDI VICI."
+      // Check if this was likely a search request without results
+      const userMessage = groqMessages[groqMessages.length - 1]?.content?.toLowerCase() || ""
+      if (userMessage.includes("search") || userMessage.includes("find") || userMessage.includes("show")) {
+        aiContent = "I'm having trouble processing your search request right now. Could you please be more specific about what you're looking for? For example, tell me the type of car, location, or dates you need."
+      } else if (userMessage.includes("book") || userMessage.includes("reserve")) {
+        aiContent = "I'd be happy to help you make a booking! However, I need a bit more information first. Could you tell me which specific car, villa, or event you'd like to book, along with your preferred dates?"
+      } else {
+        aiContent = "I apologize for the technical difficulty. Could you please rephrase your request? I'm here to help you with luxury cars, villas, and events at VIDI VICI."
+      }
     }
 
     // Save AI response to DB
