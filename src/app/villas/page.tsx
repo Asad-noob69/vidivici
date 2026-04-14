@@ -200,7 +200,7 @@ function VillasContent() {
 
           <div className="flex flex-col lg:flex-row gap-8 2xl:gap-12">
             {/* Sidebar Filters - Fixed: proper conditional visibility */}
-            <aside className={`hidden lg:block lg:w-72 2xl:w-96 shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
+            <aside className={`hidden lg:block lg:w-72 2xl:w-[480px] shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
               <VillaFilters onHide={() => setShowFilters(false)} />
             </aside>
 

@@ -182,7 +182,7 @@ return (
 
         <div className="flex flex-col lg:flex-row gap-8 2xl:gap-12">
           {/* Sidebar - FIXED: removed lg:block, added onHide prop */}
-          <aside className={`hidden lg:block lg:w-72 2xl:w-96 shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
+          <aside className={`hidden lg:block lg:w-72 2xl:w-[480px] shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
             <Suspense fallback={<div className="h-96 bg-mist-100 rounded-xl animate-pulse" />}>
               <CarFilters onHide={() => setShowFilters(false)} hideBrand={!!make} hideCategory={!!category} />
             </Suspense>

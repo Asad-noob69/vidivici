@@ -451,7 +451,7 @@ function ProductionInquiryForm() {
   }
 
   return (
-    <section className="w-fullsm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48" id="inquiry">
+    <section className="w-full sm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48" id="inquiry">
       <div>
         <div className="border border-mist-200 rounded-3xl 2xl:rounded-[40px] overflow-hidden gap-8 2xl:gap-14 sm:p-8 2xl:sm:p-16 px-4 py-6 2xl:px-8 2xl:py-12 flex flex-col md:flex-row shadow-sm">
 
@@ -765,7 +765,7 @@ function FilmTVContent() {
 
           <div className="flex flex-col lg:flex-row gap-8 2xl:gap-14">
             {/* Sidebar Filters - FIXED: removed lg:block */}
-            <aside className={`hidden lg:block lg:w-72 2xl:w-96 shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
+            <aside className={`hidden lg:block lg:w-72 2xl:w-[480px] shrink-0 ${showFilters ? "lg:block" : "lg:hidden"}`}>
               <FilmFilters onHide={() => setShowFilters(false)} />
             </aside>
 

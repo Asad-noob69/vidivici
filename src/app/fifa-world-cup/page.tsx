@@ -53,7 +53,7 @@ function EventSlider() {
     fetch("/api/events?limit=8")
       .then((r) => r.json())
       .then((d) => setEvents(d.events || []))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   const updateScroll = () => {
@@ -131,37 +131,158 @@ function EventSlider() {
 /*  Gallery Bento Grid                                                 */
 /* ================================================================== */
 const GALLERY_IMAGES = [
-  { src: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600&q=80", alt: "FIFA World Cup Trophy", className: "col-span-1 row-span-2" },
-  { src: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80", alt: "Stadium panorama", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&q=80", alt: "Stadium roof interior", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80", alt: "Fans celebrating", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80", alt: "Stadium crowd", className: "col-span-1 row-span-2" },
-  { src: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600&q=80", alt: "Football field", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=600&q=80", alt: "Los Angeles Stadium", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1486286701208-1d58e9338013?w=600&q=80", alt: "Trophy celebration", className: "col-span-1 row-span-1" },
-  { src: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80", alt: "Stadium exterior night", className: "col-span-1 row-span-1" },
+  { src: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600&q=80", alt: "FIFA World Cup Trophy" },
+  { src: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80", alt: "Stadium panorama" },
+  { src: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&q=80", alt: "Stadium roof interior" },
+  { src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80", alt: "Fans celebrating" },
+  { src: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80", alt: "Stadium crowd" },
+  { src: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600&q=80", alt: "Football field" },
+  { src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=600&q=80", alt: "Los Angeles Stadium" },
+  { src: "https://images.unsplash.com/photo-1486286701208-1d58e9338013?w=600&q=80", alt: "Trophy celebration" },
+  { src: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80", alt: "Stadium exterior night" },
 ]
 
 function GalleryBentoGrid() {
   return (
-    <section className="bg-white py-14 2xl:py-21 px-4 2xl:px-8">
-      <div className="max-w-5xl 2xl:max-w-[1840px] mx-auto">
-        <h2 className="text-3xl 2xl:text-6xl font-bold text-mist-900 text-center mb-10 2xl:mb-20">Gallery</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] sm:auto-rows-[200px] md:auto-rows-[220px] 2xl:auto-rows-[280px] gap-3 2xl:gap-6">
-          {GALLERY_IMAGES.map((img, i) => (
-            <div
-              key={i}
-              className={`relative overflow-hidden rounded-2xl 2xl:rounded-3xl group ${img.className}`}
-            >
-              <img
-                src={img.src}
-                alt={img.alt}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-            </div>
-          ))}
+    <section className="sm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48">
+      <div className="">
+        <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 text-center mb-16 2xl:mb-20">Gallery</h2>
+
+        <div className="
+          grid gap-2
+          grid-cols-2
+          [grid-template-rows:180px_120px_160px]
+
+          sm:grid-cols-[1.2fr_1fr_1fr]
+          sm:[grid-template-rows:260px_220px]
+          sm:gap-[10px]
+
+          lg:grid-cols-[1fr_1.5fr_1fr]
+          lg:[grid-template-rows:300px_220px]
+          lg:gap-3
+
+          2xl:grid-cols-[1fr_1.6fr_1fr_1fr]
+          2xl:[grid-template-rows:320px_240px]
+          2xl:gap-[14px]
+        ">
+
+          {/* Image 1 — tall left (Trophy) */}
+          <div className="
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            col-[1] row-[1]
+            sm:row-[1/3]
+            lg:row-[1]
+            2xl:row-[1/3]
+          ">
+            <img
+              src={GALLERY_IMAGES[0].src}
+              alt={GALLERY_IMAGES[0].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+          {/* Image 2 — tall center hero (Stadium panorama) */}
+          <div className="
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            col-[2] row-[1/3]
+            sm:col-[2] sm:row-[1]
+            lg:col-[2] lg:row-[1/3]
+            2xl:col-[2] 2xl:row-[1]
+          ">
+            <img
+              src={GALLERY_IMAGES[8].src}
+              alt={GALLERY_IMAGES[8].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+          {/* Image 3 (Stadium roof interior) */}
+          <div className="
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            col-[1] row-[2/4]
+            sm:col-[3] sm:row-[1]
+            lg:col-[3] lg:row-[1]
+            2xl:col-[3] 2xl:row-[1]
+          ">
+            <img
+              src={GALLERY_IMAGES[2].src}
+              alt={GALLERY_IMAGES[2].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+          {/* Image 4 (Fans celebrating) */}
+          <div className="
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            col-[2] row-[3]
+            sm:col-[2] sm:row-[2]
+            lg:col-[1] lg:row-[2]
+            2xl:col-[4] 2xl:row-[1/3]
+          ">
+            <img
+              src={GALLERY_IMAGES[3].src}
+              alt={GALLERY_IMAGES[3].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+          {/* Image 5 — hidden on mobile (Stadium crowd) */}
+          <div className="
+            hidden sm:block
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            sm:col-[3] sm:row-[2]
+            lg:col-[3] lg:row-[2]
+            2xl:col-[2] 2xl:row-[2]
+          ">
+            <img
+              src={GALLERY_IMAGES[4].src}
+              alt={GALLERY_IMAGES[4].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+          {/* Image 6 — 2xl only (Football field) */}
+          <div className="
+            hidden 2xl:block
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            2xl:col-[3] 2xl:row-[2]
+          ">
+            <img
+              src={GALLERY_IMAGES[5].src}
+              alt={GALLERY_IMAGES[5].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
+
+
+          {/* Image 8 — 2xl only (Trophy celebration) */}
+          <div className="
+            hidden 2xl:block
+            overflow-hidden rounded-2xl 2xl:rounded-3xl group
+            2xl:col-[3] 2xl:row-[2]
+          ">
+            <img
+              src={GALLERY_IMAGES[6].src}
+              alt={GALLERY_IMAGES[6].alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          </div>
+
         </div>
       </div>
     </section>
@@ -217,84 +338,86 @@ function BigImageSlider() {
   };
 
   return (
-    <section className="py-16 2xl:py-32 overflow-hidden bg-white">
-      <div className="relative px-6 2xl:px-12 sm:px-16 2xl:sm:px-32 lg:px-20 2xl:lg:px-40">
-        
+    <section className="overflow-hidden ">
+      <div className="relative">
+
         {/* Main Viewport */}
-        <div className="relative overflow-visible">
+        <div className="relative overflow-visible sm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48">
           <div
             className="flex transition-transform duration-700 ease-out"
-            style={{ 
-              transform: `translateX(-${current * 85}%)`, // Adjusted for partial visibility
-              gap: '24px' 
+            style={{
+              transform: `translateX(-${current * 85}%)`,
+              gap: '16px'
             }}
           >
             {HERO_SLIDES.map((slide, i) => (
-              <div 
-                key={i} 
-                className={`w-[85%] flex-shrink-0 relative transition-all duration-500 transform ${
-                  i === current ? "scale-100 opacity-100" : "scale-95 backdrop-opacity-80 opacity-70"
+              <div
+                key={i}
+                className={`w-[85%] flex-shrink-0 relative transition-all duration-500 ${
+                  i === current ? "scale-100 opacity-100" : "scale-95 opacity-60"
                 }`}
               >
-                <div className="relative h-[400px] 2xl:h-[600px] lg:h-[550px] 2xl:lg:h-[800px] rounded-[2.5rem] 2xl:rounded-[40px] overflow-hidden shadow-2xl">
+                {/* Card */}
+                <div className="relative h-[260px] sm:h-[380px] lg:h-[440px] 2xl:h-[560px] rounded-2xl sm:rounded-3xl 2xl:rounded-[2.5rem] overflow-hidden shadow-xl">
                   <img
                     src={slide.image}
                     alt={slide.title}
                     loading="lazy"
                     className="w-full h-full object-cover"
                   />
-                  
-                  {/* High-end Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                  
-                  {/* Content Overlay */}
-                  <div className="absolute bottom-12 2xl:bottom-20 left-12 2xl:left-20 right-12 2xl:right-20">
-                    <h3 className="text-3xl 2xl:text-7xl lg:text-5xl 2xl:lg:text-7xl font-bold text-white mb-4 tracking-tight leading-tight max-w-2xl">
+
+                  {/* Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+
+                  {/* Content */}
+                  <div className="absolute bottom-6 sm:bottom-10 2xl:bottom-14 left-6 sm:left-10 2xl:left-14 right-16 sm:right-20 2xl:right-24">
+                    <h3 className="text-lg sm:text-2xl lg:text-3xl 2xl:text-5xl font-bold text-white mb-2 2xl:mb-3 tracking-tight leading-tight max-w-xl">
                       {slide.title}
                     </h3>
-                    <p className="text-lg 2xl:text-2xl lg:text-xl 2xl:lg:text-2xl text-white/90 max-w-xl font-medium">
+                    <p className="text-xs sm:text-sm lg:text-base 2xl:text-xl text-white/85 max-w-md font-medium">
                       {slide.subtitle}
                     </p>
                   </div>
 
-                  {/* Image/FIFA Badge Branding */}
-                  <div className="absolute bottom-12 2xl:bottom-20 right-12 2xl:right-20 w-20 h-20 flex items-center justify-center">
-                     <img
-                       src="/fifa-logo.png"
-                       alt="FIFA 2026"
-                       loading="lazy"
-                       className="w-14 h-14 object-contain"
-                     />
+                  {/* FIFA Badge */}
+                  <div className="absolute bottom-6 sm:bottom-10 2xl:bottom-14 right-6 sm:right-10 2xl:right-14">
+                    <img
+                      src="/fifa-logo.png"
+                      alt="FIFA 2026"
+                      loading="lazy"
+                      className="w-10 h-10 sm:w-12 sm:h-12 2xl:w-16 2xl:h-16 object-contain"
+                    />
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Navigation Controls - Positioned exactly as in the reference */}
-          <button
-            onClick={() => go("prev")}
-            className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black transition-all shadow-xl"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          
-          <button
-            onClick={() => go("next")}
-            className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black transition-all shadow-xl"
-          >
-            <ChevronRight size={24} />
-          </button>
         </div>
+         {/* Navigation Buttons */}
+           <button
+             onClick={() => go("prev")}
+             className="absolute left-3 2xl:left-6 top-1/2 -translate-y-1/2 z-20 w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all disabled:opacity-20"
+           >
+             <ChevronLeft className="text-mist-700 w-4 h-4 2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+           </button>
+         
+           <button
+             onClick={() => go("next")}
+             className="absolute right-3 2xl:right-6 top-1/2 -translate-y-1/2 z-20 w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all disabled:opacity-20"
+           >
+             <ChevronRight className="text-mist-700 w-4 h-4 2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+           </button>
 
-        {/* Progress Indicators (Optional - hidden in your target image) */}
-        <div className="mt-10 2xl:mt-20 flex justify-center gap-3 2xl:gap-6">
+        {/* Dots */}
+        <div className="mt-10 2xl:mt-16 flex justify-center gap-2 2xl:gap-4">
           {HERO_SLIDES.map((_, i) => (
             <button
               key={i}
               onClick={() => { setCurrent(i); resetTimer(); }}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                i === current ? "w-12 bg-[#1a1a1a]" : "w-2 bg-mist-300"
+              className={`rounded-full transition-all duration-300 ${
+                i === current ? "w-5 h-2 2xl:w-7 2xl:h-2.5 bg-mist-900"
+          : "w-2 h-2 2xl:w-2.5 2xl:h-2.5 bg-mist-300 hover:bg-mist-500"
               }`}
             />
           ))}
@@ -326,15 +449,15 @@ function FifaContent() {
       />
 
       {/* VIP Journey Section */}
-      <section className="bg-white py-16 2xl:py-32 px-4 2xl:px-8">
-        <div className="max-w-6xl 2xl:max-w-[1840px] mx-auto">
+      <section className="sm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48">
+        <div className="">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 2xl:gap-20 items-center">
             <div>
-              <h2 className="text-2xl 2xl:text-4xl lg:text-3xl font-bold text-mist-900 mb-4 2xl:mb-6">Your VIP World Cup Journey Starts Here</h2>
+              <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 mb-4 2xl:mb-10">Your VIP World Cup Journey Starts Here</h2>
               <div className="space-y-3 2xl:space-y-4 text-sm 2xl:text-2xl text-mist-500 leading-relaxed">
                 <p>
                   Experience the FIFA World Cup 2026 in Los Angeles like never before.
-                  Taking place at the world-class <strong>Los Angeles Stadium</strong>, the
+                  Taking place at the world-class <strong className="text-mist-600">Los Angeles Stadium</strong>, the
                   tournament brings unparalleled energy — and we elevate it with VIP comfort.
                 </p>
                 <p>
@@ -342,7 +465,7 @@ function FifaContent() {
                   nightlife and tailored city experiences, our dedicated team
                   ensures every moment is curated to perfection.
                 </p>
-                <p className="font-normal text-mist-900">
+                <p className="font-normal text-mist-800">
                   Enjoy a seamless, personalized, and truly unforgettable
                   World Cup journey with Vidi Vici.
                 </p>
@@ -353,62 +476,82 @@ function FifaContent() {
                 src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=700&q=80"
                 alt="SoFi Stadium"
                 loading="lazy"
-                className="w-full h-[320px] 2xl:h-[400px] object-cover"
+                className="w-full h-[320px] 2xl:h-[550px] object-cover"
               />
             </div>
           </div>
         </div>
       </section>
+      <div className="mt-24 2xl:mt-48">
+        <Services />
 
-      <Services/>
+      </div>
 
-      {/* Match Fixtures */}
-    {/* FIFA World Cup Fixtures Section */}
-      <section className="px-6 2xl:px-12 sm:px-16 2xl:sm:px-32 lg:px-20 2xl:lg:px-40 py-20 2xl:py-40 bg-white">
+      {/* FIFA World Cup Fixtures Section */}
+      <section className="sm:px-16 lg:px-20 2xl:px-32 px-6 mt-24 2xl:mt-48">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl 2xl:text-7xl lg:text-5xl 2xl:lg:text-7xl font-bold text-[#1a1a1a] mb-2">
-            FIFA World Cup 2026™ Fixtures
+        <div className="text-center mb-12 2xl:mb-24">
+          <h2 className="text-3xl sm:text-4xl 2xl:text-6xl  font-bold text-mist-900 mb-8">
+            FIFA World Cup 2026™
           </h2>
-          <p className="text-xl 2xl:text-3xl text-mist-600 font-medium">in Los Angeles</p>
+          <p className="text-xl 2xl:text-3xl text-mist-600 font-medium">Fixtures in Los Angeles</p>
         </div>
 
-        {/* Table Container */}
-        <div className=" bg-mist-200 rounded-[2.5rem] 2xl:rounded-3xl shadow-sm border border-mist-100">
-          <div className="overflow-x-auto">
+        <div className="bg-mist-200 rounded-xl sm:rounded-2xl 2xl:rounded-3xl">
+
+          {/* Desktop Table — hidden on mobile */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="text-left border-b border-mist-300">
                   <th className="px-6 2xl:px-12 py-5 2xl:py-10 text-base 2xl:text-2xl font-bold text-[#1a1a1a] border-r border-mist-300">Date</th>
                   <th className="px-6 2xl:px-12 py-5 2xl:py-10 text-base 2xl:text-2xl font-bold text-[#1a1a1a] border-r border-mist-300">Match No.</th>
                   <th className="px-6 2xl:px-12 py-5 2xl:py-10 text-base 2xl:text-2xl font-bold text-[#1a1a1a] border-r border-mist-300">Stage</th>
-                  <th className="px-6 2xl:px-12 py-5 2xl:py-10 text-base 2xl:text-2xl font-bold text-[#1a1a1a] ">Stadium</th>
+                  <th className="px-6 2xl:px-12 py-5 2xl:py-10 text-base 2xl:text-2xl font-bold text-[#1a1a1a]">Stadium</th>
                 </tr>
               </thead>
               <tbody>
                 {FIXTURES.map((f, i) => (
                   <tr key={i} className="border-b border-mist-300 last:border-0 hover:bg-mist-100/50 transition-colors">
-                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-lg font-medium text-mist-700 border-r border-mist-300">{f.date}</td>
-                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-lg text-mist-500 border-r border-mist-300">{f.matchNo}</td>
-                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-lg text-mist-600 italic lg:not-italic border-r border-mist-300">{f.stage}</td>
-                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-lg text-mist-500">{f.stadium}</td>
+                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-xl font-medium text-mist-700 border-r border-mist-300">{f.date}</td>
+                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-xl text-mist-500 border-r border-mist-300">{f.matchNo}</td>
+                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-xl text-mist-600 italic lg:not-italic border-r border-mist-300">{f.stage}</td>
+                    <td className="px-6 2xl:px-12 py-5 2xl:py-10 text-sm 2xl:text-xl text-mist-500">{f.stadium}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Table — same style as long-term table */}
+          <div className="sm:hidden rounded-md overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-mist-300">
+                  <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs">Date</th>
+                  <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs border-l border-mist-300">Match</th>
+                  <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs border-l border-mist-300">Stage</th>
+                  <th className="text-left px-4 py-3 font-medium text-mist-500 text-xs border-l border-mist-300">Stadium</th>
+                </tr>
+              </thead>
+              <tbody>
+                {FIXTURES.map((f, i) => (
+                  <tr key={i} className="border-t border-mist-300">
+                    <td className="px-4 py-4 text-sm text-mist-600">{f.date}</td>
+                    <td className="px-4 py-4 text-sm font-semibold text-mist-900 border-l border-mist-300">{f.matchNo}</td>
+                    <td className="px-4 py-4 text-sm text-mist-600 border-l border-mist-300">{f.stage}</td>
+                    <td className="px-4 py-4 text-xs text-mist-500 border-l border-mist-300">{f.stadium}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
         </div>
       </section>
-      {/* Gallery Bento Grid */}
-    
-
-      {/* Big Image Slider */}
-      
-
       {/* Car Rentals Slider */}
-      <div className="py-4">
-        <Rentals showHeader={true} discountBadgeText={undefined} />
-      </div>
+      
+      <Rentals showHeader={true} discountBadgeText={undefined} />
 
       {/* Browse by Make & Type */}
       <CarBrowse />
@@ -427,7 +570,7 @@ function FifaContent() {
       {/* Client Testimonials */}
       <Reviews />
 
-        <GalleryBentoGrid />
+      <GalleryBentoGrid />
 
       {/* FAQ */}
       <FAQ />
