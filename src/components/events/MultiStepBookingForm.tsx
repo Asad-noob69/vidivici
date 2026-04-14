@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
 import { Phone, Mail, MapPin, Clock, ChevronDown } from "lucide-react"
 import Turnstile from "@/components/Turnstile"
+import CountryPicker, { Country, DEFAULT_COUNTRY } from "@/components/ui/Countrypicker";
 
 const BUDGET_OPTIONS = [
   "Under $1,000",
@@ -57,16 +58,14 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
         <div key={s.label} className="flex items-center flex-1 last:flex-none">
           <div className="flex flex-col items-center">
             <div
-              className={`w-3 2xl:w-5 h-3 2xl:h-5 rounded-full border-2 transition-colors ${
-                currentStep >= s.step
-                  ? "bg-blue-500 border-blue-500"
-                  : "bg-gray-200 border-gray-300"
-              }`}
+              className={`w-3 2xl:w-5 h-3 2xl:h-5 rounded-full border-2 transition-colors ${currentStep >= s.step
+                ? "bg-blue-500 border-blue-500"
+                : "bg-gray-200 border-gray-300"
+                }`}
             />
             <span
-              className={`text-xs 2xl:text-lg font-medium mt-2 ${
-                currentStep >= s.step ? "text-blue-600" : "text-gray-400"
-              }`}
+              className={`text-xs 2xl:text-lg font-medium mt-2 ${currentStep >= s.step ? "text-blue-600" : "text-gray-400"
+                }`}
             >
               {s.label}
             </span>
@@ -74,13 +73,12 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
           {i < steps.length - 1 && (
             <div className="flex-1 mx-2 mb-5 2xl:mb-7">
               <div
-                className={`h-0.5 w-full ${
-                  currentStep > s.step
-                    ? "bg-blue-500"
-                    : currentStep === s.step
+                className={`h-0.5 w-full ${currentStep > s.step
+                  ? "bg-blue-500"
+                  : currentStep === s.step
                     ? "bg-blue-500 opacity-50"
                     : "bg-gray-200"
-                }`}
+                  }`}
               />
             </div>
           )}
@@ -112,7 +110,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
       "function"
     ) {
       try {
-        ;(input as HTMLInputElement & { showPicker: () => void }).showPicker()
+        ; (input as HTMLInputElement & { showPicker: () => void }).showPicker()
       } catch {
         // Fallback
       }
@@ -286,6 +284,8 @@ export default function MultiStepBookingForm({
   const [couponError, setCouponError] = useState("")
   const [couponLoading, setCouponLoading] = useState(false)
 
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
+
   const VENUES = venueOptions || [
     "Delilah Los Angeles",
     "Catch LA Rooftop",
@@ -314,8 +314,8 @@ export default function MultiStepBookingForm({
           addOns: Array.isArray(data.addOns)
             ? data.addOns
             : typeof data.addOns === "string" && data.addOns
-            ? data.addOns.split(", ").filter(Boolean)
-            : [],
+              ? data.addOns.split(", ").filter(Boolean)
+              : [],
         }))
       }
     } catch {
@@ -479,18 +479,20 @@ export default function MultiStepBookingForm({
                     required
                   />
                 </Field>
-                <Field label="Phone Number">
-                  <div className="flex items-center border border-mist-300 rounded-xl 2xl:rounded-2xl overflow-hidden focus-within:border-mist-400 transition-colors duration-200 bg-white">
-                    <span className="px-4 2xl:px-6 py-3 2xl:py-5 text-sm 2xl:text-3xl border-r border-mist-300 bg-mist-50 flex items-center gap-2 text-mist-600 flex-shrink-0">
-                      <svg viewBox="0 0 30 20" className="w-5 h-3.5 2xl:w-7 2xl:h-5 shrink-0 rounded-[2px]" aria-hidden="true"><rect width="30" height="20" fill="#B22234"/><path d="M0,2.31H30M0,5.39H30M0,8.46H30M0,11.54H30M0,14.62H30M0,17.69H30" stroke="#fff" strokeWidth="1.54"/><rect width="12" height="10.77" fill="#3C3B6E"/></svg>
-                    </span>
+                <Field label="Phone">
+                  <div className="flex items-stretch border border-mist-300 rounded-xl 2xl:rounded-2xl focus-within:border-mist-400 transition-colors duration-200 bg-white overflow-visible">
+                    <CountryPicker
+                      value={selectedCountry}
+                      onChange={setSelectedCountry}
+                    />
                     <input
+                      name="phone"
                       type="tel"
-                      inputMode="tel"
-                      placeholder="Enter your phone number"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="flex-1 px-4 2xl:px-6 py-3 2xl:py-5 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 outline-none bg-white"
+                      placeholder="Phone number"
+                      className="flex-1 px-4 py-3 2xl:px-6 2xl:py-5 text-sm 2xl:text-xl text-mist-900 placeholder-mist-400 outline-none bg-transparent min-w-0"
+                      required
                     />
                   </div>
                 </Field>
@@ -578,18 +580,16 @@ export default function MultiStepBookingForm({
                       key={addon}
                       type="button"
                       onClick={() => toggleAddOn(addon)}
-                      className={`w-full px-4 2xl:px-6 py-3 2xl:py-5 rounded-2xl text-sm 2xl:text-xl font-medium border transition-all flex items-center gap-4 ${
-                        form.addOns.includes(addon)
-                          ? "bg-white text-mist-900 border-mist-300"
-                          : "bg-white text-mist-700 border-mist-200 hover:border-mist-300"
-                      }`}
+                      className={`w-full px-4 2xl:px-6 py-3 2xl:py-5 rounded-2xl text-sm 2xl:text-xl font-medium border transition-all flex items-center gap-4 ${form.addOns.includes(addon)
+                        ? "bg-white text-mist-900 border-mist-300"
+                        : "bg-white text-mist-700 border-mist-200 hover:border-mist-300"
+                        }`}
                     >
                       <span
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                          form.addOns.includes(addon)
-                            ? "border-blue-500"
-                            : "border-mist-400"
-                        }`}
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${form.addOns.includes(addon)
+                          ? "border-blue-500"
+                          : "border-mist-400"
+                          }`}
                       >
                         {form.addOns.includes(addon) && (
                           <span className="w-3 h-3 rounded-full bg-blue-500" />
@@ -689,17 +689,15 @@ export default function MultiStepBookingForm({
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("card")}
-                    className={`w-full flex items-center justify-between px-4 py-3.5 text-sm transition-colors ${
-                      paymentMethod === "card"
-                        ? "bg-blue-50/60 border-b border-mist-200"
-                        : "bg-white hover:bg-mist-50"
-                    }`}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 text-sm transition-colors ${paymentMethod === "card"
+                      ? "bg-blue-50/60 border-b border-mist-200"
+                      : "bg-white hover:bg-mist-50"
+                      }`}
                   >
                     <span className="flex items-center gap-3">
                       <span
-                        className={`h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          paymentMethod === "card" ? "border-blue-600" : "border-mist-300"
-                        }`}
+                        className={`h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === "card" ? "border-blue-600" : "border-mist-300"
+                          }`}
                       >
                         {paymentMethod === "card" && (
                           <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
@@ -833,14 +831,12 @@ export default function MultiStepBookingForm({
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("paypal")}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm transition-colors ${
-                      paymentMethod === "paypal" ? "bg-blue-50/60" : "bg-white hover:bg-mist-50"
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm transition-colors ${paymentMethod === "paypal" ? "bg-blue-50/60" : "bg-white hover:bg-mist-50"
+                      }`}
                   >
                     <span
-                      className={`h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        paymentMethod === "paypal" ? "border-blue-600" : "border-mist-300"
-                      }`}
+                      className={`h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === "paypal" ? "border-blue-600" : "border-mist-300"
+                        }`}
                     >
                       {paymentMethod === "paypal" && (
                         <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
@@ -857,7 +853,7 @@ export default function MultiStepBookingForm({
                   &amp;{" "}
                   <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
                 </p>
-                
+
 
                 {/* PayPal buttons — only rendered when paypal method is selected */}
                 {paymentMethod === "paypal" && (
