@@ -264,13 +264,13 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
   ]
 
   return (
-    <div className="bg-white pt-24 lg:pt-28 2xl:pt-36">
+    <div className="bg-white  pt-24 lg:pt-28 2xl:pt-36">
       {/* Breadcrumb (Desktop) */}
-      <div className="hidden lg:block px-6 sm:px-16 lg:px-28 2xl:px-32 pb-6 2xl:pb-10">
+      <div className="hidden lg:block px-6 sm:px-16 lg:px-28 2xl:px-32 py-8 2xl:py-12">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base 2xl:text-xl text-mist-500">
             <Link href="/" className="hover:text-mist-700">Los Angeles</Link>
-           <ChevronRight size={14} className="text-mist-400" />
+            <ChevronRight size={14} className="text-mist-400" />
             <Link href="/events" className="hover:text-mist-700">Events</Link>
             <ChevronRight size={14} className="text-mist-400" />
             <span className="text-mist-700 font-medium">{event.name}</span>
@@ -279,9 +279,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             <button className="flex items-center gap-1.5 whitespace-nowrap text-sm sm:text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
               <Share2 size={16} /> Share
             </button>
-            <button className="flex items-center gap-1.5 whitespace-nowrap text-sm sm:text-base 2xl:text-xl text-mist-500 hover:text-mist-700 transition-colors">
-              <Heart size={16} /> Save
-            </button>
+
           </div>
         </div>
       </div>
@@ -299,7 +297,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
       </div>
 
       {/* Hero Image with Event Title */}
-      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32 mb-8 2xl:mb-24">
+      <div className="px-6 sm:px-16 lg:px-20 2xl:px-32">
         <div className="relative rounded-3xl overflow-hidden h-[450px] lg:h-[550px] 2xl:h-[760px]">
           <img
             src={images[currentImage].url}
@@ -311,17 +309,17 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           <div className="absolute bottom-12 2xl:bottom-20 left-10 2xl:left-20 right-10 2xl:right-20">
-            <h1 className="text-4xl lg:text-5xl 2xl:text-7xl font-semibold text-white mb-3 2xl:mb-5 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-white mb-3 2xl:mb-5 tracking-tight">
               {event.name}
             </h1>
             {event.shortDescription && (
-              <p className="text-base lg:text-lg 2xl:text-3xl text-white/90 mb-8 2xl:mb-12 max-w-xl 2xl:max-w-5xl leading-snug">
+              <p className="text-lg lg:text-xl 2xl:text-2xl text-white/90 mb-10 2xl:mb-14 max-w-2xl 2xl:max-w-5xl leading-relaxed">
                 {event.shortDescription}
               </p>
             )}
 
             <button
-              className="bg-white text-black px-10 2xl:px-14 py-3.5 2xl:py-6 rounded-xl text-sm 2xl:text-2xl font-bold hover:bg-mist-100 transition-all shadow-lg"
+              className="bg-white text-black px-10 2xl:px-12 py-4 2xl:py-5 rounded-xl 2xl:rounded-xl text-base 2xl:text-xl hover:bg-mist-100 transition-all transform hover:scale-105 shadow-xl"
               onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
             >
               Reserve Now
@@ -363,24 +361,24 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       {/* Why Choose Section */}
       {whyChooseCards.length > 0 && (
-        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 text-center">
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 text-center mt-24 2xl:mt-48">
           {/* Header */}
-          <h2 className="text-3xl lg:text-4xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">
+          <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">
             Why Choose {event.name}?
           </h2>
-          <p className="text-mist-600 text-base 2xl:text-2xl max-w-2xl 2xl:max-w-5xl mx-auto mb-12 2xl:mb-20 leading-relaxed">
+          <p className="text-mist-600 text-base 2xl:text-xl max-w-2xl 2xl:max-w-5xl mx-auto mb-12 2xl:mb-20 leading-relaxed">
             {highlightsConfig.descriptionUnderWhyChoose || event.shortDescription || "Experience the perfect blend of luxury, entertainment, and world-class service in one unforgettable event."}
           </p>
 
           {/* Feature Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
             {whyChooseCards.map((card, i) => {
-              
+
 
               return (
                 <div
                   key={i}
-                  className="bg-[#f5f5f5] p-8 2xl:p-12 rounded-3xl text-left flex flex-col h-full"
+                  className="bg-mist-100 p-8 2xl:p-12 rounded-3xl text-left flex flex-col h-full"
                 >
                   {/* Icon Container */}
                   <div className="w-12 h-12 bg-mist-200 rounded-lg flex items-center justify-center mb-6">
@@ -392,7 +390,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
                     {card.title}
                   </h3>
                   {card.description && (
-                    <p className="text-mist-600 text-sm 2xl:text-2xl leading-relaxed">
+                    <p className="text-mist-500 text-sm 2xl:text-2xl leading-relaxed">
                       {card.description}
                     </p>
                   )}
@@ -405,7 +403,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       {/* The Experience Section */}
       {fullDescriptionParagraphs.length > 0 && (
-        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28 flex flex-col lg:flex-row items-center gap-12 2xl:gap-20 bg-white">
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 flex flex-col lg:flex-row items-center gap-12 2xl:gap-20 mt-24 2xl:mt-48">
 
           {/* Left Side: Bento Image Grid */}
           <div className="w-full lg:w-1/2 flex gap-4">
@@ -439,11 +437,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
           {/* Right Side: Content */}
           <div className="w-full lg:w-1/2">
-            <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] leading-tight mb-4 2xl:mb-6">
+            <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 leading-tight mb-4 2xl:mb-6">
               {experienceConfig.heading || `Experience the ${event.name}`}
             </h2>
 
-            <h3 className="text-lg 2xl:text-3xl font-semibold text-mist-500 mb-6 2xl:mb-8">
+            <h3 className="text-sm sm:text-base 2xl:text-2xl font-semibold text-mist-500 mb-6 2xl:mb-8">
               {experienceConfig.subtitle || "Modern luxury meets classic elegance"}
             </h3>
 
@@ -455,7 +453,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
             <button
               onClick={() => document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth" })}
-              className="bg-[#1a1a1a] text-white px-10 2xl:px-14 py-4 2xl:py-6 rounded-xl font-bold 2xl:text-2xl hover:bg-black transition-colors shadow-lg"
+              className="bg-mist-900 text-white px-10 2xl:px-12 py-4 2xl:py-5 rounded-xl 2xl:rounded-xl text-base 2xl:text-xl hover:bg-mist-800 transition-all transform hover:scale-105 shadow-xl"
             >
               Reserve Now
             </button>
@@ -465,8 +463,8 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
       )}
 
       {showcaseCards.length > 0 && (
-        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 max-w-[1840px] mx-auto">
+        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
             {showcaseCards.map((card, idx) => (
               <div key={idx} className="flex flex-col gap-6">
                 <div className={`h-[220px] sm:h-[300px] ${idx === 1 ? "lg:h-[400px] md:order-2" : "lg:h-[350px]"}`}>
@@ -476,7 +474,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
                     className="w-full h-full object-cover rounded-3xl"
                   />
                 </div>
-                <div className={`bg-[#f5f5f5] p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${idx === 1 ? "md:order-1" : ""}`}>
+                <div className={`bg-mist-100 p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${idx === 1 ? "md:order-1" : ""}`}>
                   <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">{card.title}</h3>
                   <p className="text-mist-500 text-sm 2xl:text-xl leading-relaxed">{card.description}</p>
                 </div>
@@ -485,15 +483,15 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
           </div>
         </section>
       )}
-      <section className="py-16 2xl:py-28 px-6 sm:px-12 lg:px-20 2xl:px-32 bg-white">
+      <section className="px-6 sm:px-12 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
         <div className="">
 
           {/* Header */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl 2xl:text-7xl font-bold text-mist-900 mb-3 2xl:mb-6">
+            <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 mb-3 2xl:mb-6">
               Elevate Your Night
             </h2>
-            <p className="text-base 2xl:text-2xl text-mist-600 leading-relaxed">
+            <p className="text-base 2xl:text-xl max-w-2xl 2xl:max-w-5xl mx-auto text-mist-600 leading-relaxed">
               Make your Vidi Vici experience even more extraordinary with our exclusive VIP services.
             </p>
           </div>
@@ -506,11 +504,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
               <img
                 src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300&q=80"
                 alt="Mixologist"
-                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-72 2xl:h-72 object-cover rounded-2xl flex-shrink-0"
+                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-56 2xl:h-56 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="pt-1">
-                <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services</h3>
-                <p className="text-base 2xl:text-xl text-mist-500 font-normal leading-relaxed">
+                <h3 className="text-base 2xl:text-[26px] font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services</h3>
+                <p className="text-base 2xl:text-2xl text-mist-500 font-normal leading-relaxed">
                   Professional bartenders to craft signature for drinks
                 </p>
               </div>
@@ -521,11 +519,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
               <img
                 src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=300&q=80"
                 alt="Valet Parking"
-                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-72 2xl:h-72 object-cover rounded-2xl flex-shrink-0"
+                className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-56 2xl:h-56 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="pt-1">
-                <h3 className="text-base 2xl:text-2xl font-bold text-mist-900 mb-1 2xl:mb-3">Security & Bodyguards</h3>
-                <p className="text-base 2xl:text-xl text-mist-500 font-normal leading-relaxed">
+                <h3 className="text-base 2xl:text-[26px] font-bold text-mist-900 mb-1 2xl:mb-3">Security & Bodyguards</h3>
+                <p className="text-base 2xl:text-2xl text-mist-500 font-normal leading-relaxed">
                   Hassle-free parking management for you.
                 </p>
               </div>
@@ -536,7 +534,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
       <Reviews />
 
-      <section className="py-16 2xl:py-24 px-6 sm:px-16 lg:px-20 2xl:px-32 bg-white">
+      <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
         <div className="">
           <div className="relative bg-mist-100 rounded-3xl px-8 2xl:px-16 py-16 2xl:py-24 text-center overflow-hidden">
             <img
@@ -556,13 +554,13 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
 
             {/* Content */}
-            <h2 className="text-3xl sm:text-4xl 2xl:text-7xl font-bold text-mist-900 leading-tight mb-4 2xl:mb-8">
+            <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 leading-tight mb-4 2xl:mb-8">
               Reserve Your<br /> Unforgettable Night
             </h2>
             <p className="text-sm 2xl:text-2xl text-mist-600 max-w-sm 2xl:max-w-3xl mx-auto leading-relaxed mb-8 2xl:mb-12">
               Secure your table, VIP services, or private experience today and make your evening truly extraordinary.
             </p>
-            <button className="bg-mist-900 text-white text-sm 2xl:text-2xl font-semibold px-7 2xl:px-12 py-3.5 2xl:py-5 rounded-xl hover:bg-mist-700 transition-colors">
+            <button className="bg-mist-900 text-white px-10 2xl:px-12 py-4 2xl:py-5 rounded-xl 2xl:rounded-xl text-base 2xl:text-xl hover:bg-mist-800 transition-all transform hover:scale-105 shadow-xl">
               Reserve Now
             </button>
 
@@ -570,54 +568,105 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         </div>
       </section>
 
-      <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 py-16 2xl:py-28">
-        <div className="max-w-[1840px] mx-auto">
+      <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
+        <div className="">
           {/* Header */}
           <div className="text-center mb-16 2xl:mb-24">
-            <h2 className="text-4xl lg:text-5xl 2xl:text-7xl font-bold text-[#1a1a1a] mb-6 2xl:mb-8">Gallery</h2>
-            <p className="text-mist-600 text-base 2xl:text-2xl max-w-3xl 2xl:max-w-6xl mx-auto leading-relaxed">
+            <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 mb-6 2xl:mb-8">Gallery</h2>
+            <p className="text-mist-600 text-base 2xl:text-xl max-w-2xl 2xl:max-w-5xl mx-auto leading-relaxed">
               Explore the vibrant atmosphere, elegant décor, and unforgettable
               performances that make Delilah Los Angeles a must-visit nightlife destination.
             </p>
           </div>
 
-          {/* Gallery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10 h-auto md:h-[700px] 2xl:h-[860px]">
+          {/* Bento Gallery */}
+          <div className="
+  grid gap-2
+  grid-cols-2
+  [grid-template-rows:180px_120px_160px]
 
-            {/* Left Column: Full Height */}
-            <div className="h-[260px] sm:h-[320px] md:h-full">
-              <img
-                src="https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=800"
-                alt="Bar interior"
-                className="w-full h-full object-cover rounded-3xl"
-              />
+  sm:grid-cols-[1.2fr_1fr_1fr]
+  sm:[grid-template-rows:260px_220px]
+  sm:gap-[10px]
+
+  lg:grid-cols-[1fr_1.5fr_1fr]
+  lg:[grid-template-rows:300px_220px]
+  lg:gap-3
+
+  2xl:grid-cols-[1fr_1.6fr_1fr_1fr]
+  2xl:[grid-template-rows:320px_240px]
+  2xl:gap-[14px]
+">
+
+            {/* T1 — tall left */}
+            <div className="
+    overflow-hidden rounded-2xl
+    col-[1] row-[1]
+    sm:row-[1/3]
+    lg:row-[1]
+    2xl:row-[1/3]
+  ">
+              <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=900"
+                alt="Bar interior" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
             </div>
 
-            {/* Middle Column: Two Stacked Images */}
-            <div className="flex flex-col gap-6 h-auto md:h-full">
-              <div className="h-[260px] sm:h-[320px] md:h-1/2">
-                <img
-                  src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
-                  alt="Lounge seating"
-                  className="w-full h-full object-cover rounded-3xl"
-                />
-              </div>
-              <div className="h-[260px] sm:h-[320px] md:h-1/2">
-                <img
-                  src="https://images.unsplash.com/photo-1485872299829-c673f5194813?q=80&w=800"
-                  alt="Elegant lighting"
-                  className="w-full h-full object-cover rounded-3xl"
-                />
-              </div>
+            {/* T2 — tall center hero */}
+            <div className="
+    overflow-hidden rounded-2xl
+    col-[2] row-[1/3]
+    sm:col-[2] sm:row-[1]
+    lg:col-[2] lg:row-[1/3]
+    2xl:col-[2] 2xl:row-[1]
+  ">
+              <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=900"
+                alt="Lounge seating" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
             </div>
 
-            {/* Right Column: Full Height */}
-            <div className="h-[260px] sm:h-[320px] md:h-full">
-              <img
-                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800"
-                alt="Atmospheric dining"
-                className="w-full h-full object-cover rounded-3xl"
-              />
+            {/* T3 */}
+            <div className="
+    overflow-hidden rounded-2xl
+    col-[1] row-[2/4]
+    sm:col-[3] sm:row-[1]
+    lg:col-[3] lg:row-[1]
+    2xl:col-[3] 2xl:row-[1]
+  ">
+              <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=900"
+                alt="Atmospheric dining" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+            </div>
+
+            {/* T4 */}
+            <div className="
+    overflow-hidden rounded-2xl
+    col-[2] row-[3]
+    sm:col-[2] sm:row-[2]
+    lg:col-[1] lg:row-[2]
+    2xl:col-[4] 2xl:row-[1/3]
+  ">
+              <img src="https://images.unsplash.com/photo-1485872299829-c673f5194813?q=80&w=900"
+                alt="Elegant lighting" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+            </div>
+
+            {/* T5 — hidden on mobile */}
+            <div className="
+    hidden sm:block
+    overflow-hidden rounded-2xl
+    sm:col-[3] sm:row-[2]
+    lg:col-[3] lg:row-[2]
+    2xl:col-[2] 2xl:row-[2]
+  ">
+              <img src="https://images.unsplash.com/photo-1536657464919-892534f60d6e?q=80&w=900"
+                alt="Cocktail bar" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+            </div>
+
+            {/* T6 — 2xl only */}
+            <div className="
+    hidden 2xl:block
+    overflow-hidden rounded-2xl
+    2xl:col-[3] 2xl:row-[2]
+  ">
+              <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1400"
+                alt="Restaurant wide"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
             </div>
 
           </div>
