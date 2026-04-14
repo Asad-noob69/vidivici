@@ -58,10 +58,12 @@ IMPORTANT BOOKING RULES:
 - For villas: price is per night (pricePerNight from search results), add cleaning fee and tax
 - For events: discuss budget and pricing with the customer
 
-Critical output rules (NEVER break these):
+Critical output rules (NEVER break these — violating these WILL cause errors):
 - NEVER include raw function calls, tool invocations, or JSON in your text response. Tools are called silently in the background — the customer never sees them.
-- NEVER output anything like <function=...>, [function=...], {"tool":...}, or similar syntax in your message text.
+- NEVER output anything like <function=...>, [function=...], {"tool":...}, <tool_call>, or similar syntax in your message text. This WILL crash the system.
+- When you want to call a tool, use ONLY the proper tool_calls mechanism. Never write function calls as text.
 - Only write natural, conversational text to the customer.
+- If a tool call fails or you can't complete an action, explain politely what happened and ask the customer to try again or provide more details.
 
 Important rules:
 - Always format links as markdown: [Item Name](/type/slug)
@@ -332,84 +334,94 @@ async function checkAvailability(params: any) {
 }
 
 async function createMarkBooking(params: any) {
-  const { itemType, itemId, startDate, endDate, customerName, customerEmail, customerPhone, guests, totalPrice, depositAmount, notes } = params
+  try {
+    const { itemType, itemId, startDate, endDate, customerName, customerEmail, customerPhone, guests, totalPrice, depositAmount, notes } = params
 
-  let itemName = ""
-  const itemWhere: any = {}
+    // Validate required fields
+    if (!itemType || !itemId || !startDate || !endDate || !customerName || !customerEmail || !totalPrice || !depositAmount) {
+      return { error: "Missing required fields. Need: itemType, itemId, startDate, endDate, customerName, customerEmail, totalPrice, depositAmount" }
+    }
 
-  if (itemType === "car") {
-    const car = await prisma.car.findUnique({ where: { id: itemId }, include: { brand: true } })
-    if (!car) return { error: "Car not found" }
-    itemName = `${car.brand.name} ${car.name}`
-    itemWhere.carId = itemId
-  } else if (itemType === "villa") {
-    const villa = await prisma.villa.findUnique({ where: { id: itemId } })
-    if (!villa) return { error: "Villa not found" }
-    itemName = villa.name
-    itemWhere.villaId = itemId
-  } else if (itemType === "event") {
-    const event = await prisma.event.findUnique({ where: { id: itemId } })
-    if (!event) return { error: "Event not found" }
-    itemName = event.name
-    itemWhere.eventId = itemId
-  } else {
-    return { error: "Invalid item type" }
-  }
+    let itemName = ""
+    const itemWhere: any = {}
 
-  const bookingNumber = `MK-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
-  const depositPaymentToken = crypto.randomUUID()
-  const wireProofToken = crypto.randomUUID()
-  const balanceDue = totalPrice - depositAmount
+    if (itemType === "car") {
+      const car = await prisma.car.findUnique({ where: { id: itemId }, include: { brand: true } })
+      if (!car) return { error: "Car not found with that ID" }
+      itemName = `${car.brand.name} ${car.name}`
+      itemWhere.carId = itemId
+    } else if (itemType === "villa") {
+      const villa = await prisma.villa.findUnique({ where: { id: itemId } })
+      if (!villa) return { error: "Villa not found with that ID" }
+      itemName = villa.name
+      itemWhere.villaId = itemId
+    } else if (itemType === "event") {
+      const event = await prisma.event.findUnique({ where: { id: itemId } })
+      if (!event) return { error: "Event not found with that ID" }
+      itemName = event.name
+      itemWhere.eventId = itemId
+    } else {
+      return { error: "Invalid item type. Must be 'car', 'villa', or 'event'" }
+    }
 
-  const booking = await prisma.markBooking.create({
-    data: {
+    const bookingNumber = `MK-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+    const depositPaymentToken = crypto.randomUUID()
+    const wireProofToken = crypto.randomUUID()
+    const balanceDue = Number(totalPrice) - Number(depositAmount)
+
+    const booking = await prisma.markBooking.create({
+      data: {
+        bookingNumber,
+        itemType,
+        ...itemWhere,
+        itemName,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || null,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        guests: guests ? Number(guests) : null,
+        totalPrice: Number(totalPrice),
+        depositAmount: Number(depositAmount),
+        balanceDue,
+        notes: notes || null,
+        workflowStatus: "booking_ready",
+        depositPaymentToken,
+        wireProofToken,
+        activityLog: JSON.stringify([{ action: "Booking created by Mark AI", timestamp: new Date().toISOString() }]),
+      },
+    })
+
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
+    const depositLink = `${baseUrl}/mark/pay?token=${depositPaymentToken}`
+
+    await notifyAdmin(
+      `New Mark AI Booking — ${itemName}`,
+      `<h2>New Booking Created by Mark AI</h2>
+      <p><strong>Booking #:</strong> ${bookingNumber}</p>
+      <p><strong>Customer:</strong> ${customerName} (${customerEmail})</p>
+      <p><strong>Item:</strong> ${itemName} (${itemType})</p>
+      <p><strong>Dates:</strong> ${startDate} to ${endDate}</p>
+      <p><strong>Total Price:</strong> $${Number(totalPrice).toLocaleString()}</p>
+      <p><strong>Deposit:</strong> $${Number(depositAmount).toLocaleString()}</p>
+      <p><strong>Special Requests:</strong> ${notes || "None"}</p>
+      <p><a href="${baseUrl}/admin/mark-bookings/${booking.id}">View in Admin →</a></p>`
+    ).catch(console.error)
+
+    return {
+      success: true,
       bookingNumber,
-      itemType,
-      ...itemWhere,
       itemName,
-      customerName,
-      customerEmail,
-      customerPhone: customerPhone || null,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      guests: guests || null,
-      totalPrice,
-      depositAmount,
+      dates: `${startDate} to ${endDate}`,
+      totalPrice: Number(totalPrice),
+      depositAmount: Number(depositAmount),
       balanceDue,
-      notes: notes || null,
-      workflowStatus: "booking_ready",
-      depositPaymentToken,
-      wireProofToken,
-      activityLog: JSON.stringify([{ action: "Booking created by Mark AI", timestamp: new Date().toISOString() }]),
-    },
-  })
-
-  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
-  const depositLink = `${baseUrl}/mark/pay?token=${depositPaymentToken}`
-
-  await notifyAdmin(
-    `New Mark AI Booking — ${itemName}`,
-    `<h2>New Booking Created by Mark AI</h2>
-    <p><strong>Booking #:</strong> ${bookingNumber}</p>
-    <p><strong>Customer:</strong> ${customerName} (${customerEmail})</p>
-    <p><strong>Item:</strong> ${itemName} (${itemType})</p>
-    <p><strong>Dates:</strong> ${startDate} to ${endDate}</p>
-    <p><strong>Total Price:</strong> $${totalPrice.toLocaleString()}</p>
-    <p><strong>Deposit:</strong> $${depositAmount.toLocaleString()}</p>
-    <p><strong>Special Requests:</strong> ${notes || "None"}</p>
-    <p><a href="${baseUrl}/admin/mark-bookings/${booking.id}">View in Admin →</a></p>`
-  ).catch(console.error)
-
-  return {
-    success: true,
-    bookingNumber,
-    itemName,
-    dates: `${startDate} to ${endDate}`,
-    totalPrice,
-    depositAmount,
-    balanceDue,
-    depositLink,
-    message: `Booking ${bookingNumber} created. Share this deposit payment link with the customer: ${depositLink}`,
+      depositLink,
+      message: `Booking ${bookingNumber} created successfully! Share this deposit payment link with the customer: ${depositLink}`,
+    }
+  } catch (err: any) {
+    console.error("createMarkBooking error:", err)
+    return { error: `Failed to create booking: ${err.message}` }
   }
 }
 
@@ -548,17 +560,21 @@ export async function POST(request: NextRequest) {
       messages: groqMessages,
       tools,
       tool_choice: "auto",
-      temperature: 0.7,
+      temperature: 0.6,
       max_tokens: 1024,
     }
 
     let data = await callGroq(groqBody)
 
-    // If Groq returns a tool_use_failed error, retry without tools
+    // If Groq returns a tool_use_failed error, retry with tools but lower temperature
     if (data?.error?.code === "tool_use_failed") {
-      console.warn("Groq tool_use_failed, retrying without tools")
-      const fallbackBody = { ...groqBody, tools: undefined, tool_choice: undefined }
-      data = await callGroq(fallbackBody)
+      console.warn("Groq tool_use_failed, retrying with lower temperature")
+      data = await callGroq({ ...groqBody, temperature: 0.3 })
+      // If it fails again, retry without tools as last resort
+      if (data?.error?.code === "tool_use_failed") {
+        console.warn("Groq tool_use_failed again, retrying without tools")
+        data = await callGroq({ ...groqBody, tools: undefined, tool_choice: undefined, temperature: 0.5 })
+      }
     }
 
     if (!data || !data.choices?.[0]?.message) {
@@ -573,7 +589,18 @@ export async function POST(request: NextRequest) {
       const toolResults = []
 
       for (const toolCall of assistantMessage.tool_calls) {
-        const args = JSON.parse(toolCall.function.arguments)
+        let args: any = {}
+        try {
+          args = JSON.parse(toolCall.function.arguments)
+        } catch (parseErr) {
+          console.error("Failed to parse tool arguments:", toolCall.function.arguments)
+          toolResults.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify({ error: "Invalid arguments" }),
+          })
+          continue
+        }
         const result = await executeTool(toolCall.function.name, args)
         toolResults.push({
           role: "tool",
@@ -591,7 +618,7 @@ export async function POST(request: NextRequest) {
         messages: groqMessages,
         tools,
         tool_choice: "auto",
-        temperature: 0.7,
+        temperature: 0.6,
         max_tokens: 1024,
       })
 
@@ -605,12 +632,17 @@ export async function POST(request: NextRequest) {
     const sanitizeContent = (text: string) =>
       text
         .replace(/<function=[^>]*>[\s\S]*?<\/function>/g, "")
+        .replace(/<function=[^>]*>[^<]*/g, "")
         .replace(/\[function=[^\]]*\]/g, "")
         .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "")
         .replace(/```json\s*\{[\s\S]*?"tool"[\s\S]*?```/g, "")
         .trim()
 
-    const aiContent = sanitizeContent(assistantMessage.content || "I encountered an issue. Please try again.")
+    let aiContent = sanitizeContent(assistantMessage.content || "")
+    // If sanitization removed everything, provide a helpful fallback
+    if (!aiContent) {
+      aiContent = "I apologize for the technical difficulty. Could you please repeat your request? I'm here to help you with luxury cars, villas, and events at VIDI VICI."
+    }
 
     // Save AI response to DB
     await prisma.chatMessage.create({
