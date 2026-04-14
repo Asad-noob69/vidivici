@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { notifyAdmin } from "@/lib/email"
-import { DEFAULT_VILLA_TAX } from "@/lib/utils"
+import crypto from "crypto"
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY!
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-const SYSTEM_PROMPT = `You are Mark, the friendly and knowledgeable concierge assistant for VIDI VICI — a luxury rental marketplace in Los Angeles and Miami offering exotic cars, luxury villas, and exclusive events.
+function getSystemPrompt() {
+  const today = new Date().toISOString().split("T")[0]
+  const dayName = new Date().toLocaleDateString("en-US", { weekday: "long" })
+  return `You are Mark, the friendly and knowledgeable concierge assistant for VIDI VICI — a luxury rental marketplace in Los Angeles and Miami offering exotic cars, luxury villas, and exclusive events.
+
+Today's date is ${today} (${dayName}). ALWAYS use this to calculate real dates. When a customer says "this Saturday", "next week", "tomorrow", etc., convert it to YYYY-MM-DD format. Never pass natural language dates to tools — always use YYYY-MM-DD.
 
 Strict scope (ABSOLUTE RULE — never break this):
 - You ONLY assist with VIDI VICI services: booking or browsing luxury cars, villas, and events.
@@ -32,7 +37,26 @@ When a customer asks about cars, villas, or events:
 2. Once you have enough info, use the search tools to find matching options
 3. Present results naturally with links (format: [Name](/cars/slug) or [Name](/villas/slug) or [Name](/events/slug))
 4. Ask if they'd like you to book it for them
-5. If they want to book, collect the necessary details and use the booking tools
+
+BOOKING FLOW (follow this exactly):
+When the customer wants to book something:
+1. Collect their full name, email, and phone number
+2. Confirm the item, dates, number of guests (for villas/events), and any special requests
+3. Discuss and agree on the total price and deposit amount with the customer
+4. Use check_availability to verify the dates are open
+5. Use create_mark_booking to create the booking
+6. After the booking is created, share the deposit payment link with the customer
+7. Tell them: "Once you pay the deposit, our team will confirm availability with the property owner and send you the remaining balance details and wire transfer instructions."
+
+IMPORTANT BOOKING RULES:
+- ALWAYS collect customer name, email, and phone before booking
+- ALWAYS agree on total price and deposit amount before creating the booking
+- ALWAYS check availability before creating the booking
+- The deposit is typically 10-20% of the total price, but can be negotiated
+- After creating the booking, ALWAYS share the deposit payment link from the booking result
+- For cars: price is per day (pricePerDay from search results)
+- For villas: price is per night (pricePerNight from search results), add cleaning fee and tax
+- For events: discuss budget and pricing with the customer
 
 Critical output rules (NEVER break these):
 - NEVER include raw function calls, tool invocations, or JSON in your text response. Tools are called silently in the background — the customer never sees them.
@@ -42,13 +66,10 @@ Critical output rules (NEVER break these):
 Important rules:
 - Always format links as markdown: [Item Name](/type/slug)
 - When presenting search results, show name, key details, and price
-- For car bookings you need: carId, startDate, endDate, pickupLocation
-- For villa bookings you need: villaId, checkIn, checkOut, guests
-- For event bookings you need: firstName, email, bookingDate, and optionally eventId, phone, guestsTotal, budget
-- When booking, let the user know it's been booked and they'll hear from the team
 - Keep responses concise and luxury-feeling
 - If you don't find results, suggest alternatives or ask them to adjust criteria
 - You can search multiple times with different criteria if needed`
+}
 
 const tools = [
   {
@@ -103,63 +124,41 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "book_car",
-      description: "Book a car rental for the customer. Use this when the customer confirms they want to book a specific car.",
+      name: "check_availability",
+      description: "Check if a car, villa, or event venue is available for specific dates. Always use this before creating a booking.",
       parameters: {
         type: "object",
         properties: {
-          carId: { type: "string", description: "The car ID to book" },
-          startDate: { type: "string", description: "Rental start date (YYYY-MM-DD)" },
-          endDate: { type: "string", description: "Rental end date (YYYY-MM-DD)" },
-          pickupLocation: { type: "string", description: "Pickup location/address" },
-          customerName: { type: "string", description: "Customer's name" },
-          customerEmail: { type: "string", description: "Customer's email" },
-          notes: { type: "string", description: "Any special requests" },
+          itemType: { type: "string", enum: ["car", "villa", "event"], description: "Type of item to check" },
+          itemId: { type: "string", description: "The ID of the car, villa, or event" },
+          startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date (YYYY-MM-DD)" },
         },
-        required: ["carId", "startDate", "endDate", "pickupLocation"],
+        required: ["itemType", "itemId", "startDate", "endDate"],
       },
     },
   },
   {
     type: "function",
     function: {
-      name: "book_villa",
-      description: "Book a villa stay for the customer. Use this when the customer confirms they want to book a specific villa.",
+      name: "create_mark_booking",
+      description: "Create a booking for the customer after agreeing on price and deposit. You MUST collect customerName, customerEmail, and agree on totalPrice and depositAmount before calling this.",
       parameters: {
         type: "object",
         properties: {
-          villaId: { type: "string", description: "The villa ID to book" },
-          checkIn: { type: "string", description: "Check-in date (YYYY-MM-DD)" },
-          checkOut: { type: "string", description: "Check-out date (YYYY-MM-DD)" },
-          guests: { type: "number", description: "Number of guests" },
-          customerName: { type: "string", description: "Customer's name" },
-          customerEmail: { type: "string", description: "Customer's email" },
-          notes: { type: "string", description: "Any special requests" },
+          itemType: { type: "string", enum: ["car", "villa", "event"], description: "Type of booking" },
+          itemId: { type: "string", description: "The ID of the car, villa, or event" },
+          startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date (YYYY-MM-DD)" },
+          customerName: { type: "string", description: "Customer's full name" },
+          customerEmail: { type: "string", description: "Customer's email address" },
+          customerPhone: { type: "string", description: "Customer's phone number" },
+          guests: { type: "number", description: "Number of guests (for villas/events)" },
+          totalPrice: { type: "number", description: "Agreed total price in USD" },
+          depositAmount: { type: "number", description: "Agreed deposit amount in USD" },
+          notes: { type: "string", description: "Special requests or notes" },
         },
-        required: ["villaId", "checkIn", "checkOut"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "book_event",
-      description: "Book an event/venue for the customer. Use this when the customer confirms they want to book an event.",
-      parameters: {
-        type: "object",
-        properties: {
-          eventId: { type: "string", description: "The event ID (optional)" },
-          firstName: { type: "string", description: "Customer's first name" },
-          lastName: { type: "string", description: "Customer's last name" },
-          email: { type: "string", description: "Customer's email" },
-          phone: { type: "string", description: "Customer's phone" },
-          bookingDate: { type: "string", description: "Event date (YYYY-MM-DD)" },
-          guestsTotal: { type: "string", description: "Number of guests" },
-          budget: { type: "string", description: "Budget range" },
-          clubVenue: { type: "string", description: "Venue name" },
-          specialRequests: { type: "string", description: "Any special requests" },
-        },
-        required: ["firstName", "email", "bookingDate"],
+        required: ["itemType", "itemId", "startDate", "endDate", "customerName", "customerEmail", "totalPrice", "depositAmount"],
       },
     },
   },
@@ -272,123 +271,145 @@ async function searchEvents(params: any) {
   }))
 }
 
-async function bookCar(params: any) {
-  const car = await prisma.car.findUnique({ where: { id: params.carId } })
-  if (!car) return { error: "Car not found" }
+async function checkAvailability(params: any) {
+  const { itemType, itemId, startDate, endDate } = params
+  const start = new Date(startDate)
+  const end = new Date(endDate)
 
-  const start = new Date(params.startDate)
-  const end = new Date(params.endDate)
-  const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-  if (days < car.minRentalDays) return { error: `Minimum rental is ${car.minRentalDays} days` }
+  const conflicts: string[] = []
 
-  let discount = 0
-  if (days >= 28) discount = 0.4
-  else if (days >= 7) discount = 0.15
-  const totalPrice = car.pricePerDay * days * (1 - discount)
-
-  // Find or create a placeholder user for Mark bookings
-  let user = await prisma.user.findFirst({ where: { email: "mark-ai@vidivici.com" } })
-  if (!user) {
-    user = await prisma.user.create({
-      data: { email: "mark-ai@vidivici.com", name: "Mark AI Assistant", password: "not-a-real-login", role: "USER" },
+  if (itemType === "car") {
+    const existingBookings = await prisma.booking.findMany({
+      where: {
+        carId: itemId,
+        status: { not: "CANCELLED" },
+        OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
+      },
+      select: { startDate: true, endDate: true },
     })
+    const markBookings = await prisma.markBooking.findMany({
+      where: {
+        carId: itemId,
+        workflowStatus: { notIn: ["closed", "cancelled"] },
+        OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
+      },
+      select: { startDate: true, endDate: true },
+    })
+    existingBookings.forEach((b) => conflicts.push(`Booked ${b.startDate.toISOString().split("T")[0]} to ${b.endDate.toISOString().split("T")[0]}`))
+    markBookings.forEach((b) => conflicts.push(`Reserved ${b.startDate.toISOString().split("T")[0]} to ${b.endDate.toISOString().split("T")[0]}`))
+  } else if (itemType === "villa") {
+    const existingBookings = await prisma.villaBooking.findMany({
+      where: {
+        villaId: itemId,
+        status: { not: "CANCELLED" },
+        OR: [{ checkIn: { lte: end }, checkOut: { gte: start } }],
+      },
+      select: { checkIn: true, checkOut: true },
+    })
+    const markBookings = await prisma.markBooking.findMany({
+      where: {
+        villaId: itemId,
+        workflowStatus: { notIn: ["closed", "cancelled"] },
+        OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
+      },
+      select: { startDate: true, endDate: true },
+    })
+    existingBookings.forEach((b) => conflicts.push(`Booked ${b.checkIn.toISOString().split("T")[0]} to ${b.checkOut.toISOString().split("T")[0]}`))
+    markBookings.forEach((b) => conflicts.push(`Reserved ${b.startDate.toISOString().split("T")[0]} to ${b.endDate.toISOString().split("T")[0]}`))
+  } else if (itemType === "event") {
+    const markBookings = await prisma.markBooking.findMany({
+      where: {
+        eventId: itemId,
+        workflowStatus: { notIn: ["closed", "cancelled"] },
+        OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
+      },
+      select: { startDate: true, endDate: true },
+    })
+    markBookings.forEach((b) => conflicts.push(`Reserved ${b.startDate.toISOString().split("T")[0]} to ${b.endDate.toISOString().split("T")[0]}`))
   }
 
-  const booking = await prisma.booking.create({
-    data: {
-      userId: user.id,
-      carId: params.carId,
-      startDate: start,
-      endDate: end,
-      pickupLocation: params.pickupLocation,
-      dropoffLocation: params.pickupLocation,
-      totalPrice,
-      notes: `Booked by MARK | Customer: ${params.customerName || "N/A"} | Email: ${params.customerEmail || "N/A"} | ${params.notes || ""}`.trim(),
-    },
-    include: { car: { include: { brand: true } } },
-  })
-
-  return {
-    success: true,
-    bookingId: booking.id,
-    bookingNumber: booking.bookingNumber,
-    car: `${booking.car.brand.name} ${booking.car.name}`,
-    dates: `${params.startDate} to ${params.endDate}`,
-    totalPrice,
-    days,
-    discount: discount > 0 ? `${Math.round(discount * 100)}% off` : "none",
-  }
+  return { available: conflicts.length === 0, conflicts }
 }
 
-async function bookVilla(params: any) {
-  const villa = await prisma.villa.findUnique({ where: { id: params.villaId } })
-  if (!villa) return { error: "Villa not found" }
+async function createMarkBooking(params: any) {
+  const { itemType, itemId, startDate, endDate, customerName, customerEmail, customerPhone, guests, totalPrice, depositAmount, notes } = params
 
-  const start = new Date(params.checkIn)
-  const end = new Date(params.checkOut)
-  const nights = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
-  const nightsTotal = villa.pricePerNight * nights
-  const subtotal = nightsTotal + villa.cleaningFee
-  const taxSetting = await prisma.siteSettings.findUnique({ where: { key: "villaTaxPercent" } })
-  const villaTaxRate = (parseFloat(taxSetting?.value ?? "") || DEFAULT_VILLA_TAX) / 100
-  const tax = subtotal * villaTaxRate
-  const totalPrice = subtotal + tax + villa.securityDeposit
+  let itemName = ""
+  const itemWhere: any = {}
 
-  let user = await prisma.user.findFirst({ where: { email: "mark-ai@vidivici.com" } })
-  if (!user) {
-    user = await prisma.user.create({
-      data: { email: "mark-ai@vidivici.com", name: "Mark AI Assistant", password: "not-a-real-login", role: "USER" },
-    })
+  if (itemType === "car") {
+    const car = await prisma.car.findUnique({ where: { id: itemId }, include: { brand: true } })
+    if (!car) return { error: "Car not found" }
+    itemName = `${car.brand.name} ${car.name}`
+    itemWhere.carId = itemId
+  } else if (itemType === "villa") {
+    const villa = await prisma.villa.findUnique({ where: { id: itemId } })
+    if (!villa) return { error: "Villa not found" }
+    itemName = villa.name
+    itemWhere.villaId = itemId
+  } else if (itemType === "event") {
+    const event = await prisma.event.findUnique({ where: { id: itemId } })
+    if (!event) return { error: "Event not found" }
+    itemName = event.name
+    itemWhere.eventId = itemId
+  } else {
+    return { error: "Invalid item type" }
   }
 
-  const booking = await prisma.villaBooking.create({
+  const bookingNumber = `MK-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+  const depositPaymentToken = crypto.randomUUID()
+  const wireProofToken = crypto.randomUUID()
+  const balanceDue = totalPrice - depositAmount
+
+  const booking = await prisma.markBooking.create({
     data: {
-      userId: user.id,
-      villaId: params.villaId,
-      checkIn: start,
-      checkOut: end,
-      guests: params.guests || 1,
+      bookingNumber,
+      itemType,
+      ...itemWhere,
+      itemName,
+      customerName,
+      customerEmail,
+      customerPhone: customerPhone || null,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      guests: guests || null,
       totalPrice,
-      notes: `Booked by MARK | Customer: ${params.customerName || "N/A"} | Email: ${params.customerEmail || "N/A"} | ${params.notes || ""}`.trim(),
+      depositAmount,
+      balanceDue,
+      notes: notes || null,
+      workflowStatus: "booking_ready",
+      depositPaymentToken,
+      wireProofToken,
+      activityLog: JSON.stringify([{ action: "Booking created by Mark AI", timestamp: new Date().toISOString() }]),
     },
-    include: { villa: true },
   })
+
+  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
+  const depositLink = `${baseUrl}/mark/pay?token=${depositPaymentToken}`
+
+  await notifyAdmin(
+    `New Mark AI Booking — ${itemName}`,
+    `<h2>New Booking Created by Mark AI</h2>
+    <p><strong>Booking #:</strong> ${bookingNumber}</p>
+    <p><strong>Customer:</strong> ${customerName} (${customerEmail})</p>
+    <p><strong>Item:</strong> ${itemName} (${itemType})</p>
+    <p><strong>Dates:</strong> ${startDate} to ${endDate}</p>
+    <p><strong>Total Price:</strong> $${totalPrice.toLocaleString()}</p>
+    <p><strong>Deposit:</strong> $${depositAmount.toLocaleString()}</p>
+    <p><strong>Special Requests:</strong> ${notes || "None"}</p>
+    <p><a href="${baseUrl}/admin/mark-bookings/${booking.id}">View in Admin →</a></p>`
+  ).catch(console.error)
 
   return {
     success: true,
-    bookingId: booking.id,
-    bookingNumber: booking.bookingNumber,
-    villa: booking.villa.name,
-    dates: `${params.checkIn} to ${params.checkOut}`,
-    nights,
+    bookingNumber,
+    itemName,
+    dates: `${startDate} to ${endDate}`,
     totalPrice,
-  }
-}
-
-async function bookEvent(params: any) {
-  const booking = await prisma.eventBooking.create({
-    data: {
-      eventId: params.eventId || null,
-      firstName: params.firstName,
-      lastName: params.lastName || null,
-      email: params.email,
-      phone: params.phone || null,
-      clubVenue: params.clubVenue || null,
-      bookingDate: new Date(params.bookingDate),
-      guestsTotal: params.guestsTotal || null,
-      budget: params.budget || null,
-      specialRequests: params.specialRequests
-        ? `Booked by MARK | ${params.specialRequests}`
-        : "Booked by MARK",
-    },
-    include: { event: true },
-  })
-
-  return {
-    success: true,
-    bookingId: booking.id,
-    event: booking.event?.name || params.clubVenue || "Custom Event",
-    date: params.bookingDate,
+    depositAmount,
+    balanceDue,
+    depositLink,
+    message: `Booking ${bookingNumber} created. Share this deposit payment link with the customer: ${depositLink}`,
   }
 }
 
@@ -397,9 +418,8 @@ async function executeTool(name: string, args: any) {
     case "search_cars": return await searchCars(args)
     case "search_villas": return await searchVillas(args)
     case "search_events": return await searchEvents(args)
-    case "book_car": return await bookCar(args)
-    case "book_villa": return await bookVilla(args)
-    case "book_event": return await bookEvent(args)
+    case "check_availability": return await checkAvailability(args)
+    case "create_mark_booking": return await createMarkBooking(args)
     default: return { error: "Unknown tool" }
   }
 }
@@ -474,7 +494,7 @@ export async function POST(request: NextRequest) {
     }
 
     const groqMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: getSystemPrompt() },
       ...messages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
     ]
 
@@ -500,9 +520,10 @@ export async function POST(request: NextRequest) {
             continue
           }
           if (!r.ok) {
-            const err = await r.text()
-            console.error("Groq error:", r.status, err)
-            return null
+            const errText = await r.text()
+            console.error("Groq error:", r.status, errText)
+            // Return parsed error for tool_use_failed handling
+            try { return JSON.parse(errText) } catch { return null }
           }
           return await r.json()
         } catch (err: any) {
@@ -532,6 +553,14 @@ export async function POST(request: NextRequest) {
     }
 
     let data = await callGroq(groqBody)
+
+    // If Groq returns a tool_use_failed error, retry without tools
+    if (data?.error?.code === "tool_use_failed") {
+      console.warn("Groq tool_use_failed, retrying without tools")
+      const fallbackBody = { ...groqBody, tools: undefined, tool_choice: undefined }
+      data = await callGroq(fallbackBody)
+    }
+
     if (!data || !data.choices?.[0]?.message) {
       return NextResponse.json({ error: "AI service unavailable" }, { status: 503 })
     }

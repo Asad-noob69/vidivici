@@ -115,6 +115,7 @@ model Car {
   images           CarImage[]
   bookings         Booking[]
   wishlist         Wishlist[]
+  markBookings     MarkBooking[]
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 }
@@ -300,6 +301,7 @@ model Villa {
   images           VillaImage[]
   villaBookings    VillaBooking[]
   wishlist         Wishlist[]
+  markBookings     MarkBooking[]
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 }
@@ -377,6 +379,7 @@ model Event {
   images           EventImage[]
   bookings         EventBooking[]
   wishlist         Wishlist[]
+  markBookings     MarkBooking[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
@@ -439,4 +442,44 @@ model Coupon {
   expiresAt     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model MarkBooking {
+  id                   String    @id @default(cuid())
+  bookingNumber        String    @unique
+  itemType             String
+  carId                String?
+  car                  Car?      @relation(fields: [carId], references: [id])
+  villaId              String?
+  villa                Villa?    @relation(fields: [villaId], references: [id])
+  eventId              String?
+  event                Event?    @relation(fields: [eventId], references: [id])
+  itemName             String
+  customerName         String
+  customerEmail        String
+  customerPhone        String?
+  startDate            DateTime
+  endDate              DateTime
+  guests               Int?
+  totalPrice           Float
+  depositAmount        Float
+  balanceDue           Float
+  balanceDueDate       DateTime?
+  notes                String?   @db.Text
+  adminNotes           String?   @db.Text
+  workflowStatus       String    @default("booking_ready")
+  depositPaid          Boolean   @default(false)
+  depositPaymentToken  String?   @unique
+  paypalOrderId        String?
+  paypalCaptureId      String?
+  depositPaidAt        DateTime?
+  wireProofToken       String?   @unique
+  wireProofUrl         String?
+  wireProofUploadedAt  DateTime?
+  ownerConfirmedAt     DateTime?
+  ownerNotes           String?   @db.Text
+  activityLog          String?   @db.Text
+  chatSessionId        String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }

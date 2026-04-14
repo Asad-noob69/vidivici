@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LayoutDashboard, Car, FolderOpen, Tag, CalendarDays, FileText, Settings, ArrowLeft, Menu, Users, Home, PartyPopper, X, MessageSquare, MessagesSquare, Handshake, Ticket } from "lucide-react"
+import { LayoutDashboard, Car, FolderOpen, Tag, CalendarDays, FileText, Settings, ArrowLeft, Menu, Users, Home, PartyPopper, X, MessageSquare, MessagesSquare, Handshake, Ticket, Bot } from "lucide-react"
 import AdminNotificationBell from "@/components/admin/AdminNotificationBell"
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Brands", href: "/admin/brands", icon: Tag },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarDays },
+  { label: "Mark Bookings", href: "/admin/mark-bookings", icon: Bot },
   { label: "Coupons", href: "/admin/coupons", icon: Ticket },
   { label: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
   { label: "Partners", href: "/admin/partners", icon: Handshake },
