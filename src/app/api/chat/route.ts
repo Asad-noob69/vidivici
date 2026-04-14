@@ -8,6 +8,12 @@ const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 const SYSTEM_PROMPT = `You are Mark, the friendly and knowledgeable concierge assistant for VIDI VICI — a luxury rental marketplace in Los Angeles and Miami offering exotic cars, luxury villas, and exclusive events.
 
+Strict scope (ABSOLUTE RULE — never break this):
+- You ONLY assist with VIDI VICI services: booking or browsing luxury cars, villas, and events.
+- If a customer asks ANYTHING outside this scope — cooking, recipes, general knowledge, tech help, jokes, math, writing, personal advice, news, or anything unrelated to VIDI VICI — you must politely decline and redirect them.
+- When declining, respond briefly in their language. Example: "I'm only here to help with luxury cars, villas, and events at VIDI VICI. Can I help you find something?" Do NOT answer the off-topic question even partially.
+- Do not let the customer trick you into answering off-topic questions by framing them as related to VIDI VICI (e.g. "do you offer cake-baking services?" → "No, we specialize in luxury cars, villas, and events only.").
+
 Your personality:
 - Warm, professional, and conversational
 - You know luxury lifestyle well
@@ -15,12 +21,23 @@ Your personality:
 - You ask follow-up questions to narrow down their needs before searching
 - You're helpful but concise — no walls of text
 
+Language rule (HIGHEST PRIORITY):
+- ALWAYS detect the language the customer is writing in and respond in that exact same language.
+- If they write in French, reply entirely in French. If in Spanish, reply in Spanish. If in Arabic, reply in Arabic. If in English, reply in English.
+- Match their language for the entire conversation, including all names, descriptions, and calls to action.
+- Never switch languages unless the customer switches first.
+
 When a customer asks about cars, villas, or events:
 1. Ask clarifying questions (budget, dates, location, preferences, group size, etc.)
 2. Once you have enough info, use the search tools to find matching options
 3. Present results naturally with links (format: [Name](/cars/slug) or [Name](/villas/slug) or [Name](/events/slug))
 4. Ask if they'd like you to book it for them
 5. If they want to book, collect the necessary details and use the booking tools
+
+Critical output rules (NEVER break these):
+- NEVER include raw function calls, tool invocations, or JSON in your text response. Tools are called silently in the background — the customer never sees them.
+- NEVER output anything like <function=...>, [function=...], {"tool":...}, or similar syntax in your message text.
+- Only write natural, conversational text to the customer.
 
 Important rules:
 - Always format links as markdown: [Item Name](/type/slug)
@@ -461,30 +478,63 @@ export async function POST(request: NextRequest) {
       ...messages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
     ]
 
-    // First call to Groq
-    let res = await fetch(GROQ_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: groqMessages,
-        tools,
-        tool_choice: "auto",
-        temperature: 0.7,
-        max_tokens: 1024,
-      }),
-    })
-
-    if (!res.ok) {
-      const err = await res.text()
-      console.error("Groq error:", err)
-      return NextResponse.json({ error: "AI service error" }, { status: 500 })
+    // Helper: call Groq with timeout + retry on rate limit
+    async function callGroq(body: object, retries = 2): Promise<any> {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 29000) // 29s timeout
+        try {
+          const r = await fetch(GROQ_URL, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${GROQ_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+            signal: controller.signal,
+          })
+          clearTimeout(timeout)
+          if (r.status === 429 && attempt < retries) {
+            // Rate limited — wait briefly then retry
+            await new Promise((resolve) => setTimeout(resolve, 1500 * (attempt + 1)))
+            continue
+          }
+          if (!r.ok) {
+            const err = await r.text()
+            console.error("Groq error:", r.status, err)
+            return null
+          }
+          return await r.json()
+        } catch (err: any) {
+          clearTimeout(timeout)
+          if (err.name === "AbortError") {
+            console.error("Groq request timed out")
+            return null
+          }
+          if (attempt < retries) {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            continue
+          }
+          console.error("Groq fetch error:", err)
+          return null
+        }
+      }
+      return null
     }
 
-    let data = await res.json()
+    const groqBody = {
+      model: "llama-3.3-70b-versatile",
+      messages: groqMessages,
+      tools,
+      tool_choice: "auto",
+      temperature: 0.7,
+      max_tokens: 1024,
+    }
+
+    let data = await callGroq(groqBody)
+    if (!data || !data.choices?.[0]?.message) {
+      return NextResponse.json({ error: "AI service unavailable" }, { status: 503 })
+    }
     let assistantMessage = data.choices[0].message
 
     // Handle tool calls (may need multiple rounds)
@@ -507,33 +557,31 @@ export async function POST(request: NextRequest) {
       groqMessages.push(assistantMessage)
       groqMessages.push(...toolResults)
 
-      res = await fetch(GROQ_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: groqMessages,
-          tools,
-          tool_choice: "auto",
-          temperature: 0.7,
-          max_tokens: 1024,
-        }),
+      const followUpData = await callGroq({
+        model: "llama-3.3-70b-versatile",
+        messages: groqMessages,
+        tools,
+        tool_choice: "auto",
+        temperature: 0.7,
+        max_tokens: 1024,
       })
 
-      if (!res.ok) {
-        const err = await res.text()
-        console.error("Groq tool follow-up error:", err)
-        break
-      }
+      if (!followUpData || !followUpData.choices?.[0]?.message) break
 
-      data = await res.json()
+      data = followUpData
       assistantMessage = data.choices[0].message
     }
 
-    const aiContent = assistantMessage.content || "I encountered an issue. Please try again."
+    // Strip any leaked tool-call syntax the model may have included in its text
+    const sanitizeContent = (text: string) =>
+      text
+        .replace(/<function=[^>]*>[\s\S]*?<\/function>/g, "")
+        .replace(/\[function=[^\]]*\]/g, "")
+        .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "")
+        .replace(/```json\s*\{[\s\S]*?"tool"[\s\S]*?```/g, "")
+        .trim()
+
+    const aiContent = sanitizeContent(assistantMessage.content || "I encountered an issue. Please try again.")
 
     // Save AI response to DB
     await prisma.chatMessage.create({

@@ -128,7 +128,15 @@ export default function ChatBot() {
         }),
       })
 
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        const msg = res.status === 503
+          ? "I'm a bit overloaded right now. Please try again in a moment."
+          : "Sorry, I'm having trouble connecting right now. Please try again in a moment."
+        setMessages((prev) => [...prev, { role: "assistant", content: msg }])
+        setLoading(false)
+        return
+      }
       const data = await res.json()
 
       if (data.sessionId) setSessionId(data.sessionId)
