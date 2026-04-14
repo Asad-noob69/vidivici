@@ -39,6 +39,29 @@ export default function ChatBot() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const pollRef = useRef<NodeJS.Timeout | null>(null)
 
+  const startNewConversation = useCallback(async () => {
+    setMessages([GREETING])
+    setPaused(false)
+    setInput("")
+
+    if (userId) {
+      try {
+        const response = await fetch("/api/chat/sessions/new", { method: "POST" })
+        const data = await response.json()
+        if (data.success && data.sessionId) {
+          setSessionId(data.sessionId)
+        } else {
+          setSessionId(null)
+        }
+      } catch (error) {
+        console.error("Failed to create new session:", error)
+        setSessionId(null)
+      }
+    } else {
+      setSessionId(null)
+    }
+  }, [userId])
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -214,9 +237,20 @@ export default function ChatBot() {
                 </p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-mist-400 hover:text-white">
-              <X size={18} />
-            </button>
+            <div className="flex items-center gap-2">
+              {userId && messages.length > 1 && (
+                <button
+                  onClick={startNewConversation}
+                  className="text-mist-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-mist-800"
+                  title="Start new conversation"
+                >
+                  New Chat
+                </button>
+              )}
+              <button onClick={() => setOpen(false)} className="text-mist-400 hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           {/* Paused banner */}
@@ -238,7 +272,7 @@ export default function ChatBot() {
           {userId && historyLoaded && messages.length > 1 && !historyLoading && (
             <div className="bg-amber-50 border-b border-amber-100 px-4 py-2 text-xs text-amber-700 flex-shrink-0 flex items-center gap-2">
               <History size={12} />
-              Your previous conversation has been restored.
+              Continuing your conversation.
             </div>
           )}
 
