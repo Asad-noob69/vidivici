@@ -1,19 +1,44 @@
 "use client"
 
 import Banner from "@/components/ui/Banner"
-import ExoticCarRentals from "@/components/cars/ExoticCarRentals"
-import WhyChooseUs from "@/components/home/WhyChooseUs"
-import Reviews from "@/components/home/Reviews"
 import FAQ from "@/components/home/FAQ"
 import Contact from "@/components/home/Contact"
 import CarBrowse from "@/components/home/CarBrowse"
-import HowItWorks from "@/components/ui/HowItWorks"
+import { CircleCheckBig } from "lucide-react"
 
 const steps = [
-    { number: 1, title: "Sign Up", description: "Fill out our partner application form.", position: "top" },
-    { number: 2, title: "Verify & Approve", description: "Our team reviews and approves your asset.", position: "bottom" },
-    { number: 3, title: "List & Manage", description: "Upload your cars, villas, clubs, or events.", position: "top" },
-    { number: 4, title: "Earn Revenue", description: "Start receiving bookings from high-end clients.", position: "bottom" },
+    { number: 1, title: "Submit Your Request", description: "Share your claim details or contact us directly to begin your booking.", position: "top" },
+    { number: 2, title: "Select Your Replacement Vehicle", description: "Choose your preferred model from our luxury fleet.", position: "bottom" },
+    { number: 3, title: "We Handle the Coordination", description: "Our specialists liaise with your insurer and confirm your eligibility.", position: "top" },
+    { number: 4, title: "We Deliver to Your Doorstep", description: "Your car arrives ready to drive — and prepared to perfection.", position: "bottom" },
+];
+
+const features = [
+  {
+    title: "Fast Delivery",
+    description:
+      "Same-day or next-day replacements available.",
+  },
+  {
+    title: "Luxury Fleet",
+    description:
+      "Premium brands for every need and policy type.",
+  },
+  {
+    title: "Insurance Assistance",
+    description:
+      "We manage coordination with insurers.",
+  },
+  {
+    title: "Flexible Terms",
+    description:
+      "Short- or long-term replacement options.",
+  },
+  {
+    title: "Personal Support",
+    description:
+      "Our concierge team is available 24/7.",
+  },
 ];
 
 export default function InsurancePage() {
@@ -51,23 +76,16 @@ export default function InsurancePage() {
               {/* Top full-width image */}
               <div className="col-span-2 rounded-xl 2xl:rounded-2xl overflow-hidden h-48 sm:h-56 2xl:h-72 bg-mist-200">
                 <img
-                  src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80"
+                  src="/insurance1.png"
                   alt="Luxury car interior"
                   className="w-full h-full object-cover"
                 />
               </div>
               {/* Bottom two images */}
-              <div className="rounded-xl 2xl:rounded-2xl overflow-hidden h-36 sm:h-44 2xl:h-56 bg-mist-200">
+              <div className="col-span-2 rounded-xl 2xl:rounded-2xl overflow-hidden h-48 sm:h-56 2xl:h-72 bg-mist-200">
                 <img
-                  src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80"
-                  alt="Luxury SUV exterior"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="rounded-xl 2xl:rounded-2xl overflow-hidden h-36 sm:h-44 2xl:h-56 bg-mist-200">
-                <img
-                  src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80"
-                  alt="Luxury sedan"
+                  src="/insurance2.png"
+                  alt="Luxury car interior"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -102,14 +120,14 @@ export default function InsurancePage() {
               {/* Top two images */}
               <div className="rounded-xl 2xl:rounded-2xl overflow-hidden h-40 sm:h-48 2xl:h-60 bg-mist-200">
                 <img
-                  src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=400&q=80"
+                  src="/insurance3.png"
                   alt="Luxury car side"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="rounded-xl 2xl:rounded-2xl overflow-hidden h-40 sm:h-48 2xl:h-60 bg-mist-200">
                 <img
-                  src="https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=400&q=80"
+                  src="/insurance4.png"
                   alt="Luxury car interior"
                   className="w-full h-full object-cover"
                 />
@@ -117,7 +135,7 @@ export default function InsurancePage() {
               {/* Bottom full-width image */}
               <div className="col-span-2 rounded-xl 2xl:rounded-2xl overflow-hidden h-44 sm:h-52 2xl:h-96 bg-mist-200">
                 <img
-                  src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80"
+                  src="/insurance5.png"
                   alt="Luxury estate"
                   className="w-full h-full object-cover"
                 />
@@ -212,20 +230,20 @@ export default function InsurancePage() {
                             1
                         </div>
                         <div className="mt-4">
-                            <p className="font-semibold text-gray-900 text-sm sm:text-base">Sign Up</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base">{steps[0].title}</p>
                             <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
-                                Fill out our partner application form.
+                                {steps[0].description}
                             </p>
                         </div>
                     </div>
 
                     {/* Step 2 — right, at ~140px from top (circle center) */}
-                    <div className="absolute right-0 w-1/2 flex flex-col items-center text-center px-4" style={{ top: "34px" }}>
+                    <div className="absolute right-0 w-1/2 flex flex-col items-center text-center px-4" style={{ top: "-10px" }}>
                         <div className="mb-4">
                             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                                Our team reviews and approves your asset.
+                                {steps[1].description}
                             </p>
-                            <p className="font-semibold text-gray-900 text-sm sm:text-base mt-2">Verify &amp; Approve</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base mt-2">{steps[1].title}</p>
                         </div>
                         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-base font-bold shadow-md shrink-0">
                             2
@@ -238,20 +256,20 @@ export default function InsurancePage() {
                             3
                         </div>
                         <div className="mt-4">
-                            <p className="font-semibold text-gray-900 text-sm sm:text-base">List &amp; Manage</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base">{steps[2].title}</p>
                             <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
-                                Upload your cars, villas, clubs, or events.
+                                {steps[2].description}
                             </p>
                         </div>
                     </div>
 
                     {/* Step 4 — right, at ~370px from top (circle center) */}
-                    <div className="absolute right-0 w-1/2 flex flex-col items-center text-center px-4" style={{ top: "260px" }}>
+                    <div className="absolute right-0 w-1/2 flex flex-col items-center text-center px-4" style={{ top: "230px" }}>
                         <div className="mb-4">
                             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                                Start receiving bookings from high-end clients.
+                                {steps[3].description}
                             </p>
-                            <p className="font-semibold text-gray-900 text-sm sm:text-base mt-2">Earn Revenue</p>
+                            <p className="font-semibold text-gray-900 text-sm sm:text-base mt-2">{steps[3].title}</p>
                         </div>
                         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-900 text-white flex items-center justify-center text-base font-bold shadow-md shrink-0">
                             4
@@ -285,9 +303,9 @@ export default function InsurancePage() {
 
             {/* Right: Image */}
             <div className="w-full lg:w-[620px] 2xl:w-[820px] flex-shrink-0">
-              <div className="rounded-2xl 2xl:rounded-3xl overflow-hidden w-full h-64 sm:h-72 lg:h-80 2xl:h-[420px] bg-mist-100">
+              <div className="rounded-2xl 2xl:rounded-3xl overflow-hidden w-full h-64 sm:h-80 lg:h-96 2xl:h-[475px] bg-mist-100">
                 <img
-                  src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80"
+                  src="/insurance6.png"
                   alt="Professional chauffeur in uniform"
                   className="w-full h-full object-cover object-top"
                 />
@@ -298,7 +316,60 @@ export default function InsurancePage() {
       </section>
 
 
-      <WhyChooseUs />
+       <section
+            /* Increased vertical padding to 2xl:py-64 to account for the massive 7k height */
+            className="w-full px-6 sm:px-16 lg:px-20 2xl:px-32 py-20 2xl:py-36 mt-24 2xl:mt-48 relative overflow-visible"
+            style={{ backgroundColor:  "#eeeeed"  }}
+          >
+            {/* Background Vectors - Scaled up for 2xl */}
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left pointer-events-none select-none rotate-180 "
+            />
+      
+            <img
+              src="/Vector 7.png"
+              alt=""
+              aria-hidden="true"
+              className="hidden md:block absolute right-0 top-0 h-full w-auto object-contain object-right pointer-events-none select-none scale-x-[-1] rotate-180 opacity-80"
+            />
+      
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-0 items-start">
+      
+              {/* Left: Heading + CTA */}
+              <div className="flex flex-col h-full gap-8 2xl:gap-16">
+                <div>
+                  <h2 className="text-4xl md:text-5xl 2xl:text-7xl font-bold text-mist-900 leading-tight tracking-tight">
+                    Why Choose Vidi Vici Insurance Replacements
+                  </h2>
+                  <p className="mt-4 2xl:mt-10 text-md 2xl:text-2xl text-mist-500 leading-relaxed 2xl:max-w-xl">
+                   Enjoy total peace of mind knowing you’re backed by efficiency, professionalism, and luxury every step of the way.
+                  </p>
+                </div>
+              </div>
+      
+              {/* Right: 2x2 Feature Grid */}
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-x-44 2xl:gap-x-64 2xl:gap-y-32 md:pl-44 2xl:pl-56 pt-14 sm:pt-0">
+                {features.map((f) => (
+                  <div key={f.title} className="flex flex-col gap-3 2xl:gap-8">
+                    {/* Scaled Icon Container */}
+                    <div className="w-9 h-9 2xl:w-14 2xl:h-14 bg-white rounded-xl 2xl:rounded-2xl flex items-center justify-center shadow-sm">
+                      <CircleCheckBig strokeWidth={2} className="text-mist-700 w-[18px] h-[18px] 2xl:w-7 2xl:h-7" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl 2xl:text-3xl font-bold text-mist-900 leading-snug">
+                      {f.title}
+                    </h3>
+                    <p className="text-md 2xl:text-2xl text-mist-500 leading-relaxed 2xl:max-w-md">
+                      {f.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+      
+            </div>
+          </section>
       <FAQ />
       <Contact />
     </div>

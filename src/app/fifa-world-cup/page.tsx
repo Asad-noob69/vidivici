@@ -131,15 +131,15 @@ function EventSlider() {
 /*  Gallery Bento Grid                                                 */
 /* ================================================================== */
 const GALLERY_IMAGES = [
-  { src: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600&q=80", alt: "FIFA World Cup Trophy" },
-  { src: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80", alt: "Stadium panorama" },
-  { src: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&q=80", alt: "Stadium roof interior" },
-  { src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80", alt: "Fans celebrating" },
-  { src: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80", alt: "Stadium crowd" },
-  { src: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600&q=80", alt: "Football field" },
-  { src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=600&q=80", alt: "Los Angeles Stadium" },
-  { src: "https://images.unsplash.com/photo-1486286701208-1d58e9338013?w=600&q=80", alt: "Trophy celebration" },
-  { src: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80", alt: "Stadium exterior night" },
+  { src: "/fifa2.png", alt: "FIFA World Cup Trophy" },
+  { src: "/fifa3.png", alt: "Stadium panorama" },
+  { src: "/fifa4.png", alt: "Stadium roof interior" },
+  { src: "/fifa5.png", alt: "Fans celebrating" },
+  { src: "/fifa6.png", alt: "Stadium crowd" },
+  { src: "/fifa7.png", alt: "Football field" },
+  { src: "/fifa9.png", alt: "Los Angeles Stadium" },
+  { src: "/fifa9.png", alt: "Trophy celebration" },
+  { src: "/fifa7.png", alt: "Stadium exterior night" },
 ]
 
 function GalleryBentoGrid() {
@@ -294,26 +294,62 @@ function GalleryBentoGrid() {
 /* ================================================================== */
 const HERO_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1400&q=80",
+    image: "/fifa-carousel.png",
     title: "Feel the Energy of LA × World Cup 2026",
     subtitle: "Matches, celebrations, nightlife — enjoy it all with seamless VIP services.",
   },
   {
-    image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1400&q=80",
+    image: "/fifa-carousel.png",
     title: "VIP Match Day Experiences",
     subtitle: "Premium seating, luxury transport & exclusive lounge access at every game.",
   },
   {
-    image: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1400&q=80",
+    image: "/fifa-carousel.png",
     title: "Luxury Stays for the World Stage",
     subtitle: "Private villas and penthouses minutes from the stadium.",
   },
   {
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1400&q=80",
+    image: "/fifa-carousel.png",
     title: "Celebrate Like a Champion",
     subtitle: "After-party planning, club reservations & bottle service — all arranged for you.",
   },
 ]
+
+const services = [
+  {
+    title: "Exotic Cars",
+    description:
+      "Unleash the thrill of the world's most powerful machines. From Lamborghinis to Rolls-Royces, your dream car is ready to be delivered to your door.",
+    image: "/pic3.png",
+    href: "/cars",
+  },
+  {
+    title: "Villas",
+    description:
+      "Stay in breathtaking LA properties with skyline views, infinity pools, and unmatched comfort. A home that defines prestige.",
+    image: "/pic2.png",
+    href: "/villas",
+  },
+  {
+    title: "Nightlife & Events",
+    description:
+      "Step into a world of exclusivity. From elite club access to personalized concierge services — we open the doors to unforgettable nights.",
+    image: "/pic1.png",
+    href: "/events",
+  },
+];
+
+const ArrowIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path
+      d="M3.5 12.5L12.5 3.5M12.5 3.5H6M12.5 3.5V10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 function BigImageSlider() {
   const [current, setCurrent] = useState(0);
@@ -358,7 +394,7 @@ function BigImageSlider() {
                 }`}
               >
                 {/* Card */}
-                <div className="relative h-[260px] sm:h-[380px] lg:h-[440px] 2xl:h-[560px] rounded-2xl sm:rounded-3xl 2xl:rounded-[2.5rem] overflow-hidden shadow-xl">
+                <div className="relative h-[260px] sm:h-[380px] lg:h-[440px] 2xl:h-[600px] rounded-2xl sm:rounded-3xl 2xl:rounded-[2.5rem] overflow-hidden shadow-xl">
                   <img
                     src={slide.image}
                     alt={slide.title}
@@ -377,16 +413,6 @@ function BigImageSlider() {
                     <p className="text-xs sm:text-sm lg:text-base 2xl:text-xl text-white/85 max-w-md font-medium">
                       {slide.subtitle}
                     </p>
-                  </div>
-
-                  {/* FIFA Badge */}
-                  <div className="absolute bottom-6 sm:bottom-10 2xl:bottom-14 right-6 sm:right-10 2xl:right-14">
-                    <img
-                      src="/fifa-logo.png"
-                      alt="FIFA 2026"
-                      loading="lazy"
-                      className="w-10 h-10 sm:w-12 sm:h-12 2xl:w-16 2xl:h-16 object-contain"
-                    />
                   </div>
                 </div>
               </div>
@@ -473,7 +499,7 @@ function FifaContent() {
             </div>
             <div className="rounded-2xl 2xl:rounded-3xl overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=700&q=80"
+                src="/fifa1.png"
                 alt="SoFi Stadium"
                 loading="lazy"
                 className="w-full h-[320px] 2xl:h-[550px] object-cover"
@@ -483,8 +509,75 @@ function FifaContent() {
         </div>
       </section>
       <div className="mt-24 2xl:mt-48">
-        <Services />
+     <section className="bg-[#f0f0ee] w-full py-16 2xl:py-24 sm:px-16 lg:px-20 px-6 2xl:px-32">
+      <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 2xl:gap-40 ">
 
+        {/* Left — heading + subtitle */}
+        <div className="w-full lg:w-64 2xl:w-96 shrink-0 lg:pt-6 2xl:pt-8 text-center lg:text-left">
+          <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold leading-tight text-mist-900 mb-5 2xl:mb-7 mx-auto lg:mx-0">
+            Our Luxury Services
+          </h2>
+          <p className="text-sm 2xl:text-xl text-mist-500 leading-relaxed font-normal max-w-xs mx-auto lg:mx-0">
+            Exotic cars, premium villas, and unforgettable nightlife – all curated for your ultimate comfort and style.
+          </p>
+        </div>
+
+        {/* Right — cards grid */}
+        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 2xl:gap-7">
+          {services.map((service) => (
+            <Link
+              key={service.title}
+              href={service.href}
+              className="group bg-white rounded-2xl overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+             {/* Image */}
+<div className="h-48 2xl:h-72 overflow-hidden relative">
+  <img
+    src={service.image}
+    alt={service.title}
+    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+  />
+
+  {/* Black overlay */}
+  <div className="absolute inset-0 bg-black/50" />
+
+  {/* FIFA logo overlay */}
+  <div className="absolute inset-0 flex items-center justify-center">
+    <img
+      src="/fifa-logo.png"
+      alt="FIFA 2026"
+      className="w-16 2xl:w-24 h-auto object-contain"
+    />
+  </div>
+</div>
+
+              {/* Body */}
+              <div className="p-5 2xl:p-7 flex flex-col flex-1">
+                <h3 className="text-base 2xl:text-2xl font-semibold text-mist-900 mb-2 2xl:mb-3">
+                  {service.title}
+                </h3>
+                <p className="text-sm 2xl:text-xl text-mist-500 leading-relaxed font-normal flex-1">
+                  {service.description}
+                </p>
+
+                {/* Footer */}
+                <div className="mt-5 2xl:mt-7 flex items-center justify-end">
+                  <span className="flex items-center gap-2 text-sm 2xl:text-lg group-hover:bg-mist-100 py-1 pr-2 pl-4 rounded-full text-mist-800 font-normal cursor-pointer transition-all duration-300">
+                    <span className="opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-mist-800">
+                      View Details
+                    </span>
+                    <span className="flex items-center justify-center w-8 h-8 2xl:w-11 2xl:h-11 rounded-full bg-mist-900 text-white">
+                      <ArrowIcon />
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+      </div>
+    </section>
       </div>
 
       {/* FIFA World Cup Fixtures Section */}
