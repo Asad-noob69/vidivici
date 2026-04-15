@@ -18,7 +18,7 @@ export async function GET() {
       include: {
         messages: {
           orderBy: { createdAt: 'desc' },
-          take: 15, // Only load last 15 messages for frontend display
+          take: 10, // Keep resumed chats lighter so older sessions do not overload Mark
         },
       },
     })

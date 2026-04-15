@@ -5,6 +5,8 @@ import crypto from "crypto"
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY!
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+const MAX_CONTEXT_MESSAGES = 12
+const MAX_CONTEXT_CHARS = 6000
 
 function getSystemPrompt() {
   const today = new Date().toISOString().split("T")[0]
@@ -78,7 +80,7 @@ Important rules:
 // Extract key context from conversation history to preserve important information
 function extractContextMemory(messages: any[]): string {
   let memory = ""
-  let customerInfo = { name: "", email: "", phone: "" }
+  const customerInfo = { name: "", email: "", phone: "" }
   let currentBookingInfo = ""
   let recentSearches = ""
 
@@ -123,6 +125,30 @@ function extractContextMemory(messages: any[]): string {
   }
 
   return memory
+}
+
+function trimConversation(messages: any[]) {
+  const recentMessages: any[] = []
+  let totalChars = 0
+
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i]
+    if (!msg?.content || !msg?.role) continue
+
+    const content = String(msg.content)
+    const nextTotal = totalChars + content.length
+    if (recentMessages.length >= MAX_CONTEXT_MESSAGES || nextTotal > MAX_CONTEXT_CHARS) {
+      break
+    }
+
+    recentMessages.unshift({
+      role: msg.role,
+      content,
+    })
+    totalChars = nextTotal
+  }
+
+  return recentMessages
 }
 
 const tools = [
@@ -491,6 +517,7 @@ async function executeTool(name: string, args: any) {
 export async function POST(request: NextRequest) {
   try {
     const { messages, sessionId, visitorId, userId } = await request.json()
+    const incomingMessages = Array.isArray(messages) ? messages : []
 
     // Get or create session
     let session: any = null
@@ -530,7 +557,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save the user's latest message
-    const latestUserMsg = messages[messages.length - 1]
+    const latestUserMsg = incomingMessages[incomingMessages.length - 1]
     if (latestUserMsg && latestUserMsg.role === "user") {
       await prisma.chatMessage.create({
         data: { sessionId: session.id, role: "user", content: latestUserMsg.content },
@@ -557,9 +584,11 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    const trimmedMessages = trimConversation(incomingMessages)
+
     const allMessages = [
       { role: "system", content: getSystemPrompt() },
-      ...messages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
+      ...trimmedMessages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
     ]
 
     // Smart context management with memory preservation
