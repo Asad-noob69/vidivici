@@ -46,24 +46,24 @@ const whyPartnerFeatures = [
 
 const whoCanJoin = [
     {
-        image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&q=80",
+        image: "/partner2.png",
         title: "Supercar Owners",
-        description: "List your exotic vehicles and earn premium returns.",
+        description: "Rent your exotic vehicles to verified clients",
     },
     {
-        image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80",
+        image: "/partner3.png",
         title: "Villa Owners",
-        description: "Showcase your exclusive properties to an elite audience.",
+        description: "Feature your premium properties for exclusive stays",
     },
     {
-        image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=600&q=80",
+        image: "/partner4.png",
         title: "Clubs & Venues",
-        description: "Connect with top clients, host events and private parties.",
+        description: "Get bookings from high-end events and private parties",
     },
     {
-        image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80",
+        image: "/partner5.png",
         title: "Event Hosts",
-        description: "Curate high-end events and experiences for a premium clientele.",
+        description: "List unique experiences for premium clientele",
     },
 ];
 
@@ -143,7 +143,7 @@ export default function PartnerPage() {
                     <div className="flex-1 w-full max-w-sm md:max-w-none">
                         <div className="rounded-2xl 2xl:rounded-[40px] overflow-hidden shadow-md aspect-[4/3]">
                             <img
-                                src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80"
+                                src="/partner1.png"
                                 alt="Business handshake"
                                 className="w-full h-full object-cover"
                             />
@@ -181,7 +181,7 @@ export default function PartnerPage() {
                                     <span className="2xl:scale-[1.5]">{f.icon}</span>
                                 </div>
                                 <h3 className="text-lg sm:text-xl 2xl:text-3xl font-bold text-mist-900">{f.title}</h3>
-                                <p className="text-base 2xl:text-2xl text-mist-400 leading-relaxed">{f.description}</p>
+                                <p className="text-base 2xl:text-2xl text-mist-500 leading-relaxed">{f.description}</p>
                             </div>
                         ))}
                     </div>
@@ -236,9 +236,9 @@ export default function PartnerPage() {
                                 />
 
                                 <div className="p-4 2xl:p-8">
-                                    <h3 className="text-lg 2xl:text-3xl font-bold text-mist-900">
+                                    <h2 className="text-lg 2xl:text-3xl font-bold text-mist-900">
                                         {item.title}
-                                    </h3>
+                                    </h2>
 
                                     <p className="text-base 2xl:text-2xl text-mist-500 mt-1 2xl:mt-4 leading-relaxed">
                                         {item.description}
