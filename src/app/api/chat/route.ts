@@ -5,6 +5,14 @@ import crypto from "crypto"
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY!
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+const MAX_CONTEXT_MESSAGES = 12
+const MAX_CONTEXT_CHARS = 6000
+const PRIMARY_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile"
+const FALLBACK_MODEL = process.env.GROQ_FALLBACK_MODEL || "llama-3.1-8b-instant"
+const PRIMARY_MAX_TOKENS = 900
+const FOLLOWUP_MAX_TOKENS = 700
+const FALLBACK_MAX_TOKENS = 500
+const MAX_TOOL_ROUNDS = 2
 
 function getSystemPrompt() {
   const today = new Date().toISOString().split("T")[0]
@@ -77,52 +85,137 @@ Important rules:
 
 // Extract key context from conversation history to preserve important information
 function extractContextMemory(messages: any[]): string {
-  let memory = ""
-  let customerInfo = { name: "", email: "", phone: "" }
+  const customerInfo = { name: "", email: "", phone: "" }
   let currentBookingInfo = ""
   let recentSearches = ""
+  let selectedItem = ""
+  let preferredLocation = ""
+  let requestedDates = ""
 
   // Look through messages for important information
   for (const msg of messages) {
-    const content = msg.content.toLowerCase()
+    const text = String(msg?.content || "")
+    if (!text) continue
+    const content = text.toLowerCase()
 
-    // Extract customer information
-    if (content.includes("name") && content.includes("email")) {
-      const nameMatch = msg.content.match(/name[:\s]+([a-zA-Z\s]+)/i)
-      const emailMatch = msg.content.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i)
-      if (nameMatch) customerInfo.name = nameMatch[1].trim()
-      if (emailMatch) customerInfo.email = emailMatch[1].trim()
+    // Extract customer name from common phrases.
+    const nameMatch =
+      text.match(/full name is\s+([a-z][a-z\s'-]{1,60})/i) ||
+      text.match(/my name is\s+([a-z][a-z\s'-]{1,60})/i) ||
+      text.match(/\bname is\s+([a-z][a-z\s'-]{1,60})/i)
+    if (nameMatch) {
+      customerInfo.name = nameMatch[1].trim().replace(/\s+/g, " ")
+    }
+
+    // Extract email from any message.
+    const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i)
+    if (emailMatch) {
+      customerInfo.email = emailMatch[1].trim()
     }
 
     // Extract phone numbers
-    const phoneMatch = msg.content.match(/(\+?[\d\s\-\(\)]{10,})/i)
+    const phoneMatch = text.match(/(\+?[\d\s\-\(\)]{10,})/i)
     if (phoneMatch && phoneMatch[1].replace(/\D/g, '').length >= 10) {
       customerInfo.phone = phoneMatch[1].trim()
     }
 
+    // Capture latest stated location.
+    if (content.includes("los angeles")) preferredLocation = "Los Angeles"
+    if (content.includes("miami")) preferredLocation = "Miami"
+
+    // Capture explicit or relative booking windows.
+    const dateRangeMatch = text.match(/(\d{4}-\d{2}-\d{2}).{0,20}(?:to|-).{0,20}(\d{4}-\d{2}-\d{2})/i)
+    if (dateRangeMatch) {
+      requestedDates = `${dateRangeMatch[1]} to ${dateRangeMatch[2]}`
+    } else if (content.includes("today") && (content.includes("30 days") || content.includes("next 30 days"))) {
+      requestedDates = "Start: today, Duration: 30 days"
+    }
+
+    // Capture selected item when user says "book this ...".
+    if (msg.role === "user") {
+      const selectedItemMatch = text.match(/(?:book|reserve)(?:\s+this)?\s+([a-z0-9][a-z0-9\s\-]{2,80})/i)
+      if (selectedItemMatch) {
+        const candidate = selectedItemMatch[1].trim().replace(/[.,!?]+$/, "")
+        if (!/for me|starting|from today|in los angeles|in miami|for next/i.test(candidate)) {
+          selectedItem = candidate
+        }
+      } else if (/\bsuv\b/i.test(content)) {
+        selectedItem = "SUV"
+      }
+    }
+
     // Detect booking confirmations or creation
     if (content.includes("booking") && (content.includes("created") || content.includes("mk-"))) {
-      currentBookingInfo = msg.content
+      currentBookingInfo = text
     }
 
     // Capture recent search context (last few car/villa/event mentions)
     if (msg.role === "assistant" && content.includes("[") && content.includes("](/")) {
-      recentSearches = msg.content // Keep the last assistant message with search results
+      recentSearches = text // Keep the last assistant message with search results
     }
   }
 
-  // Build memory string
+  const memoryLines: string[] = []
   if (customerInfo.name || customerInfo.email || customerInfo.phone) {
-    memory += `\nKnown Customer: ${customerInfo.name} (${customerInfo.email}) ${customerInfo.phone}`.trim()
+    memoryLines.push(`Known Customer: ${customerInfo.name} (${customerInfo.email}) ${customerInfo.phone}`.trim())
+  }
+  if (selectedItem) {
+    memoryLines.push(`Selected Item: ${selectedItem}`)
+  }
+  if (preferredLocation) {
+    memoryLines.push(`Preferred Location: ${preferredLocation}`)
+  }
+  if (requestedDates) {
+    memoryLines.push(`Requested Dates: ${requestedDates}`)
   }
   if (currentBookingInfo) {
-    memory += `\nActive Booking Context: ${currentBookingInfo.substring(0, 200)}...`
+    memoryLines.push(`Active Booking Context: ${currentBookingInfo.substring(0, 200)}...`)
   }
   if (recentSearches) {
-    memory += `\nRecent Search Results: ${recentSearches.substring(0, 300)}...`
+    memoryLines.push(`Recent Search Results: ${recentSearches.substring(0, 300)}...`)
   }
 
-  return memory
+  return memoryLines.join("\n")
+}
+
+function trimConversation(messages: any[]) {
+  const recentMessages: any[] = []
+  let totalChars = 0
+
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i]
+    if (!msg?.content || !msg?.role) continue
+
+    const content = String(msg.content)
+    const nextTotal = totalChars + content.length
+    if (recentMessages.length >= MAX_CONTEXT_MESSAGES || nextTotal > MAX_CONTEXT_CHARS) {
+      break
+    }
+
+    recentMessages.unshift({
+      role: msg.role,
+      content,
+    })
+    totalChars = nextTotal
+  }
+
+  return recentMessages
+}
+
+function parseRetryDelayMs(errorText: string, retryAfterHeader: string | null, attempt: number) {
+  const headerSeconds = retryAfterHeader ? Number(retryAfterHeader) : NaN
+  const headerMs = Number.isFinite(headerSeconds) ? headerSeconds * 1000 : 0
+
+  const bodyMatch = errorText.match(/try again in\s+([\d.]+)s/i)
+  const bodyMs = bodyMatch ? Math.ceil(Number(bodyMatch[1]) * 1000) : 0
+
+  const fallbackMs = 1500 * (attempt + 1)
+  return Math.max(headerMs, bodyMs, fallbackMs)
+}
+
+function isRateLimitError(data: any) {
+  const message = String(data?.error?.message || "").toLowerCase()
+  return data?.error?.code === "rate_limit_exceeded" || message.includes("rate limit")
 }
 
 const tools = [
@@ -491,6 +584,7 @@ async function executeTool(name: string, args: any) {
 export async function POST(request: NextRequest) {
   try {
     const { messages, sessionId, visitorId, userId } = await request.json()
+    const incomingMessages = Array.isArray(messages) ? messages : []
 
     // Get or create session
     let session: any = null
@@ -530,7 +624,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save the user's latest message
-    const latestUserMsg = messages[messages.length - 1]
+    const latestUserMsg = incomingMessages[incomingMessages.length - 1]
     if (latestUserMsg && latestUserMsg.role === "user") {
       await prisma.chatMessage.create({
         data: { sessionId: session.id, role: "user", content: latestUserMsg.content },
@@ -557,29 +651,16 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const allMessages = [
-      { role: "system", content: getSystemPrompt() },
-      ...messages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
+    const trimmedMessages = trimConversation(incomingMessages)
+    const contextMemory = extractContextMemory(incomingMessages)
+    const systemPrompt = contextMemory
+      ? `${getSystemPrompt()}\n\nPersisted booking context (use this unless user corrects it):\n${contextMemory}`
+      : getSystemPrompt()
+
+    const workingMessages = [
+      { role: "system", content: systemPrompt },
+      ...trimmedMessages.map((m: any) => ({ role: m.role === "admin" ? "assistant" : m.role, content: m.content })),
     ]
-
-    // Smart context management with memory preservation
-    let contextMemory = ""
-    let workingMessages = allMessages
-
-    // If context is too long, extract memory from older messages and use sliding window
-    if (allMessages.length > 25) {
-      const olderMessages = allMessages.slice(1, -20) // Messages to be "forgotten" but analyzed
-      contextMemory = extractContextMemory(olderMessages)
-
-      // Keep system prompt + memory + recent 20 messages
-      workingMessages = [
-        {
-          role: "system",
-          content: getSystemPrompt() + (contextMemory ? `\n\nContext from earlier conversation:${contextMemory}` : "")
-        },
-        ...allMessages.slice(-20) // Last 20 messages
-      ]
-    }
 
     // Helper: call Groq with timeout + retry on rate limit
     async function callGroq(body: object, retries = 2): Promise<any> {
@@ -597,10 +678,18 @@ export async function POST(request: NextRequest) {
             signal: controller.signal,
           })
           clearTimeout(timeout)
-          if (r.status === 429 && attempt < retries) {
-            // Rate limited — wait briefly then retry
-            await new Promise((resolve) => setTimeout(resolve, 1500 * (attempt + 1)))
-            continue
+          if (r.status === 429) {
+            const errText = await r.text()
+            if (attempt < retries) {
+              const waitMs = parseRetryDelayMs(errText, r.headers.get("retry-after"), attempt)
+              await new Promise((resolve) => setTimeout(resolve, waitMs))
+              continue
+            }
+            try {
+              return JSON.parse(errText)
+            } catch {
+              return { error: { code: "rate_limit_exceeded", message: errText || "Rate limit exceeded" } }
+            }
           }
           if (!r.ok) {
             const errText = await r.text()
@@ -627,15 +716,28 @@ export async function POST(request: NextRequest) {
     }
 
     const groqBody = {
-      model: "llama-3.3-70b-versatile",
+      model: PRIMARY_MODEL,
       messages: workingMessages,
       tools,
       tool_choice: "auto",
       temperature: 0.4, // Lower temperature for more consistent responses
-      max_tokens: 2048,
+      max_tokens: PRIMARY_MAX_TOKENS,
     }
 
     let data = await callGroq(groqBody)
+
+    // If primary model is rate-limited, fall back to a lower-cost model quickly
+    if (isRateLimitError(data)) {
+      data = await callGroq(
+        {
+          ...groqBody,
+          model: FALLBACK_MODEL,
+          max_tokens: FALLBACK_MAX_TOKENS,
+          temperature: 0.3,
+        },
+        1
+      )
+    }
 
     // If Groq returns a tool_use_failed error, try multiple recovery strategies
     if (data?.error?.code === "tool_use_failed") {
@@ -647,7 +749,7 @@ export async function POST(request: NextRequest) {
       if (data?.error?.code === "tool_use_failed") {
         console.warn("Still failing, trying with different model settings...")
         // Strategy 2: Lower temperature + reduce max_tokens
-        data = await callGroq({ ...groqBody, temperature: 0.1, max_tokens: 1024 })
+        data = await callGroq({ ...groqBody, temperature: 0.1, max_tokens: FOLLOWUP_MAX_TOKENS })
       }
 
       if (data?.error?.code === "tool_use_failed") {
@@ -658,7 +760,7 @@ export async function POST(request: NextRequest) {
           tools: undefined,
           tool_choice: undefined,
           temperature: 0.4,
-          max_tokens: 1024
+          max_tokens: FALLBACK_MAX_TOKENS
         })
       }
     }
@@ -670,7 +772,7 @@ export async function POST(request: NextRequest) {
 
     // Handle tool calls (may need multiple rounds)
     let rounds = 0
-    while (assistantMessage.tool_calls && rounds < 3) {
+    while (assistantMessage.tool_calls && rounds < MAX_TOOL_ROUNDS) {
       rounds++
       const toolResults = []
 
@@ -702,13 +804,31 @@ export async function POST(request: NextRequest) {
         : updatedMessages
 
       const followUpData = await callGroq({
-        model: "llama-3.3-70b-versatile",
+        model: PRIMARY_MODEL,
         messages: finalWorkingMessages,
         tools,
         tool_choice: "auto",
         temperature: 0.4,
-        max_tokens: 2048,
+        max_tokens: FOLLOWUP_MAX_TOKENS,
       })
+
+      if (isRateLimitError(followUpData)) {
+        const fallbackFollowUp = await callGroq(
+          {
+            model: FALLBACK_MODEL,
+            messages: finalWorkingMessages,
+            tools,
+            tool_choice: "auto",
+            temperature: 0.3,
+            max_tokens: FALLBACK_MAX_TOKENS,
+          },
+          1
+        )
+        if (!fallbackFollowUp || !fallbackFollowUp.choices?.[0]?.message) break
+        data = fallbackFollowUp
+        assistantMessage = fallbackFollowUp.choices[0].message
+        continue
+      }
 
       if (!followUpData || !followUpData.choices?.[0]?.message) break
 

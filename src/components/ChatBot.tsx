@@ -26,6 +26,7 @@ export default function ChatBot() {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [paused, setPaused] = useState(false)
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [showHistoryNotice, setShowHistoryNotice] = useState(false)
   const [visitorId] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("vv_visitor_id")
@@ -37,12 +38,20 @@ export default function ChatBot() {
     return `visitor-${Date.now()}`
   })
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const pollRef = useRef<NodeJS.Timeout | null>(null)
+
+  const focusInput = useCallback(() => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus()
+    })
+  }, [])
 
   const startNewConversation = useCallback(async () => {
     setMessages([GREETING])
     setPaused(false)
     setInput("")
+    setShowHistoryNotice(false)
 
     if (userId) {
       try {
@@ -60,11 +69,16 @@ export default function ChatBot() {
     } else {
       setSessionId(null)
     }
-  }, [userId])
+    focusInput()
+  }, [focusInput, userId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  useEffect(() => {
+    if (open) focusInput()
+  }, [open, focusInput])
 
   // Load chat history for logged-in users
   useEffect(() => {
@@ -95,8 +109,16 @@ export default function ChatBot() {
       setSessionId(null)
       setMessages([GREETING])
       setPaused(false)
+      setShowHistoryNotice(false)
     }
   }, [userId])
+
+  useEffect(() => {
+    if (!(userId && historyLoaded && messages.length > 1 && !historyLoading)) return
+    setShowHistoryNotice(true)
+    const timeoutId = setTimeout(() => setShowHistoryNotice(false), 4000)
+    return () => clearTimeout(timeoutId)
+  }, [userId, historyLoaded, historyLoading, messages.length])
 
   // Poll for admin messages when paused
   const pollForAdmin = useCallback(async () => {
@@ -138,10 +160,11 @@ export default function ChatBot() {
     setMessages(newMessages)
     setInput("")
     setLoading(true)
+    focusInput()
 
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 90000) // 90 second timeout
 
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -158,12 +181,13 @@ export default function ChatBot() {
       clearTimeout(timeoutId)
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        const msg = res.status === 503
+        await res.json().catch(() => ({}))
+        const msg = (res.status === 503 || res.status === 429)
           ? "I'm a bit overloaded right now. Please try again in a moment."
           : "Sorry, I'm having trouble connecting right now. Please try again in a moment."
         setMessages((prev) => [...prev, { role: "assistant", content: msg }])
         setLoading(false)
+        focusInput()
         return
       }
       const data = await res.json()
@@ -191,6 +215,7 @@ export default function ChatBot() {
       ])
     } finally {
       setLoading(false)
+      focusInput()
     }
   }
 
@@ -200,7 +225,13 @@ export default function ChatBot() {
       const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/)
       if (linkMatch) {
         return (
-          <a key={i} href={linkMatch[2]} className="text-[#dbb241] underline hover:text-[#c9a238]" target={linkMatch[2].startsWith("http") ? "_blank" : undefined}>
+          <a
+            key={i}
+            href={linkMatch[2]}
+            className="text-[#dbb241] underline hover:text-[#c9a238]"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {linkMatch[1]}
           </a>
         )
@@ -269,7 +300,7 @@ export default function ChatBot() {
           )}
 
           {/* Logged-in history banner (shown once after history loads) */}
-          {userId && historyLoaded && messages.length > 1 && !historyLoading && (
+          {showHistoryNotice && (
             <div className="bg-amber-50 border-b border-amber-100 px-4 py-2 text-xs text-amber-700 flex-shrink-0 flex items-center gap-2">
               <History size={12} />
               Continuing your conversation.
@@ -317,16 +348,17 @@ export default function ChatBot() {
           <div className="px-3 py-2 border-t border-mist-200 bg-white flex-shrink-0">
             <div className="flex items-center gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
                 placeholder="Ask Mark anything..."
-                disabled={loading}
-                className="flex-1 text-sm px-3 py-2 border border-mist-200 rounded-lg focus:outline-none focus:border-[#dbb241] disabled:opacity-50"
+                className="flex-1 text-sm px-3 py-2 border border-mist-200 rounded-lg focus:outline-none focus:border-[#dbb241]"
               />
               <button
                 onClick={send}
+                onMouseDown={(e) => e.preventDefault()}
                 disabled={loading || !input.trim()}
                 className="bg-[#dbb241] text-black p-2 rounded-lg hover:bg-[#c9a238] transition-colors disabled:opacity-50"
               >
