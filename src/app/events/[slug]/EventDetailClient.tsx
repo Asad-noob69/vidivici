@@ -477,7 +477,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             </h2>
 
             <h3 className="text-sm sm:text-base 2xl:text-2xl font-semibold text-mist-500 mb-6 2xl:mb-8">
-              {experienceConfig.subtitle || "Modern luxury meets classic elegance"}
+              {experienceConfig.subtitle}
             </h3>
 
             <div className="text-mist-600 2xl:text-2xl leading-relaxed mb-8 2xl:mb-10 max-w-xl 2xl:max-w-4xl space-y-4 2xl:space-y-6">
@@ -497,27 +497,41 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
         </section>
       )}
 
-      {showcaseCards.length > 0 && (
-        <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
-            {showcaseCards.map((card, idx) => (
-              <div key={idx} className="flex flex-col gap-6">
-                <div className={`h-[220px] sm:h-[300px] ${idx === 1 ? "lg:h-[400px] md:order-2" : "lg:h-[350px]"}`}>
-                  <img
-                    src={card.imageUrl || `https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800&v=${idx}`}
-                    alt={card.title || `${event.name} showcase ${idx + 1}`}
-                    className="w-full h-full object-cover rounded-3xl"
-                  />
-                </div>
-                <div className={`bg-mist-100 p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${idx === 1 ? "md:order-1" : ""}`}>
-                  <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">{card.title}</h3>
-                  <p className="text-mist-500 text-sm 2xl:text-xl leading-relaxed">{card.description}</p>
-                </div>
-              </div>
-            ))}
+    {showcaseCards.length > 0 && (
+  <section className="px-6 sm:px-16 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-10">
+      {showcaseCards.map((card, idx) => {
+        const posInRow = idx % 3; // 0, 1, 2, 0, 1, 2, ...
+        const isFlipped = posInRow === 1; // only middle column flips
+
+        return (
+          <div key={idx} className="flex flex-col gap-6">
+            <div
+              className={`h-[220px] sm:h-[300px] ${
+                isFlipped ? "lg:h-[400px] md:order-2" : "lg:h-[350px] md:order-1"
+              }`}
+            >
+              <img
+                src={card.imageUrl || `https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800&v=${idx}`}
+                alt={card.title || `${event.name} showcase ${idx + 1}`}
+                className="w-full h-full object-cover rounded-3xl"
+              />
+            </div>
+
+            <div
+              className={`bg-mist-100 p-6 sm:p-8 2xl:p-14 rounded-3xl flex-grow ${
+                isFlipped ? "md:order-1" : "md:order-2"
+              }`}
+            >
+              <h3 className="text-xl 2xl:text-3xl font-bold text-[#1a1a1a] mb-4 2xl:mb-6">{card.title}</h3>
+              <p className="text-mist-500 text-sm 2xl:text-xl leading-relaxed">{card.description}</p>
+            </div>
           </div>
-        </section>
-      )}
+        );
+      })}
+    </div>
+  </section>
+)}
       <section className="px-6 sm:px-12 lg:px-20 2xl:px-32 mt-24 2xl:mt-48">
         <div className="">
 
