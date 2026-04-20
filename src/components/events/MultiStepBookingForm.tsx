@@ -818,9 +818,12 @@ export default function MultiStepBookingForm({
                         type="button"
                         onClick={handlePlaceOrder}
                         disabled={placingOrder}
-                        className="w-full rounded-lg bg-mist-900 py-3 text-sm font-semibold text-white hover:bg-mist-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        className={`w-full rounded-lg py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed ${cardName && cardNumber.replace(/\s/g, "").length >= 13 && cardExpiry.length >= 5 && cardCvv.length >= 3
+                            ? "bg-mist-900 hover:bg-mist-800"
+                            : "bg-mist-300 cursor-not-allowed"
+                          }`}
                       >
-                        {placingOrder ? "Processing…" : "Place Order"}
+                        {placingOrder ? "Processing…" : "Authorize $100 & Submit Request"}
                       </button>
                     </div>
                   )}
