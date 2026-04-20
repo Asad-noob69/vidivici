@@ -11,7 +11,7 @@ import FAQ from "@/components/home/FAQ"
 import Events from "@/components/home/Events"
 import {
   Heart,
-  ArrowUpRight,
+  ArrowUpRight,  Plus, Minus
 } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
@@ -53,6 +53,39 @@ const NIGHTLIFE_CATEGORIES = [
     description: "Savor the finest cocktails and cuisine at LA's most exclusive lounges and restaurants.",
   },
 ]
+
+const faqs = [
+  {
+    id: 1,
+    question: "Can I book access for specific clubs or events?",
+    answer:
+      "Yes, our concierge team partners directly with leading venues like Delilah, Raspoutine, and Puzzle LA to arrange premium reservations.",
+  },
+  {
+    id: 2,
+    question: "Is a reservation required?",
+    answer:
+      "While some venues accept walk-ins, we strongly recommend reservations to guarantee entry and avoid long wait times, especially on weekends or for high-demand events.",
+  },
+  {
+    id: 3,
+    question: "Can I book VIP tables or bottle service?",
+    answer:
+      "Absolutely. We specialize in securing VIP tables and bottle service packages tailored to your preferences, group size, and occasion.",
+  },
+  {
+    id: 4,
+    question: "What is the dress code?",
+    answer:
+      "Most venues enforce an upscale dress code. We recommend smart elegant attire—no athletic wear, shorts, or flip-flops—to ensure smooth entry.",
+  },
+  {
+    id: 5,
+    question: "How long does it take to get approved as a partner?",
+    answer:
+      "Our vetting process typically takes 2–4 business days. Once approved, your listing goes live immediately and is promoted across our platform.",
+  },
+];
 
 /* ================================================================== */
 /*  Event Card                                                         */
@@ -161,6 +194,7 @@ function EventsContent() {
   const [loading, setLoading] = useState(true)
   const [hovered, setHovered] = useState(null);
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set())
+    const [openId, setOpenId] = useState(1);
 
   const sort = searchParams.get("sort") || "newest"
   const activeCategory = searchParams.get("category") || ""
@@ -373,29 +407,29 @@ function EventsContent() {
             {/* Mixologist */}
             <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-3xl p-4 2xl:p-8">
               <img
-                src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300&q=80"
+                src="/event1.png"
                 alt="Mixologist"
                 className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-56 2xl:h-56 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="pt-1">
-                <h3 className="text-base 2xl:text-[26px] font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services</h3>
+                <h3 className="text-base 2xl:text-[26px] font-bold text-mist-900 mb-1 2xl:mb-3">Chauffeur Services or Party Bus</h3>
                 <p className="text-base 2xl:text-2xl text-mist-500 font-normal leading-relaxed">
-                 Professional bartenders to craft signature for drinks
+                 Arrive in style with luxury transportation arranged exclusively for you and your guests.
                 </p>
               </div>
             </div>
 
             {/* Valet Parking */}
             <div className="flex items-center gap-4 2xl:gap-8 bg-mist-100 rounded-3xl p-4 2xl:p-8">
-              <img
-                src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=300&q=80"
+             <img
+                src="/event2.png"
                 alt="Valet Parking"
                 className="w-24 h-24 sm:w-32 sm:h-32 2xl:w-56 2xl:h-56 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="pt-1">
                 <h3 className="text-base 2xl:text-[26px] font-bold text-mist-900 mb-1 2xl:mb-3">Security & Bodyguards</h3>
                 <p className="text-base 2xl:text-2xl text-mist-500 font-normal leading-relaxed">
-                  Hassle-free parking management for you.
+                 Enjoy peace of mind and privacy with our professional protection and discreet service.
                 </p>
               </div>
             </div>
@@ -463,7 +497,64 @@ function EventsContent() {
       {/* Reuse existing sections */}
       <WhyChooseUs />
       <Reviews />
-      <FAQ />
+          <section className="w-full mt-24 2xl:mt-48 sm:px-24 md:px-32 px-10 2xl:px-72">
+                  <div className="">
+            
+                    {/* Header - Scaled to 7xl for 2xl screens */}
+                    <h2 className="text-3xl sm:text-4xl 2xl:text-6xl font-bold text-mist-900 text-center tracking-tight mb-10 2xl:mb-24 mt-20 2xl:mt-0">
+                      Frequently Asked Questions
+                    </h2>
+            
+                    {/* Accordion Container - Larger gap for 2xl */}
+                    <div className="flex flex-col gap-3 2xl:gap-8">
+                      {faqs.map((faq) => {
+                        const isOpen = openId === faq.id;
+                        return (
+                          <div
+                            key={faq.id}
+                            className="border border-mist-200 rounded-2xl 2xl:rounded-3xl overflow-hidden transition-all duration-200"
+                          >
+                            {/* Question row - Increased padding and text size */}
+                            <button
+                              onClick={() => setOpenId(isOpen ? null : faq.id)}
+                              className="w-full flex items-center justify-between px-5 py-4 2xl:px-12 2xl:py-6 text-left"
+                            >
+                              <span className="text-base 2xl:text-2xl font-normal text-mist-900 pr-4 leading-snug">
+                                {faq.question}
+                              </span>
+                              <span
+                                className={`flex-shrink-0 w-8 h-8 2xl:w-10 2xl:h-10 rounded-lg 2xl:rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                                  isOpen
+                                    ? "bg-mist-900 text-white"
+                                    : "bg-mist-100 text-mist-600 hover:bg-mist-200"
+                                }`}
+                              >
+                                {isOpen ? 
+                                  <Minus className="w-3.5 h-3.5 2xl:w-5 2xl:h-5" strokeWidth={2.5} /> : 
+                                  <Plus className="w-3.5 h-3.5 2xl:w-5 2xl:h-5" strokeWidth={2.5} />
+                                }
+                              </span>
+                            </button>
+            
+                            {/* Answer Area - Increased max-height for 2xl text volume */}
+                            <div
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                isOpen ? "max-h-48 2xl:max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                              }`}
+                            >
+                              <div className="bg-mist-50 border-t border-mist-100 px-5 py-4 2xl:px-12 2xl:py-10">
+                                <p className="text-sm 2xl:text-2xl text-mist-500 leading-relaxed 2xl:max-w-4xl">
+                                  {faq.answer}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+            
+                  </div>
+                </section>
 
       <div className="relative w-full bg-[#eeeeed] py-16 2xl:py-24 px-6 sm:px-16 lg:px-20 2xl:px-32 text-center mt-24 2xl:mt-48 overflow-hidden">
         <img
