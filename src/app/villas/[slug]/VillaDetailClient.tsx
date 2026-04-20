@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import toast from "react-hot-toast"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, ChevronDown, BedDouble, Users, Bath, Maximize2, MapPin, CreditCard, Sparkles, Percent, Tag, Share2, Bookmark, ArrowUpRight } from "lucide-react"
 import { parseAmenity, AMENITY_ICONS } from "@/lib/amenity-icons"
@@ -146,6 +148,7 @@ function getTemporalCenterLabelClass(hasValue: boolean, desktop = false) {
 
 export default function VillaDetailClient({ villa, relatedVillas }: { villa: Villa; relatedVillas: RelatedVilla[] }) {
   const router = useRouter()
+  const { data: session } = useSession()
   const [currentImage, setCurrentImage] = useState(0)
   const thumbsRef = useRef<HTMLDivElement | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>("Stay")
@@ -165,6 +168,35 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
   const [securityService, setSecurityService] = useState(false)
   const [bookedRanges, setBookedRanges] = useState<{ start: string; end: string }[]>([])
   const [villaTaxPercent, setVillaTaxPercent] = useState(14)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    if (!session?.user) return
+    fetch("/api/wishlist?type=villa")
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: any[]) => { if (items.some((w) => w.villaId === villa.id)) setSaved(true) })
+      .catch(() => {})
+  }, [session, villa.id])
+
+  const handleShare = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title: villa.name, url }).catch(() => {})
+    } else {
+      await navigator.clipboard.writeText(url)
+      toast.success("Link copied!")
+    }
+  }
+
+  const handleSave = async () => {
+    if (!session?.user) { toast.error("Please log in to save"); return }
+    try {
+      const res = await fetch("/api/wishlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ villaId: villa.id }) })
+      const data = await res.json()
+      setSaved(data.wishlisted)
+      toast.success(data.wishlisted ? "Saved to wishlist" : "Removed from wishlist")
+    } catch { toast.error("Failed to save") }
+  }
 
   useEffect(() => {
     fetch(`/api/villas/${villa.id}/availability`)
@@ -354,11 +386,11 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
             <span className="text-mist-700">{villa.name}</span>
           </div>
           <div className="flex items-center gap-4 2xl:gap-5">
-            <button className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
+            <button onClick={handleShare} className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
               <Share2 size={14} /> Share
             </button>
-            <button className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
-              <Bookmark size={14} /> Save
+            <button onClick={handleSave} className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
+              <Bookmark size={14} className={saved ? "fill-current" : ""} /> {saved ? "Saved" : "Save"}
             </button>
           </div>
         </div>
@@ -482,7 +514,7 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
 
                 {villa.description && (
                   <div className="mb-5">
-                    <p className={`text-sm 2xl:text-lg text-mist-600 leading-relaxed ${!showFullDesc ? "line-clamp-4" : ""}`}>
+                    <p className={`text-sm 2xl:text-lg text-mist-600 leading-relaxed whitespace-pre-line ${!showFullDesc ? "line-clamp-4" : ""}`}>
                       {villa.description}
                     </p>
                     <button

@@ -291,8 +291,8 @@ export default function ChatBot() {
           >
             <div className="w-9 h-9 rounded-full bg-[#dbb241] flex items-center justify-center text-black text-xs font-bold flex-shrink-0">M</div>
             <div className="pr-2">
-              <p className="text-sm font-medium text-mist-900 leading-snug">Hi there, have a question?</p>
-              <p className="text-sm text-mist-600 leading-snug">Text us here.</p>
+              <p className="text-sm font-medium text-mist-900 leading-snug">Hi there! Can I help you?</p>
+              <p className="text-sm text-mist-600 leading-snug">I probably speak your language</p>
             </div>
           </button>
           <button

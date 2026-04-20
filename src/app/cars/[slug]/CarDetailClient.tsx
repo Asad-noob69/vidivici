@@ -404,6 +404,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import toast from "react-hot-toast"
 import Link from "next/link"
 import CarGallery from "@/components/cars/CarGallery"
 import Rentals from "@/components/home/Rentals"
@@ -550,6 +552,7 @@ function switchTemporalInputType(input: HTMLInputElement, kind: "date" | "time")
 
 export default function CarDetailClient({ car }: { car: CarDetail }) {
   const router = useRouter()
+  const { data: session } = useSession()
   const [startDate, setStartDate] = useState("")
   const [startTime, setStartTime] = useState("")
   const [endDate, setEndDate] = useState("")
@@ -564,7 +567,36 @@ export default function CarDetailClient({ car }: { car: CarDetail }) {
   const [showMore, setShowMore] = useState(false);
   const [bookedRanges, setBookedRanges] = useState<{ start: string; end: string }[]>([])
   const [carTaxPercent, setCarTaxPercent] = useState(9.5)
+  const [saved, setSaved] = useState(false)
   const today = new Date().toISOString().split("T")[0]
+
+  useEffect(() => {
+    if (!session?.user) return
+    fetch("/api/wishlist?type=car")
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: any[]) => { if (items.some((w) => w.carId === car.id)) setSaved(true) })
+      .catch(() => {})
+  }, [session, car.id])
+
+  const handleShare = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title: car.name, url }).catch(() => {})
+    } else {
+      await navigator.clipboard.writeText(url)
+      toast.success("Link copied!")
+    }
+  }
+
+  const handleSave = async () => {
+    if (!session?.user) { toast.error("Please log in to save"); return }
+    try {
+      const res = await fetch("/api/wishlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ carId: car.id }) })
+      const data = await res.json()
+      setSaved(data.wishlisted)
+      toast.success(data.wishlisted ? "Saved to wishlist" : "Removed from wishlist")
+    } catch { toast.error("Failed to save") }
+  }
 
   useEffect(() => {
     fetch(`/api/cars/${car.id}/availability`)
@@ -712,11 +744,11 @@ if (extraHours > 0) {
           </div>
           {/* Share / Save */}
           <div className="flex items-center gap-4 2xl:gap-5">
-            <button className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
+            <button onClick={handleShare} className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
               <Share2 size={14} /> Share
             </button>
-            <button className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
-              <Bookmark size={14} /> Save
+            <button onClick={handleSave} className="flex items-center gap-1.5 text-xs sm:text-sm 2xl:text-lg text-mist-500 hover:text-mist-800">
+              <Bookmark size={14} className={saved ? "fill-current" : ""} /> {saved ? "Saved" : "Save"}
             </button>
           </div>
         </div>
@@ -880,7 +912,7 @@ if (extraHours > 0) {
                     />
                   </button>
 
-                  <p className={`text-sm 2xl:text-xl text-mist-500 leading-relaxed ${showMore ? "" : "line-clamp-3"}`}>
+                  <p className={`text-sm 2xl:text-xl text-mist-500 leading-relaxed whitespace-pre-line ${showMore ? "" : "line-clamp-3"}`}>
                     {car.description}
                   </p>
 

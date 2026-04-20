@@ -1,8 +1,10 @@
 "use client"
 import MultiStepBookingForm from "@/components/events/MultiStepBookingForm"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
+import toast from "react-hot-toast"
 import {
   ChevronLeft,
   ChevronRight,
@@ -240,7 +242,37 @@ function ContactInfo({ icon, label, value }: { icon: React.ReactNode; label: str
 }
 
 export default function EventDetailClient({ event, relatedEvents }: { event: EventDetail; relatedEvents: RelatedEvent[] }) {
+  const { data: session } = useSession()
   const [currentImage, setCurrentImage] = useState(0)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    if (!session?.user) return
+    fetch("/api/wishlist?type=event")
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: any[]) => { if (items.some((w) => w.eventId === event.id)) setSaved(true) })
+      .catch(() => {})
+  }, [session, event.id])
+
+  const handleShare = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title: event.name, url }).catch(() => {})
+    } else {
+      await navigator.clipboard.writeText(url)
+      toast.success("Link copied!")
+    }
+  }
+
+  const handleSave = async () => {
+    if (!session?.user) { toast.error("Please log in to save"); return }
+    try {
+      const res = await fetch("/api/wishlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventId: event.id }) })
+      const data = await res.json()
+      setSaved(data.wishlisted)
+      toast.success(data.wishlisted ? "Saved to wishlist" : "Removed from wishlist")
+    } catch { toast.error("Failed to save") }
+  }
 
   const images = event.images.length > 0
     ? event.images
@@ -254,7 +286,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
   const whyChooseCards = highlightsConfig.whyChooseCards
   const showcaseCards = highlightsConfig.showcaseCards
   const fullDescriptionParagraphs = (event.description || event.experience || "")
-    .split("\n")
+    .split("\n\n")
     .map((p) => p.trim())
     .filter(Boolean)
   const experienceImages = [
@@ -276,11 +308,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
             <span className="text-mist-700 font-medium">{event.name}</span>
           </div>
           <div className="flex flex-nowrap items-center gap-4 sm:gap-5">
-            <button className="flex items-center gap-2 text-sm 2xl:text-xl font-medium text-mist-600 hover:text-mist-900 transition-colors">
+            <button onClick={handleShare} className="flex items-center gap-2 text-sm 2xl:text-xl font-medium text-mist-600 hover:text-mist-900 transition-colors">
               <Share2 size={18} /> Share
             </button>
-            <button className="flex items-center gap-2 text-sm 2xl:text-xl font-medium text-mist-600 hover:text-black transition-colors">
-              <Heart size={18} /> Save
+            <button onClick={handleSave} className="flex items-center gap-2 text-sm 2xl:text-xl font-medium text-mist-600 hover:text-black transition-colors">
+              <Heart size={18} className={saved ? "fill-red-500 text-red-500" : ""} /> {saved ? "Saved" : "Save"}
             </button>
 
           </div>
@@ -290,11 +322,11 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
       {/* Top Actions (Mobile) */}
       <div className="lg:hidden px-8 sm:px-16 pb-4">
         <div className="flex items-center justify-end gap-3">
-          <button className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
+          <button onClick={handleShare} className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
             <Share2 size={15} /> Share
           </button>
-          <button className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
-            <Heart size={15} /> Save
+          <button onClick={handleSave} className="flex items-center gap-1 text-sm text-mist-500 hover:text-mist-700 transition-colors">
+            <Heart size={15} className={saved ? "fill-red-500 text-red-500" : ""} /> {saved ? "Saved" : "Save"}
           </button>
         </div>
       </div>
@@ -450,7 +482,7 @@ export default function EventDetailClient({ event, relatedEvents }: { event: Eve
 
             <div className="text-mist-600 2xl:text-2xl leading-relaxed mb-8 2xl:mb-10 max-w-xl 2xl:max-w-4xl space-y-4 2xl:space-y-6">
               {fullDescriptionParagraphs.map((para, i) => (
-                <p key={i}>{para}</p>
+                <p key={i} className="whitespace-pre-line">{para}</p>
               ))}
             </div>
 

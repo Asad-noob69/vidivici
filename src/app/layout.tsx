@@ -2,6 +2,7 @@ import { Outfit, Raleway } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
+import { Toaster } from "react-hot-toast";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} ${raleway.variable} antialiased font-outfit`}>
+        <Toaster position="top-right" />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

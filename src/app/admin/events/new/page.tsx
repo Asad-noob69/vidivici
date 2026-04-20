@@ -2,9 +2,11 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import toast, { Toaster } from "react-hot-toast"
 import ImageManager, { ExistingImage } from "@/components/admin/ImageManager"
 import IconPickerInput from "@/components/ui/IconPickerInput"
+import { ArrowLeft } from "lucide-react"
 
 type WhyChooseCard = {
   title: string
@@ -328,7 +330,12 @@ function EventForm() {
   return (
     <div>
       <Toaster position="top-right" />
-      <h1 className="text-2xl font-bold mb-8">{isEditing ? "Edit Event" : "Add New Event"}</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <Link href="/admin/events" className="text-mist-400 hover:text-mist-900 transition">
+          <ArrowLeft size={20} />
+        </Link>
+        <h1 className="text-2xl font-bold">{isEditing ? "Edit Event" : "Add New Event"}</h1>
+      </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
         {/* Basic Info */}
@@ -374,6 +381,28 @@ function EventForm() {
         <div className="bg-white rounded-xl p-6">
           <h2 className="text-lg font-semibold text-mist-900 mb-4">Event Details</h2>
           <div className="space-y-6">
+            <div>
+              <label className="text-xs text-mist-400 block mb-1">Experience Section Heading</label>
+              <input
+                type="text"
+                value={experienceHeading}
+                onChange={(e) => setExperienceHeading(e.target.value)}
+                className={inputClass}
+                placeholder="e.g., Experience the {event name}"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-mist-400 block mb-1">Experience Section Subtitle (line below heading)</label>
+              <input
+                type="text"
+                value={experienceSubtitle}
+                onChange={(e) => setExperienceSubtitle(e.target.value)}
+                className={inputClass}
+                placeholder="e.g., Modern luxury meets classic elegance"
+              />
+            </div>
+
             <div>
               <label className="text-xs text-mist-400 block mb-1">Short Description</label>
               <input type="text" value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} className={inputClass} placeholder="Brief tagline for the event" />
@@ -447,28 +476,6 @@ function EventForm() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-mist-400 block mb-1">Experience Section Heading</label>
-              <input
-                type="text"
-                value={experienceHeading}
-                onChange={(e) => setExperienceHeading(e.target.value)}
-                className={inputClass}
-                placeholder="e.g., Experience the {event name}"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-mist-400 block mb-1">Experience Section Subtitle (line below heading)</label>
-              <input
-                type="text"
-                value={experienceSubtitle}
-                onChange={(e) => setExperienceSubtitle(e.target.value)}
-                className={inputClass}
-                placeholder="e.g., Modern luxury meets classic elegance"
-              />
             </div>
 
             <div>
