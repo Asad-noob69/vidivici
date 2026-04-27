@@ -1,92 +1,51 @@
 "use client";
-import { useRef, useState, useEffect} from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "@/components/ui/EventCard";
+import Link from "next/link";
 
-export const events = [
-  {
-    id: 1,
-    venue: "Delilah Los Angeles",
-    name: "Roaring '20s Luxury Dining",
-    image: "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=800&q=80",
-    category: "Fine Dining & Lounge",
-    capacity: "Up to 200",
-    dressCode: "Upscale",
-    pricePerPerson: 299,
-    originalPrice: "450",
-    liked: true,
-  },
-  {
-    id: 2,
-    venue: "LIV Miami",
-    name: "VIP Nightclub Experience",
-    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80",
-    category: "Elite Nightclub",
-    capacity: "Up to 500",
-    dressCode: "Bottle Service",
-    pricePerPerson: 499,
-    originalPrice: "750",
-    liked: false,
-  },
-  {
-    id: 3,
-    venue: "Nobu Malibu",
-    name: "Oceanfront Private Dinner",
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
-    category: "Private Events",
-    capacity: "Up to 50",
-    dressCode: "Smart Casual",
-    pricePerPerson: 399,
-    originalPrice: "600",
-    liked: true,
-  },
-  {
-    id: 4,
-    venue: "1 OAK New York",
-    name: "Celebrity VIP Lounge Night",
-    image: "https://images.unsplash.com/photo-1571266028243-d220c6a7ea4f?w=800&q=80",
-    category: "Elite Nightclub",
-    capacity: "Up to 300",
-    dressCode: "Bottle Service",
-    pricePerPerson: 599,
-    originalPrice: "900",
-    liked: false,
-  },
-  {
-    id: 5,
-    venue: "Surrender Las Vegas",
-    name: "Pool Party VIP Access",
-    image: "https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&q=80",
-    category: "Private Events",
-    capacity: "Up to 1000",
-    dressCode: "Resort Wear",
-    pricePerPerson: 349,
-    originalPrice: "550",
-    liked: false,
-  },
-  {
-    id: 6,
-    venue: "Catch LA",
-    name: "Rooftop Influencer Soirée",
-    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80",
-    category: "Fine Dining & Lounge",
-    capacity: "Up to 150",
-    dressCode: "Trendy",
-    pricePerPerson: 249,
-    originalPrice: "400",
-    liked: true,
-  },
-];
+interface EventFromAPI {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string | null;
+  location: string;
+  category: string;
+  capacity: number;
+  images: { url: string; isPrimary: boolean }[];
+}
 
-const repeatedEvents = [...events, ...events, ...events];
+const CARD_WIDTH = 270 + 20;
 
 export default function ExclusiveNightlife({ showHeader = true }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const isScrolling = useRef(false);
+  const [events, setEvents] = useState<EventFromAPI[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const CARD_WIDTH = 270 + 20;
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/events?limit=10");
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data.events || []);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
   const originalLength = events.length;
+  const shouldLoop = events.length >= 4;
+  const repeatedEvents = shouldLoop ? [...events, ...events, ...events] : events;
 
   const handleScroll = () => {
     if (!trackRef.current || isScrolling.current) return;
@@ -112,7 +71,7 @@ export default function ExclusiveNightlife({ showHeader = true }) {
   };
 
   const scrollTo = (index: number) => {
-    if (!trackRef.current) return;
+    if (!trackRef.current || events.length === 0) return;
     const el = trackRef.current;
     const singleSetWidth = el.scrollWidth / 3;
     const cardWidth = el.firstElementChild
@@ -128,11 +87,11 @@ export default function ExclusiveNightlife({ showHeader = true }) {
   };
 
   useEffect(() => {
-    if (!trackRef.current) return;
+    if (!trackRef.current || events.length === 0) return;
     const el = trackRef.current;
     const singleSetWidth = el.scrollWidth / 3;
     el.scrollLeft = singleSetWidth;
-  }, []);
+  }, [events.length]);
 
   return (
     <section className="bg-white w-full mt-24 2xl:mt-48 overflow-hidden">
@@ -143,22 +102,15 @@ export default function ExclusiveNightlife({ showHeader = true }) {
           <h2 className="text-2xl sm:text-4xl 2xl:text-5xl font-bold text-mist-900 tracking-tight w-xl">
             Exclusive Nightlife & VIP Experiences
           </h2>
-         <button className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base 2xl:text-xl 2xl:py-4 2xl:px-6 text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
-      View all
-      <ArrowUpRight size={15} />
-    </button>
+          <Link href="/events" className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base 2xl:text-xl 2xl:py-4 2xl:px-6 text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
+            View all
+            <ArrowUpRight size={15} />
+          </Link>
         </div>
       )}
 
       <div className="relative">
-
         {/* Left Arrow */}
-        <button
-          onClick={() => scrollTo(activeIndex - 1)}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
-        >
-          <ChevronLeft size={16} strokeWidth={2.5} className="text-mist-700  2xl:w-6 2xl:h-6" />
-        </button>
 
         {/* Right Arrow */}
         <button
@@ -175,11 +127,45 @@ export default function ExclusiveNightlife({ showHeader = true }) {
           className="flex gap-5 px-6 md:px-12 overflow-x-auto pb-2 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {repeatedEvents.map((event, i) => (
-            <div key={`${event.id}-${i}`} className="shrink-0">
-              <EventCard event={event} />
-            </div>
-          ))}
+          {loading ? (
+            // Loading skeleton cards
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[270px] 2xl:w-[450px] flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-sm animate-pulse"
+              >
+                <div className="h-56 2xl:h-[300px] bg-mist-100" />
+                <div className="flex flex-col gap-2 2xl:gap-4 px-6 2xl:px-8 pt-3.5 2xl:pt-5 pb-4 2xl:pb-6">
+                  <div className="h-3 w-24 bg-mist-100 rounded" />
+                  <div className="h-5 w-32 bg-mist-100 rounded" />
+                  <div className="h-4 w-full bg-mist-100 rounded" />
+                  <div className="h-px bg-mist-100" />
+                  <div className="flex items-center justify-between mt-0.5">
+                    <div className="h-4 w-20 bg-mist-100 rounded" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            repeatedEvents.map((event, i) => {
+              const primaryImage = event.images?.[0]?.url;
+              return (
+                <div key={`${event.id}-${i}`} className="shrink-0">
+                  <EventCard
+                    event={{
+                      id: event.id,
+                      name: event.name,
+                      slug: event.slug,
+                      image: primaryImage || "/placeholder.jpg",
+                      venue: event.location || event.category || "VIP Experience",
+                      description: event.shortDescription || "",
+                      liked: false,
+                    }}
+                  />
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -189,11 +175,10 @@ export default function ExclusiveNightlife({ showHeader = true }) {
           <button
             key={i}
             onClick={() => scrollTo(i)}
-            className={`rounded-full transition-all duration-300 ${
-              i === activeIndex
-                 ? "w-6 h-3 bg-mist-800"
+            className={`rounded-full transition-all duration-300 ${i === activeIndex
+                ? "w-6 h-3 bg-mist-800"
                 : "w-2 h-2 2xl:w-3 2xl:h-3 bg-mist-300 hover:bg-mist-400"
-            }`}
+              }`}
           />
         ))}
       </div>
