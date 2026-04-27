@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react"
 import toast, { Toaster } from "react-hot-toast"
-import { Mail, Phone, Calendar, Tag, Trash2 } from "lucide-react"
+import { Mail, Phone, Calendar, Tag, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+
+const PAGE_SIZE = 10
 
 interface Inquiry {
   id: string
@@ -34,6 +36,9 @@ export default function AdminInquiriesPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("All")
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [activeTab])
 
   const fetchInquiries = async () => {
     try {
@@ -83,6 +88,11 @@ export default function AdminInquiriesPage() {
 
   const unreadCount = inquiries.filter((i) => !i.isRead).length
 
+  const totalPages = Math.max(1, Math.ceil(inquiries.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageStart = (currentPage - 1) * PAGE_SIZE
+  const paginated = inquiries.slice(pageStart, pageStart + PAGE_SIZE)
+
   const tabCounts = TABS.reduce((acc, tab) => {
     if (tab === "All") {
       acc[tab] = inquiries.length
@@ -128,7 +138,7 @@ export default function AdminInquiriesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {inquiries.map((inq) => {
+          {paginated.map((inq) => {
             let extraData: Record<string, any> = {}
             try {
               if (inq.data) extraData = JSON.parse(inq.data)
@@ -242,6 +252,24 @@ export default function AdminInquiriesPage() {
               </div>
             )
           })}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-1">
+              <p className="text-xs text-mist-500">
+                Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, inquiries.length)} of {inquiries.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                  <ChevronLeft size={14} />
+                </button>
+                <span className="text-xs text-mist-700 px-3">Page {currentPage} of {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

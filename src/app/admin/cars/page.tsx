@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
-import { Search, Plus, Car, ArrowLeft } from "lucide-react"
+import { Search, Plus, Car, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+
+const PAGE_SIZE = 10
 
 interface Car {
   id: string
@@ -22,6 +24,9 @@ export default function AdminCarsPage() {
   const [cars, setCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [search])
 
   const fetchCars = async () => {
     try {
@@ -82,6 +87,10 @@ export default function AdminCarsPage() {
       {(() => {
         const q = search.toLowerCase()
         const filtered = cars.filter(c => !q || c.name.toLowerCase().includes(q) || c.brand?.name.toLowerCase().includes(q) || c.category?.name.toLowerCase().includes(q))
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+        const currentPage = Math.min(page, totalPages)
+        const pageStart = (currentPage - 1) * PAGE_SIZE
+        const paginated = filtered.slice(pageStart, pageStart + PAGE_SIZE)
 
         return loading ? (
           <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-mist-100 rounded-xl animate-pulse" />)}</div>
@@ -103,7 +112,7 @@ export default function AdminCarsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((car) => {
+                  {paginated.map((car) => {
                     const status = getStatus(car)
                     const primaryImage = car.images?.[0]?.url
                     return (
@@ -141,7 +150,7 @@ export default function AdminCarsPage() {
             </div>
             {/* Mobile Cards */}
             <div className="sm:hidden space-y-3">
-              {filtered.map((car) => {
+              {paginated.map((car) => {
                 const status = getStatus(car)
                 const primaryImage = car.images?.[0]?.url
                 return (
@@ -171,6 +180,24 @@ export default function AdminCarsPage() {
                 )
               })}
             </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 px-1">
+                <p className="text-xs text-mist-500">
+                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                    className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    <ChevronLeft size={14} />
+                  </button>
+                  <span className="text-xs text-mist-700 px-3">Page {currentPage} of {totalPages}</span>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )
       })()}

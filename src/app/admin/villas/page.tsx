@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import toast, { Toaster } from "react-hot-toast"
-import { Search, Plus, Home, ArrowLeft } from "lucide-react"
+import { Search, Plus, Home, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+
+const PAGE_SIZE = 10
 
 interface Villa {
   id: string
@@ -22,6 +24,9 @@ export default function AdminVillasPage() {
   const [villas, setVillas] = useState<Villa[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [search])
 
   const fetchVillas = async () => {
     try {
@@ -77,6 +82,10 @@ export default function AdminVillasPage() {
       {(() => {
         const q = search.toLowerCase()
         const filtered = villas.filter(v => !q || v.name.toLowerCase().includes(q) || v.location.toLowerCase().includes(q))
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+        const currentPage = Math.min(page, totalPages)
+        const pageStart = (currentPage - 1) * PAGE_SIZE
+        const paginated = filtered.slice(pageStart, pageStart + PAGE_SIZE)
 
         return loading ? (
           <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-mist-100 rounded-xl animate-pulse" />)}</div>
@@ -99,7 +108,7 @@ export default function AdminVillasPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((villa) => {
+                  {paginated.map((villa) => {
                     const primaryImage = villa.images?.[0]?.url
                     return (
                       <tr key={villa.id} className="border-b border-mist-100 hover:bg-mist-50 transition-colors">
@@ -137,7 +146,7 @@ export default function AdminVillasPage() {
             </div>
             {/* Mobile Cards */}
             <div className="sm:hidden space-y-3">
-              {filtered.map((villa) => {
+              {paginated.map((villa) => {
                 const primaryImage = villa.images?.[0]?.url
                 return (
                   <div key={villa.id} className="bg-white border border-mist-200 rounded-xl p-4">
@@ -166,6 +175,24 @@ export default function AdminVillasPage() {
                 )
               })}
             </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 px-1">
+                <p className="text-xs text-mist-500">
+                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                    className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    <ChevronLeft size={14} />
+                  </button>
+                  <span className="text-xs text-mist-700 px-3">Page {currentPage} of {totalPages}</span>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )
       })()}

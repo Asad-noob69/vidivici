@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
-import { Search, Car, Home, PartyPopper, Plus, Globe, UserPlus } from "lucide-react"
+import { Search, Car, Home, PartyPopper, Plus, Globe, UserPlus, ChevronLeft, ChevronRight } from "lucide-react"
+
+const PAGE_SIZE = 10
 
 interface Booking {
   id: string
@@ -66,6 +68,9 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState("All Statuses")
   const [typeFilter, setTypeFilter] = useState("All Types")
   const [payFilter, setPayFilter] = useState("All Payments")
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [search, statusFilter, typeFilter, payFilter])
 
   useEffect(() => {
     fetch("/api/admin/bookings")
@@ -93,6 +98,11 @@ export default function AdminBookingsPage() {
     }
     return true
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageStart = (currentPage - 1) * PAGE_SIZE
+  const paginated = filtered.slice(pageStart, pageStart + PAGE_SIZE)
 
   return (
     <div>
@@ -149,7 +159,7 @@ export default function AdminBookingsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(b => (
+                {paginated.map(b => (
                   <tr key={b.id} onClick={() => router.push(`/admin/bookings/${b.id}`)} className="border-b border-mist-100 hover:bg-mist-50/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3.5 max-w-[180px]">
                       <p className="text-sm font-medium text-mist-900 truncate">{b.customerName || "N/A"}</p>
@@ -187,7 +197,7 @@ export default function AdminBookingsPage() {
 
           {/* Mobile Cards */}
           <div className="sm:hidden space-y-3">
-            {filtered.map(b => (
+            {paginated.map(b => (
               <Link key={b.id} href={`/admin/bookings/${b.id}`} className="block bg-white border border-mist-200 rounded-xl p-4 hover:border-mist-400 transition-colors">
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -213,6 +223,24 @@ export default function AdminBookingsPage() {
               </Link>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-1">
+              <p className="text-xs text-mist-500">
+                Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                  <ChevronLeft size={14} />
+                </button>
+                <span className="text-xs text-mist-700 px-3">Page {currentPage} of {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-mist-200 text-mist-600 hover:bg-mist-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
