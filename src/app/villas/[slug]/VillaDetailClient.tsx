@@ -36,6 +36,7 @@ interface Villa {
   guests: number
   sqft: number
   pricePerNight: number
+  originalPrice?: number | null
   cleaningFee: number
   securityDeposit: number
   amenities: string | null
@@ -642,7 +643,9 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
                   <div className="bg-white border border-mist-300 rounded-lg p-5 2xl:p-8 space-y-5 2xl:space-y-7 shadow-lg">
                     <div className="flex items-baseline gap-2 mb-6 2xl:mb-8">
                       <span className="text-3xl 2xl:text-5xl font-bold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
-                      {/* <span className="text-sm text-mist-400 line-through">${villa.originalPrice?.toLocaleString()} </span> */}
+                      {villa.originalPrice && (
+                        <span className="text-sm 2xl:text-lg text-mist-400 line-through">${villa.originalPrice.toLocaleString()}</span>
+                      )}
                       <span className="text-sm 2xl:text-lg text-mist-400">USD / night</span>
                     </div>
                     {/* Date + Time Rows - UPDATED with focus/blur behavior like car form */}
@@ -1164,11 +1167,17 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-mist-200 px-6 sm:px-16 py-2.5 sm:py-3">
         <div className="flex items-center justify-between gap-2 sm:gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xl sm:text-2xl font-semibold text-mist-900 leading-none">
-              ${villa.pricePerNight.toLocaleString()}
-            </p>
-            <p className="text-xs sm:text-sm text-mist-500 leading-tight">USD / night</p>
-          </div>
+  <p className="text-xl sm:text-2xl font-semibold text-mist-900 leading-none">
+    ${villa.pricePerNight.toLocaleString()}
+  </p>
+  <p className="text-xs sm:text-sm text-mist-500 leading-tight">
+    {villa.originalPrice ? (
+      <><span className="line-through">${villa.originalPrice.toLocaleString()}</span> USD / night</>
+    ) : (
+      <span>USD / night</span>
+    )}
+  </p>
+</div>
           <button
             type="button"
             onClick={() => setShowMobileBooking(true)}
@@ -1227,6 +1236,9 @@ export default function VillaDetailClient({ villa, relatedVillas }: { villa: Vil
               <div className="bg-white border border-mist-300 rounded-lg p-5 space-y-5 shadow-lg">
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-mist-900">${villa.pricePerNight.toLocaleString()}</span>
+                  {villa.originalPrice && (
+                    <span className="text-sm text-mist-400 line-through">${villa.originalPrice.toLocaleString()}</span>
+                  )}
                   <span className="text-sm text-mist-400">USD / night</span>
                 </div>
 

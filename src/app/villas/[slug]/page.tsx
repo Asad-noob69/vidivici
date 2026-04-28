@@ -35,6 +35,7 @@ export default async function VillaDetailPage({ params }: { params: Promise<{ sl
     guests: villa.guests,
     sqft: villa.sqft,
     pricePerNight: villa.pricePerNight,
+    originalPrice: villa.originalPrice,
     cleaningFee: villa.cleaningFee,
     securityDeposit: villa.securityDeposit,
     amenities: villa.amenities,
