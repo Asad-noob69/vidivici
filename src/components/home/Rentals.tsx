@@ -1,82 +1,24 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import CarCard from "@/components/ui/CarCard";
 
-export const cars = [
-  {
-    id: 1,
-    brand: "Range Rover",
-    name: "Range Rover V8",
-    image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80",
-    seats: "5",
-    zeroToSixty: "4.4 sec",
-    engine: "523 hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: true,
-  },
-  {
-    id: 2,
-    brand: "Tesla",
-    name: "Cyber Truck",
-    image: "https://images.unsplash.com/photo-1698778573682-346d219402b5?w=800&q=80",
-    seats: "Up to 6",
-    zeroToSixty: "Under 2.9 sec",
-    engine: "800+ hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: false,
-  },
-  {
-    id: 3,
-    brand: "Porsche",
-    name: "Carrera S 992.2 Cabriolet",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
-    seats: "2+2",
-    zeroToSixty: "3.5 sec",
-    engine: "443 hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: true,
-  },
-  {
-    id: 4,
-    brand: "Rolls Royce",
-    name: "Rolls Royce Ghost",
-    image: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800&q=80",
-    seats: "4",
-    zeroToSixty: "4.8 sec",
-    engine: "563 hp",
-    pricePerDay: 899,
-    originalPrice: "2,100",
-    liked: false,
-  },
-  {
-    id: 5,
-    brand: "Lamborghini",
-    name: "Huracán EVO",
-    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
-    seats: "2",
-    zeroToSixty: "2.9 sec",
-    engine: "630 hp",
-    pricePerDay: 1299,
-    originalPrice: "2,800",
-    liked: false,
-  },
-  {
-    id: 6,
-    brand: "Ferrari",
-    name: "488 Spider",
-    image: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800&q=80",
-    seats: "2",
-    zeroToSixty: "3.0 sec",
-    engine: "660 hp",
-    pricePerDay: 1199,
-    originalPrice: "2,600",
-    liked: false,
-  },
-];
+interface CarFromAPI {
+  id: string;
+  name: string;
+  slug: string;
+  pricePerDay: number;
+  originalPrice?: number | null;
+  year: number | null;
+  seats: number;
+  transmission: string;
+  shortDescription: string | null;
+  horsepower: number | null;
+  acceleration: string | null;
+  brand: { name: string; slug: string };
+  category: { name: string; slug: string };
+  images: { url: string; isPrimary: boolean }[];
+}
 
 const CARD_WIDTH = 270 + 20;
 
@@ -85,6 +27,27 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
   const [activeIndex, setActiveIndex] = useState(0);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
+  const [cars, setCars] = useState<CarFromAPI[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCars = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/cars?limit=10&sort=newest");
+      if (res.ok) {
+        const data = await res.json();
+        setCars(data.cars || []);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCars();
+  }, [fetchCars]);
 
   const handleScroll = () => {
     const el = trackRef.current;
@@ -98,10 +61,8 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
     setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
 
-  const CARD_WIDTH = 270 + 20; // desktop
-
   const scrollTo = (index) => {
-    if (!trackRef.current) return;
+    if (!trackRef.current || cars.length === 0) return;
     const clamped = Math.max(0, Math.min(index, cars.length - 1));
 
     // Get actual card width dynamically
@@ -124,15 +85,14 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
             Exotic Car Rentals
           </h2>
 
-          <button className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base 2xl:text-xl 2xl:py-4 2xl:px-6 text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
+          <a href="/cars" className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base 2xl:text-xl 2xl:py-4 2xl:px-6 text-mist-500 bg-mist-200 border border-mist-200 rounded-xl hover:bg-mist-50 hover:border-mist-300 transition-all duration-200 whitespace-nowrap">
             View all
             <ArrowUpRight size={15} />
-          </button>
+          </a>
         </div>
       )}
 
       <div className="relative">
-
         <button
           onClick={() => scrollTo(activeIndex - 1)}
           className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full 2xl:w-12 2xl:h-12 bg-white border border-mist-200 shadow-md flex items-center justify-center hover:bg-mist-50 transition-all"
@@ -155,9 +115,56 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
           className="flex gap-5 px-6 md:px-12 overflow-x-auto pb-2 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {cars.map((car) => (
-            <CarCard key={car.id} car={car} discountBadgeText={discountBadgeText} />
-          ))}
+          {loading ? (
+            // Loading skeleton cards
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[270px] 2xl:w-[450px] flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-sm animate-pulse"
+              >
+                <div className="h-56 2xl:h-[300px] bg-mist-100" />
+                <div className="flex flex-col gap-2 2xl:gap-4 px-6 2xl:px-8 pt-3.5 2xl:pt-5 pb-4 2xl:pb-6">
+                  <div className="h-3 w-16 bg-mist-100 rounded" />
+                  <div className="h-5 w-32 bg-mist-100 rounded" />
+                  <div className="flex items-center justify-between py-3">
+                    <div className="h-8 w-12 bg-mist-100 rounded" />
+                    <div className="h-8 w-px bg-mist-100" />
+                    <div className="h-8 w-12 bg-mist-100 rounded" />
+                    <div className="h-8 w-px bg-mist-100" />
+                    <div className="h-8 w-12 bg-mist-100 rounded" />
+                  </div>
+                  <div className="h-px bg-mist-100" />
+                  <div className="flex items-center justify-between mt-0.5">
+                    <div className="h-4 w-20 bg-mist-100 rounded" />
+                    <div className="h-5 w-16 bg-mist-100 rounded" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            cars.map((car) => {
+              const primaryImage = car.images?.[0]?.url;
+              return (
+                <CarCard
+                  key={car.id}
+                  car={{
+                    id: car.id,
+                    name: car.name,
+                    slug: car.slug,
+                    image: primaryImage || "/placeholder.jpg",
+                    brand: car.brand?.name || "",
+                    seats: car.seats?.toString() || "—",
+                    zeroToSixty: car.acceleration || "—",
+                    engine: car.horsepower ? `${car.horsepower} hp` : "—",
+                    pricePerDay: car.pricePerDay,
+                    originalPrice: car.originalPrice?.toString(),
+                    liked: false,
+                  }}
+                  discountBadgeText={discountBadgeText}
+                />
+              );
+            })
+          )}
           <div className="w-6 shrink-0" />
         </div>
       </div>
