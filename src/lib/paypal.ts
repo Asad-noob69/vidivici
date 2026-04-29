@@ -61,6 +61,11 @@ export async function createPayPalOrder(
           },
         },
       ],
+      application_context: {
+        shipping_preference: "NO_SHIPPING",
+        user_action: "PAY_NOW",
+        brand_name: "Vidi Vici Hospitality Group",
+      },
     }),
   })
 
