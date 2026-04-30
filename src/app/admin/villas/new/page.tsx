@@ -43,6 +43,7 @@ function VillaForm() {
   const [amenityRows, setAmenityRows] = useState<AmenityRow[]>([{ name: "", iconKey: DEFAULT_ICON_KEY }])
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([])
   const [newFiles, setNewFiles] = useState<File[]>([])
+  const [newPrimaryIndex, setNewPrimaryIndex] = useState<number | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -118,8 +119,14 @@ function VillaForm() {
         }
       }
 
-      const keptUrls = existingImages.map(img => img.url)
-      const allImages = [...keptUrls, ...uploadedUrls]
+      const existingPart = existingImages.map((img) => ({ url: img.url, isPrimary: img.isPrimary }))
+      const newPart = uploadedUrls.map((url, i) => ({ url, isPrimary: i === newPrimaryIndex }))
+      let allImages = [...existingPart, ...newPart]
+
+      // Ensure exactly one primary. If none chosen, default to the first image.
+      if (allImages.length > 0 && !allImages.some((img) => img.isPrimary)) {
+        allImages = allImages.map((img, i) => ({ ...img, isPrimary: i === 0 }))
+      }
 
       const payload = {
         ...form,
@@ -323,6 +330,8 @@ function VillaForm() {
           onExistingChange={setExistingImages}
           newFiles={newFiles}
           onNewFilesChange={setNewFiles}
+          newPrimaryIndex={newPrimaryIndex}
+          onNewPrimaryIndexChange={setNewPrimaryIndex}
         />
 
         {/* Toggles */}

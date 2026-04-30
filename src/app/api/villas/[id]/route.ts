@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { normalizeImages, type ImageInput } from '../_helpers'
 
 export async function GET(
   request: NextRequest,
@@ -46,9 +47,9 @@ export async function PUT(
       await prisma.villaImage.deleteMany({ where: { villaId: id } })
       if (Array.isArray(images) && images.length > 0) {
         await prisma.villaImage.createMany({
-          data: (images as string[]).map((url: string, i: number) => ({
-            url,
-            isPrimary: i === 0,
+          data: normalizeImages(images as ImageInput[]).map((img) => ({
+            url: img.url,
+            isPrimary: img.isPrimary,
             villaId: id,
           })),
         })

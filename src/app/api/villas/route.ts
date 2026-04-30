@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { normalizeImages, type ImageInput } from './_helpers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -72,12 +73,7 @@ export async function POST(request: NextRequest) {
         ...villaData,
         slug,
         ...(images && images.length > 0 && {
-          images: {
-            create: (images as string[]).map((url: string, i: number) => ({
-              url,
-              isPrimary: i === 0,
-            })),
-          },
+          images: { create: normalizeImages(images as ImageInput[]) },
         }),
       },
       include: { images: true },
