@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast, { Toaster } from "react-hot-toast"
 import ImageManager, { ExistingImage } from "@/components/admin/ImageManager"
 import { AMENITY_ICONS, ICON_KEYS, DEFAULT_ICON_KEY, parseAmenity, serializeAmenities } from "@/lib/amenity-icons"
 import IconPickerInput from "@/components/ui/IconPickerInput"
-import { Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Plus, Trash2 } from "lucide-react"
 
 interface AmenityRow {
   name: string
@@ -170,7 +171,16 @@ function VillaForm() {
   if (loadingData) {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-8">{isEditing ? "Edit Villa" : "Add New Villa"}</h1>
+        <div className="flex items-center gap-3 mb-8">
+          <Link
+            href="/admin/villas"
+            className="p-1.5 rounded-lg hover:bg-mist-100 text-mist-500 hover:text-mist-900 transition-colors"
+            aria-label="Back to villas"
+          >
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-2xl font-bold">{isEditing ? "Edit Villa" : "Add New Villa"}</h1>
+        </div>
         <p className="text-mist-400 text-sm">Loading...</p>
       </div>
     )
@@ -179,7 +189,16 @@ function VillaForm() {
   return (
     <div>
       <Toaster position="top-right" />
-      <h1 className="text-2xl font-bold mb-8">{isEditing ? "Edit Villa" : "Add New Villa"}</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <Link
+          href="/admin/villas"
+          className="p-1.5 rounded-lg hover:bg-mist-100 text-mist-500 hover:text-mist-900 transition-colors"
+          aria-label="Back to villas"
+        >
+          <ArrowLeft size={18} />
+        </Link>
+        <h1 className="text-2xl font-bold">{isEditing ? "Edit Villa" : "Add New Villa"}</h1>
+      </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
         {/* Basic Info */}

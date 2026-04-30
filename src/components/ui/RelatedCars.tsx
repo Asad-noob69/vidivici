@@ -1,82 +1,7 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import CarCard from "@/components/ui/CarCard";
-
-export const cars = [
-  {
-    id: 1,
-    brand: "Range Rover",
-    name: "Range Rover V8",
-    image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80",
-    seats: "5",
-    zeroToSixty: "4.4 sec",
-    engine: "523 hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: true,
-  },
-  {
-    id: 2,
-    brand: "Tesla",
-    name: "Cyber Truck",
-    image: "https://images.unsplash.com/photo-1698778573682-346d219402b5?w=800&q=80",
-    seats: "Up to 6",
-    zeroToSixty: "Under 2.9 sec",
-    engine: "800+ hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: false,
-  },
-  {
-    id: 3,
-    brand: "Porsche",
-    name: "Carrera S 992.2 Cabriolet",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
-    seats: "2+2",
-    zeroToSixty: "3.5 sec",
-    engine: "443 hp",
-    pricePerDay: 499,
-    originalPrice: "1,425",
-    liked: true,
-  },
-  {
-    id: 4,
-    brand: "Rolls Royce",
-    name: "Rolls Royce Ghost",
-    image: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800&q=80",
-    seats: "4",
-    zeroToSixty: "4.8 sec",
-    engine: "563 hp",
-    pricePerDay: 899,
-    originalPrice: "2,100",
-    liked: false,
-  },
-  {
-    id: 5,
-    brand: "Lamborghini",
-    name: "Huracán EVO",
-    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
-    seats: "2",
-    zeroToSixty: "2.9 sec",
-    engine: "630 hp",
-    pricePerDay: 1299,
-    originalPrice: "2,800",
-    liked: false,
-  },
-  {
-    id: 6,
-    brand: "Ferrari",
-    name: "488 Spider",
-    image: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800&q=80",
-    seats: "2",
-    zeroToSixty: "3.0 sec",
-    engine: "660 hp",
-    pricePerDay: 1199,
-    originalPrice: "2,600",
-    liked: false,
-  },
-];
 
 const CARD_WIDTH = 270 + 20;
 
@@ -85,6 +10,31 @@ export default function ExoticCarRentals({ showHeader = true, discountBadgeText 
   const [activeIndex, setActiveIndex] = useState(0);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
+  const [cars, setCars] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/cars?limit=8")
+      .then((r) => r.json())
+      .then((data) => {
+        const list = Array.isArray(data.cars) ? data.cars : [];
+        setCars(
+          list.map((c: any) => ({
+            id: c.id,
+            brand: c.brand?.name ?? "",
+            name: c.name,
+            image: c.images?.[0]?.url ?? "",
+            seats: c.seats ? String(c.seats) : "-",
+            zeroToSixty: c.acceleration ?? "-",
+            engine: c.horsepower ? `${c.horsepower} hp` : "-",
+            pricePerDay: c.pricePerDay,
+            originalPrice: c.originalPrice ? String(c.originalPrice) : undefined,
+            slug: c.slug,
+            liked: false,
+          }))
+        );
+      })
+      .catch(() => {/* silently keep empty */});
+  }, []);
 
   const handleScroll = () => {
     const el = trackRef.current;
